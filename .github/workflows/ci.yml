@@ -24,7 +24,7 @@ jobs:
       run:
         working-directory: bridge
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-go@v5
         with:
@@ -58,7 +58,7 @@ jobs:
       run:
         working-directory: bridge
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-go@v5
         with:
@@ -84,7 +84,7 @@ jobs:
           - os: macos-latest
             python: "3.13"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: astral-sh/setup-uv@v6
         with:
@@ -110,7 +110,7 @@ jobs:
     name: pip-audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: astral-sh/setup-uv@v6
         with:
@@ -132,7 +132,7 @@ jobs:
       WA_MCP_DOMAIN: wa.example.test
       WA_MCP_PORT: "18765"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build the bridge image
         run: docker build -f Dockerfile.bridge -t wa-mcp-bridge:local ../..
@@ -167,7 +167,7 @@ jobs:
     name: Documentation checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-go@v5
         with:

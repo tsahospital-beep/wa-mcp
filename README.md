@@ -12,6 +12,7 @@
   <img alt="MCP compatible" src="https://img.shields.io/badge/MCP-compatible-5f8a7a?style=flat">
   <img alt="Platform: Windows, macOS, Linux" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-5f8a7a?style=flat">
   <a href="CHANGELOG.md"><img alt="Version 0.2.1" src="https://img.shields.io/badge/version-0.2.1-6c7a89?style=flat"></a>
+  <a href="https://glama.ai/mcp/servers/tsahospital-beep/wa-mcp"><img alt="WA MCP on Glama" src="https://glama.ai/mcp/servers/tsahospital-beep/wa-mcp/badges/score.svg"></a>
 </p>
 
 <p align="center">

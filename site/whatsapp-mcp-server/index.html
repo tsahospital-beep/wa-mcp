@@ -75,7 +75,7 @@
                 "name": "Which tools does the WhatsApp MCP server load?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "The v0.2.0 checkout loads core by default. Add named groups to mcp.toolsets in config.json and restart the MCP server. For example, add history alongside core to make chat export and import available."
+                  "text": "The v0.2.1 checkout loads core by default. Add named groups to mcp.toolsets in config.json and restart the MCP server. For example, add history alongside core to make chat export and import available."
                 }
               },
               {
@@ -192,7 +192,7 @@
           <div>
             <div class="kicker">Architecture guide</div>
             <h1>How the WhatsApp MCP server works</h1>
-            <p class="lead">The WhatsApp MCP server gives an assistant access to a linked account. A Go bridge collects messages and a Python server reads the store. The v0.2.0 source checkout exposes 11 core tools by default, with 53 across all toolsets.</p>
+            <p class="lead">The WhatsApp MCP server gives an assistant access to a linked account. A Go bridge collects messages and a Python server reads the store. The v0.2.1 source checkout exposes 11 core tools by default, with 53 across all toolsets.</p>
             <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
           </div>
           <div class="plate guide-plate" aria-hidden="true">
@@ -257,7 +257,7 @@
               <p>
                 Install uv so your client can launch the Python server with uvx. Give it the absolute path of the same
                 <code>config.json</code> that the bridge uses. Relative configuration paths can lead the client to look
-                for an empty store in its working directory. Start with <code>bridge_status</code> and check three
+                for an empty store in its working directory. Start with <code>get_bridge_status</code> and check three
                 separate results: the database is readable, the bridge is connected and the phone account is logged in.
               </p>
             </section>
@@ -302,7 +302,7 @@
             </section>
             <section id="faq">
               <h2>Questions</h2>
-              <details><summary>Which tools does the WhatsApp MCP server load?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>The v0.2.0 checkout loads core by default. Add named groups to mcp.toolsets in config.json and restart the MCP server. For example, add history alongside core to make chat export and import available.</p></details>
+              <details><summary>Which tools does the WhatsApp MCP server load?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>The v0.2.1 checkout loads core by default. Add named groups to mcp.toolsets in config.json and restart the MCP server. For example, add history alongside core to make chat export and import available.</p></details>
           <details>
                 <summary>
                   Is there a required background model?<svg

@@ -10,6 +10,6 @@ import (
 )
 
 // version is set at build time with -ldflags "-X main.version=...".
-var version = "0.2.0"
+var version = "0.2.1"
 
 func main() { os.Exit(wabridge.Main(os.Args[1:], wabridge.Options{Version: version})) }

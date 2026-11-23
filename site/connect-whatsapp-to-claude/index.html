@@ -75,7 +75,7 @@
                 "name": "How do I connect WhatsApp to Claude Desktop with the extension?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Open wa-mcp.mcpb from the v0.1.1 release, choose Install and select the config.json used by the running bridge. Restart Claude Desktop and ask it to run bridge_status."
+                  "text": "Open wa-mcp.mcpb from the v0.1.1 release, choose Install and select the config.json used by the running bridge. Restart Claude Desktop and ask it to run get_bridge_status."
                 }
               },
               {
@@ -109,7 +109,7 @@
               {
                 "@type": "HowToStep",
                 "name": "Check what Claude can read",
-                "text": "Ask Claude to run bridge_status . Look for a true database result, then check the connected and logged_in values under bridge. If the database result fails, check which configuration file you selected. If only the bridge is unreachable, check that the bridge process is running with the same API address and that both processes run as the user who linked the account.",
+                "text": "Ask Claude to run get_bridge_status . Look for a true database result, then check the connected and logged_in values under bridge. If the database result fails, check which configuration file you selected. If only the bridge is unreachable, check that the bridge process is running with the same API address and that both processes run as the user who linked the account.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/#section-3"
               },
               {
@@ -308,7 +308,7 @@
             <section id="section-3">
               <h2>Check what Claude can read</h2>
               <p>
-                Ask Claude to run <code>bridge_status</code>. Look for a true database result, then check the connected
+                Ask Claude to run <code>get_bridge_status</code>. Look for a true database result, then check the connected
                 and logged_in values under bridge. If the database result fails, check which configuration file you
                 selected. If only the bridge is unreachable, check that the bridge process is running with the same API
                 address and that both processes run as the user who linked the account.
@@ -347,7 +347,7 @@
             <section id="faq">
               <h2>Questions</h2>
 
-              <details><summary>How do I connect WhatsApp to Claude Desktop with the extension?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Open wa-mcp.mcpb from the v0.1.1 release, choose Install and select the config.json used by the running bridge. Restart Claude Desktop and ask it to run bridge_status.</p></details>
+              <details><summary>How do I connect WhatsApp to Claude Desktop with the extension?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Open wa-mcp.mcpb from the v0.1.1 release, choose Install and select the config.json used by the running bridge. Restart Claude Desktop and ask it to run get_bridge_status.</p></details>
           <details>
                 <summary>
                   Can Claude send a message after installation?<svg

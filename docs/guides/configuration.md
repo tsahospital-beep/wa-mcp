@@ -65,6 +65,8 @@ MCP client config, add the variable to the server's `env` block.
 
 ## Toolsets
 
+Set `mcp.legacy_tool_names` to true to advertise deprecated aliases for enabled toolsets. The default is false. Existing clients can call the aliases in either mode.
+
 Set `mcp.toolsets` to a nonempty JSON list. The default is `["core"]`, including when an older config omits
 the section. Include `core` alongside any additional sets you want. Use `["all"]` for the full catalog
 including all tools from 0.1.1. Each selection replaces the lower-priority selection in full.
@@ -129,7 +131,7 @@ its account.
 | Key | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `read_receipts.auto_mark_read` | boolean | `false` | Mark every new incoming message as read as soon as it is stored. Off by default, so reading through an assistant leaves no blue ticks. |
-| `read_receipts.allow_mark_read` | boolean | `true` | Allow the `mark_as_read` tool and the `/read` endpoint. When false, the endpoint answers 403 and nothing can send read receipts on request. |
+| `read_receipts.allow_mark_read` | boolean | `true` | Allow the `mark_messages_read` tool and the `/read` endpoint. When false, the endpoint answers 403 and nothing can send read receipts on request. |
 | `calls.record` | boolean | `true` | Store call events in the call log. When false, new call events are not stored. |
 
 ## Media
@@ -268,7 +270,7 @@ Your words extend the lists. They do not replace them. A trailing `*` in a word 
 | `tasks.reply_window_minutes` | number | `30` | How long after a request your reply still counts as accepting it. Allowed range 1 to 1440. |
 | `tasks.refresh_days` | integer | `14` | Days of chat history the tracker rebuilds from. Allowed range 1 to 3650. |
 | `tasks.min_score` | integer | `60` | Minimum score (0 to 100) for a request to create a tracked task. |
-| `tasks.stale_days` | integer | `60` | An open task with no activity for this many days becomes `stale`. Stale tasks are not shown by `my_day`. Allowed range 1 to 3650. |
+| `tasks.stale_days` | integer | `60` | An open task with no activity for this many days becomes `stale`. Stale tasks are not shown by `get_my_day`. Allowed range 1 to 3650. |
 | `tasks.keep_days` | integer | `365` | Finished (`done`, `cancelled`) and `stale` tasks older than this many days are removed from the tracker. Allowed range 1 to 36500. |
 | `tasks.include_imported` | boolean | `false` | Also detect requests and promises in messages from imported chat exports (`wa-bridge import-export`). Off by default, because old exported requests are usually finished. Tools mark such messages with `imported: true`. |
 | `mentions.watch` | list | `[]` | Words or phrases for `find_mentions`. Each entry is a phrase or an object `{"label": "Report", "words": ["report", "q3 numbers"]}`. |
@@ -286,7 +288,7 @@ A project entry has these keys:
 
 ## Insight settings
 
-These keys tune chat analytics and `my_day`.
+These keys tune chat analytics and `get_my_day`.
 
 | Key | Type | Default | Meaning |
 | --- | --- | --- | --- |

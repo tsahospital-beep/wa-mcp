@@ -5,7 +5,37 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] - Unreleased
+## [0.2.1] - Unreleased
+
+Every tool publishes a typed output schema for structured results and errors. The default catalog contains 11 tools. Tool descriptions now cover offline use and side effects.
+
+Use `list_tasks` to filter tracked work, `get_task` to inspect an id, and `find_task_for_message` to look up a stored step without refreshing the tracker. Use `detect_tasks` to score one chat or `refresh_tasks` to rebuild the index.
+
+Deprecated names still work in enabled toolsets. Set `mcp.legacy_tool_names` to true to include them in discovery.
+
+| Deprecated name | Current name |
+| --- | --- |
+| `bridge_status` | `get_bridge_status` |
+| `my_day` | `get_my_day` |
+| `chat_analytics` | `get_chat_analytics` |
+| `chat_analytics_compare` | `compare_chat_analytics` |
+| `tasks_overview` | `list_tasks` |
+| `task_detail` | `get_task` |
+| `which_task` | `find_task_for_message` |
+| `project_overview` | `get_project_overview` |
+| `whats_new` | `list_whats_new` |
+| `agent_status` | `get_agent_status` |
+| `agent_test` | `test_agent_provider` |
+| `agent_drafts` | `list_agent_drafts` |
+| `agent_approve_draft` | `approve_agent_draft` |
+| `agent_pause` | `pause_agent` |
+| `agent_resume` | `resume_agent` |
+| `mark_as_read` | `mark_messages_read` |
+| `list_scheduled` | `list_scheduled_messages` |
+| `cancel_scheduled` | `cancel_scheduled_message` |
+| `react_to_message` | `set_message_reaction` |
+
+## [0.2.0] - 2026-11-23
 
 - Add an offline demo with eight fictional chats, searchable voice transcripts and a daily task briefing.
   Start it with `uvx wa-mcp-server --demo` or set `WA_MCP_DEMO=1`.
@@ -228,6 +258,7 @@ Initial release.
   than 2 MiB are refused. The untrusted-content note also names transcripts, image text, image descriptions
   and AI summaries.
 
-[0.2.0]: https://github.com/tsahospital-beep/wa-mcp/compare/v0.1.1...main
+[0.2.1]: https://github.com/tsahospital-beep/wa-mcp/compare/v0.2.0...main
+[0.2.0]: https://github.com/tsahospital-beep/wa-mcp/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/tsahospital-beep/wa-mcp/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/tsahospital-beep/wa-mcp/releases/tag/v0.1.0

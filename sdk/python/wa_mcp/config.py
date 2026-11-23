@@ -20,7 +20,7 @@ from wa_mcp import secretfile
 from wa_mcp.agent import settings as agent_settings
 
 DEFAULTS: dict[str, Any] = {
-    "mcp": {"toolsets": ["core"]},
+    "mcp": {"toolsets": ["core"], "legacy_tool_names": False},
     "store_dir": "store",
     "downloads_dir": "downloads",
     "exports_dir": "exports",

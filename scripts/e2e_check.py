@@ -795,7 +795,7 @@ def step_ocr(ctx: Ctx) -> None:
     items = [i for i in text.get("items", []) if i.get("source") == "image"]
     if not items:
         raise Fail(
-            f"no text was read from the image ({text.get('hint', 'check bridge_status for ocr_ready')})"
+            f"no text was read from the image ({text.get('hint', 'check get_bridge_status for ocr_ready')})"
         )
     ocr_text = str(items[0].get("text", ""))
     ctx.note("text read", code(" ".join(ocr_text.split())[:200]))
@@ -1149,12 +1149,12 @@ def step_http_mcp(ctx: Ctx) -> None:
                 "jsonrpc": "2.0",
                 "id": 3,
                 "method": "tools/call",
-                "params": {"name": "bridge_status", "arguments": {}},
+                "params": {"name": "get_bridge_status", "arguments": {}},
             }
             status = parse_sse_or_json(http.post(f"{base}/mcp", json=call, headers=auth2))
-            ctx.note("bridge_status over HTTP", "answered" if status.get("result") else "no result")
+            ctx.note("get_bridge_status over HTTP", "answered" if status.get("result") else "no result")
             if not status.get("result"):
-                raise Fail("bridge_status over HTTP returned no result")
+                raise Fail("get_bridge_status over HTTP returned no result")
             _manage_token(ctx, "revoke", name)
             revoked = True
             after = http.post(f"{base}/mcp", json=init, headers=auth)

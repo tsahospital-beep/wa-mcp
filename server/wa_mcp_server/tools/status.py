@@ -6,16 +6,17 @@ from mcp.server.fastmcp import FastMCP
 
 from wa_mcp import db, transcribe, vision
 from wa_mcp.client import BridgeError, load_token
-from wa_mcp_server.common import Result, bridge, cfg, hints, load_errors, ok, safe
+from wa_mcp_server import outputs
+from wa_mcp_server.common import Result, bridge, cfg, hints, load_errors, ok, structured
 
 
 def register(mcp: FastMCP) -> None:
     @mcp.tool(annotations=hints("Check bridge status", read_only=True))
-    @safe
-    def bridge_status() -> Result:
-        """Check whether one account's bridge is reachable and logged in before requesting history or
-        sending. Returns bridge, database, sending_enabled, require_confirm, backend readiness and
-        security_events. Report security warnings to the user. Use list_chats to browse stored conversations or list_accounts in the accounts toolset to check other bridges.
+    @structured(outputs.Output[outputs.BridgeStatus])
+    def get_bridge_status() -> Result:
+        """Check whether this account is linked and ready to send.
+
+        Use list_accounts to check several accounts. An offline bridge is reported alongside local diagnostics. Demo reports an unlinked archive with sending disabled.
         """
         c = cfg()
         if c.demo:

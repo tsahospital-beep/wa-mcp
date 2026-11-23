@@ -1,12 +1,12 @@
 [project]
 name = "wa-mcp-server"
-version = "0.2.0"
+version = "0.2.1"
 description = "MCP server (stdio and Streamable HTTP) that gives AI assistants access to a wa-mcp WhatsApp bridge"
 license = "MIT"
 authors = [{ name = "tsahospital-beep" }]
 requires-python = ">=3.11"
 dependencies = [
-    "wa-mcp-sdk>=0.2.0",
+    "wa-mcp-sdk>=0.2.1",
     "mcp~=1.30",
 ]
 

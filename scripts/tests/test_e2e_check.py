@@ -487,7 +487,7 @@ def test_encryption_step_detects_plain_text_in_a_sealed_store(
 
 
 def real_cfg(tmp_path: Path) -> wa_config.Config:
-    """A config with an empty store folder: enough for the server to start and answer bridge_status."""
+    """A config with an empty store folder: enough for the server to start and answer get_bridge_status."""
     return wa_config.load(synth.make_config(tmp_path))
 
 
@@ -497,7 +497,7 @@ def test_stdio_client_talks_to_the_real_server(tmp_path: Path) -> None:
     client.start()
     try:
         assert "list_messages" in client.tool_names()
-        status = client.call("bridge_status", {})
+        status = client.call("get_bridge_status", {})
         assert status["ok"] is True and status["database"] is False
         assert client.call("list_accounts", {})["count"] == 1
         assert client.call("list_messages", {"limit": 1})["ok"] is False  # no database in this store

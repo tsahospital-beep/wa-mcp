@@ -43,7 +43,7 @@ def _post(srv: remote_env.Server, token: str = "", **kw: Any) -> httpx.Response:
 def test_mcp_over_http_with_a_token(server: dict[str, Any]) -> None:
     out = asyncio.run(remote_env.mcp_session(server["srv"].base + "/mcp", token=server["tokens"]["laptop"]))
     assert out["server"] == "wa-mcp"
-    assert {"list_chats", "list_messages", "send_message", "bridge_status"} <= out["tools"]
+    assert {"list_chats", "list_messages", "send_message", "get_bridge_status"} <= out["tools"]
     assert out["list_chats"]["ok"] is True and out["list_chats"]["chats"]
 
 

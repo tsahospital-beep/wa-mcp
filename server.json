@@ -6,11 +6,11 @@
     "url": "https://github.com/tsahospital-beep/wa-mcp",
     "source": "github"
   },
-  "version": "0.2.0",
+  "version": "0.2.1",
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/tsahospital-beep/wa-mcp-server:0.2.0",
+      "identifier": "ghcr.io/tsahospital-beep/wa-mcp-server:0.2.1",
       "transport": { "type": "stdio" },
       "runtimeHint": "docker",
       "runtimeArguments": [

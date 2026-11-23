@@ -37,11 +37,11 @@ EXPECTED_TOOLS = {
     "request_chat_history", "sync_chat_history", "sync_all_history", "download_media", "download_chat_media",
     "export_chat", "export_period", "get_media_text", "list_stickers", "transcribe_chat_audio",
     "extract_file_text", "fetch_shared_docs", "send_message", "send_file", "send_voice_note", "send_sticker",
-    "mark_as_read", "list_calls", "schedule_message", "list_scheduled", "cancel_scheduled", "bridge_status",
+    "mark_messages_read", "list_calls", "schedule_message", "list_scheduled_messages", "cancel_scheduled_message", "get_bridge_status",
 }  # fmt: skip
 INSIGHT_TOOLS = {
-    "my_day", "chat_analytics", "chat_analytics_compare", "detect_tasks", "tasks_overview", "task_detail",
-    "which_task", "refresh_tasks", "project_overview", "whats_new", "find_mentions",
+    "get_my_day", "get_chat_analytics", "compare_chat_analytics", "detect_tasks", "list_tasks", "get_task",
+    "find_task_for_message", "refresh_tasks", "get_project_overview", "list_whats_new", "find_mentions",
 }  # fmt: skip
 T0_DAY = datetime.fromtimestamp(synth.T0).date().isoformat()
 
@@ -222,7 +222,9 @@ async def _session(
         for name, arguments in calls:
             res = await session.call_tool(name, arguments, read_timeout_seconds=timedelta(seconds=90))
             text = "".join(getattr(c, "text", "") for c in res.content)
+            assert not res.isError, (name, text)
             data = json.loads(text)
+            assert res.structuredContent == data, name
             data["_raw"] = text
             results.append(data)
     return names, results
@@ -239,7 +241,7 @@ def run(env: dict[str, Any]) -> dict[str, Any]:
     in_store = env["root"] / "store" / "inside.ogg"
     in_store.write_bytes(b"OggS")
     calls: list[tuple[str, dict[str, Any]]] = [
-        ("bridge_status", {}),
+        ("get_bridge_status", {}),
         ("search_contacts", {"query": "ally"}),
         ("list_chats", {"offset": -12}),
         ("get_chat", {"chat": "Alice"}),
@@ -277,24 +279,24 @@ def run(env: dict[str, Any]) -> dict[str, Any]:
         ("list_messages", {"kinds": ["hologram"]}),
         ("check_links", {"chat": "Bob"}),
         ("send_message", {"to": synth.ALICE, "text": "x" * 12001, "confirm": True}),
-        ("mark_as_read", {"chat": "Alice", "message_ids": ["A1"]}),
+        ("mark_messages_read", {"chat": "Alice", "message_ids": ["A1"]}),
         ("list_calls", {"limit": 1, "offset": 1}),
         (
             "schedule_message",
             {"to": synth.GROUP, "at": "2030-01-01T18:00:00Z", "text": "Reading", "confirm": True},
         ),
-        ("list_scheduled", {"status": "pending"}),
-        ("cancel_scheduled", {"scheduled_id": 1}),
+        ("list_scheduled_messages", {"status": "pending"}),
+        ("cancel_scheduled_message", {"scheduled_id": 1}),
         ("refresh_tasks", {"days": 3650}),
-        ("my_day", {"date": T0_DAY}),
-        ("chat_analytics", {"chat": "Alice", "detail": "brief"}),
-        ("chat_analytics_compare", {"chats": ["Alice", "Bob"]}),
+        ("get_my_day", {"date": T0_DAY}),
+        ("get_chat_analytics", {"chat": "Alice", "detail": "brief"}),
+        ("compare_chat_analytics", {"chats": ["Alice", "Bob"]}),
         ("detect_tasks", {"chat": "Book club"}),
-        ("tasks_overview", {"open_only": False}),
-        ("task_detail", {"query": "book"}),
-        ("which_task", {"message_id": "A1"}),
-        ("project_overview", {"project": "Reading"}),
-        ("whats_new", {"hours": 24 * 3650}),
+        ("list_tasks", {"open_only": False}),
+        ("get_task", {"task_id": "absent"}),
+        ("find_task_for_message", {"message_id": "A1"}),
+        ("get_project_overview", {"project": "Reading"}),
+        ("list_whats_new", {"hours": 24 * 3650}),
         ("find_mentions", {"days": 3650, "words": ["library"]}),
     ]
     names, results = asyncio.run(_session(env["cfg"], calls))
@@ -316,9 +318,9 @@ def test_no_secret_in_any_output(run: dict[str, Any]) -> None:
 
 def test_read_tools(run: dict[str, Any]) -> None:
     by = run["by"]
-    assert by["bridge_status"][0]["bridge"]["connected"] is True
-    assert by["bridge_status"][0]["app_state"] == {"regular_high": "recovering"}
-    assert by["bridge_status"][0]["transcription_ready"] is True
+    assert by["get_bridge_status"][0]["bridge"]["connected"] is True
+    assert by["get_bridge_status"][0]["app_state"] == {"regular_high": "recovering"}
+    assert by["get_bridge_status"][0]["transcription_ready"] is True
     assert by["search_contacts"][0]["contacts"][0]["jids"] == [synth.ALICE, synth.ALICE_LID]
     assert by["list_chats"][0]["offset"] == 0
     assert by["list_messages"][0]["next_offset"] == by["list_messages"][0]["count"]
@@ -386,10 +388,10 @@ def test_send_tools(run: dict[str, Any], env: dict[str, Any]) -> None:
         assert converted.parent.parent == env["root"] / "exports" / "outgoing"
         assert not converted.exists() and not converted.parent.exists()
     assert by["send_sticker"][0]["ok"] and sends[-1]["sticker_path"].endswith("wave.webp")
-    assert by["mark_as_read"][0]["marked"] == 1
+    assert by["mark_messages_read"][0]["marked"] == 1
     assert by["schedule_message"][0]["id"] == 9
-    assert by["list_scheduled"][0]["scheduled"][0]["text"] == "Reading tonight"
-    assert by["cancel_scheduled"][0]["cancelled"] is True
+    assert by["list_scheduled_messages"][0]["scheduled"][0]["text"] == "Reading tonight"
+    assert by["cancel_scheduled_message"][0]["cancelled"] is True
 
 
 def test_insight_tools(run: dict[str, Any]) -> None:
@@ -398,24 +400,24 @@ def test_insight_tools(run: dict[str, Any]) -> None:
     for name in INSIGHT_TOOLS:
         assert by[name][0]["ok"] is True, (name, by[name][0])
     assert by["refresh_tasks"][0]["chats"] >= 3
-    day = by["my_day"][0]
+    day = by["get_my_day"][0]
     assert day["date"] == T0_DAY and day["summary"].startswith(T0_DAY) and isinstance(day["people"], list)
     assert UNTRUSTED in day["note"]
-    ana = by["chat_analytics"][0]
+    ana = by["get_chat_analytics"][0]
     assert ana["meta"]["detail"] == "brief" and ana["sections"]["volume"]["n"] > 0
     assert ana["summary"].startswith("Chat with Alice Example")
-    assert len(by["chat_analytics_compare"][0]["rows"]) == 2
+    assert len(by["compare_chat_analytics"][0]["rows"]) == 2
     det = by["detect_tasks"][0]
     assert det["is_group"] is True and {d["category"] for d in det["detections"]} <= {
         "CHAT",
         "TEAM",
         "PRECURSOR",
     }
-    assert by["tasks_overview"][0]["count"] == len(by["tasks_overview"][0]["tasks"])
-    assert by["task_detail"][0]["found"] is False
-    assert by["which_task"][0]["found"] is False
-    assert by["project_overview"][0]["configured"] is False
-    assert isinstance(by["whats_new"][0]["steps"], list)
+    assert by["list_tasks"][0]["count"] == len(by["list_tasks"][0]["tasks"])
+    assert by["get_task"][0]["found"] is False
+    assert by["find_task_for_message"][0]["found"] is False
+    assert by["get_project_overview"][0]["configured"] is False
+    assert isinstance(by["list_whats_new"][0]["steps"], list)
     found = by["find_mentions"][0]
     assert found["count"] >= 1 and found["mentions"][0]["message_id"] == "A4"
     carries_text = INSIGHT_TOOLS - {"refresh_tasks"}
@@ -464,7 +466,7 @@ def test_untrusted_notes_and_push_names(run: dict[str, Any]) -> None:
         "list_chats",
         "get_chat",
         "list_calls",
-        "list_scheduled",
+        "list_scheduled_messages",
         "list_stickers",
         "download_media",
         "download_chat_media",
@@ -482,7 +484,8 @@ def test_tool_annotations(tmp_path: Path) -> None:
     tools: list[Any] = []
     asyncio.run(_session(cfg, [], tools_out=tools))
     for tool in tools:
-        assert tool.description and tool.annotations and tool.annotations.title, tool.name
+        assert tool.outputSchema and tool.outputSchema["type"] == "object", tool.name
+        assert tool.description and tool.annotations and tool.title == tool.annotations.title, tool.name
         for key in ("readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint"):
             assert isinstance(getattr(tool.annotations, key), bool), (tool.name, key)
         for name, prop in tool.inputSchema["properties"].items():
@@ -494,28 +497,30 @@ def test_tool_annotations(tmp_path: Path) -> None:
         "send_voice_note",
         "send_sticker",
         "schedule_message",
-        "mark_as_read",
+        "forward_message",
     ):
-        assert ann[name] is not None and ann[name].destructiveHint is True, name
+        assert ann[name] and not ann[name].readOnlyHint and not ann[name].destructiveHint, name
+        assert ann[name].openWorldHint and not ann[name].idempotentHint, name
+    assert ann["mark_messages_read"].destructiveHint
     for name in (
         "list_messages",
         "list_chats",
         "search_contacts",
         "get_media_text",
         "list_calls",
-        "bridge_status",
+        "get_bridge_status",
     ):
         assert ann[name] is not None and ann[name].readOnlyHint is True, name
     # Tools that may refresh the local task cache (insight.db) are honest about it.
-    writes = {"refresh_tasks", "my_day", "chat_analytics", "tasks_overview", "task_detail", "which_task"}
-    writes |= {"chat_analytics_compare", "project_overview", "whats_new"}
+    writes = {"refresh_tasks", "get_my_day", "get_chat_analytics", "list_tasks"}
+    writes |= {"compare_chat_analytics", "get_project_overview", "list_whats_new"}
     for name in INSIGHT_TOOLS - writes:
         assert ann[name] is not None and ann[name].readOnlyHint is True, name
     for name in writes:
         a = ann[name]
         assert a is not None and a.readOnlyHint is False, name
-        assert a.destructiveHint == (name != "chat_analytics_compare"), name
-    for name in ("my_day", "check_links", "read_images", "extract_file_text", "transcribe_chat_audio"):
+        assert a.destructiveHint == (name != "compare_chat_analytics"), name
+    for name in ("get_my_day", "check_links", "read_images", "extract_file_text", "transcribe_chat_audio"):
         assert ann[name] is not None and ann[name].openWorldHint is True, name
     assert ann["check_links"].readOnlyHint is True
 
@@ -558,13 +563,13 @@ def test_agent_tools_over_stdio(env: dict[str, Any], tmp_path: Path, monkeypatch
         return ElicitResult(action="accept", content={"approve": True})
 
     calls = [
-        ("agent_status", {}),
-        ("agent_test", {}),
-        ("agent_drafts", {}),
-        ("agent_pause", {}),
-        ("agent_resume", {}),
-        ("agent_approve_draft", args),
-        ("agent_approve_draft", args),
+        ("get_agent_status", {}),
+        ("test_agent_provider", {}),
+        ("list_agent_drafts", {}),
+        ("pause_agent", {}),
+        ("resume_agent", {}),
+        ("approve_agent_draft", args),
+        ("approve_agent_draft", args),
     ]
     _, results = asyncio.run(_session(path, calls, elicit=elicit))
     assert results[0]["mode"] == "approve" and results[1]["preview"] == "Thanks for your message."
@@ -630,7 +635,7 @@ def test_bridge_status_reports_failed_module(tmp_path: Path, monkeypatch: pytest
     monkeypatch.setattr(app, "OPTIONAL_MODULES", ("broken_tools_mod",))
     cfg = synth.make_config(tmp_path, port=_free_port())
     mcp = app.create_app(config.load(cfg))
-    out = asyncio.run(mcp.call_tool("bridge_status", {}))
+    out = asyncio.run(mcp.call_tool("get_bridge_status", {}))
     blocks = out[0] if isinstance(out, tuple) else out
     data = json.loads("".join(getattr(b, "text", "") for b in blocks))
     assert data["tool_modules_failed"] == {"broken_tools_mod": "RuntimeError: missing dependency"}
@@ -657,7 +662,7 @@ def test_message_actions_over_stdio(env: dict[str, Any]) -> None:
     own = {"chat": synth.ALICE, "message_id": "A2"}
     incoming = {"chat": synth.ALICE, "message_id": "A1"}
     calls = [
-        ("react_to_message", {**incoming, "emoji": THUMBS}),
+        ("set_message_reaction", {**incoming, "emoji": THUMBS}),
         ("edit_message", {**own, "text": "Updated meeting"}),
         ("delete_message", own),
         ("forward_message", {**incoming, "to": synth.BOB}),

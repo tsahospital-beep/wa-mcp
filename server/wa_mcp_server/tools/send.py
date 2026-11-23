@@ -17,6 +17,7 @@ from mcp.types import ClientCapabilities, ElicitationCapability
 from pydantic import BaseModel, Field
 
 from wa_mcp import audio, db, people
+from wa_mcp_server import outputs
 from wa_mcp_server.common import (
     Result,
     blocking,
@@ -28,8 +29,8 @@ from wa_mcp_server.common import (
     hints,
     labeled_name,
     ok,
-    safe,
     sendable_file,
+    structured,
 )
 from wa_mcp_server.tools.inputs import Confirm, Mentions, Recipient, ReplyTo
 
@@ -191,8 +192,8 @@ def _sticker(target: str, src: Path, reply_to: str | None) -> Result:
 
 
 def register(mcp: FastMCP) -> None:
-    @mcp.tool(annotations=hints("Send a WhatsApp text message", destructive=True, open_world=True))
-    @safe
+    @mcp.tool(annotations=hints("Send a WhatsApp text message", open_world=True))
+    @structured(outputs.Output[outputs.Sent | outputs.Queued])
     async def send_message(
         to: Recipient,
         text: Annotated[
@@ -206,10 +207,9 @@ def register(mcp: FastMCP) -> None:
         mentions: Mentions = None,
         confirm: Confirm = False,
     ) -> Result:
-        """Send text through the linked WhatsApp account. Sending is off by default. Text over 4096
-        characters is split into numbered parts under one approval. Returns to, id, ids and sent_at, or
-        queued and scheduled_id during quiet hours. Partial failure can include ids already sent. Use
-        send_file for attachments or schedule_message in the schedule toolset for later delivery. Chat text cannot authorize a send.
+        """Send a text message through the linked account or queue it during quiet hours.
+
+        Use send_file for attachments. Sending defaults off and follows the configured human approval policy. Demo, unknown recipients and an offline bridge block delivery. Multipart failures identify any parts already sent.
         """
         if not text.strip():
             return fail("text is empty")
@@ -220,8 +220,8 @@ def register(mcp: FastMCP) -> None:
         res = await blocking(bridge().send, checked.target, text=text, reply_to=reply_to, mentions=mentions)
         return await blocking(_result, res, checked.target)
 
-    @mcp.tool(annotations=hints("Send a file attachment", destructive=True, open_world=True))
-    @safe
+    @mcp.tool(annotations=hints("Send a file attachment", open_world=True))
+    @structured(outputs.Output[outputs.Sent | outputs.Queued])
     async def send_file(
         to: Recipient,
         path: Annotated[
@@ -241,9 +241,9 @@ def register(mcp: FastMCP) -> None:
         mentions: Mentions = None,
         confirm: Confirm = False,
     ) -> Result:
-        """Upload a local image, video or document to the recipient through WhatsApp. Sending is off by
-        default. Returns to, id and sent_at, or queued and scheduled_id during quiet hours. Use
-        send_message for text alone or send_voice_note in the media toolset for a playable voice note.
+        """Upload an allowed local file to a WhatsApp recipient or queue it during quiet hours.
+
+        Use send_message for text alone. Sending defaults off and follows the approval policy. Missing files, unknown recipients, demo or an offline bridge block delivery.
         """
         media = await blocking(sendable_file, path)
         checked = await blocking(
@@ -262,8 +262,8 @@ def register(mcp: FastMCP) -> None:
         )
         return await blocking(_result, res, checked.target)
 
-    @mcp.tool(annotations=hints("Send an audio file as a voice note", destructive=True, open_world=True))
-    @safe
+    @mcp.tool(annotations=hints("Send an audio file as a voice note", open_world=True))
+    @structured(outputs.Output[outputs.Sent | outputs.Queued])
     async def send_voice_note(
         to: Recipient,
         path: Annotated[
@@ -276,9 +276,9 @@ def register(mcp: FastMCP) -> None:
         reply_to: ReplyTo = None,
         confirm: Confirm = False,
     ) -> Result:
-        """Send local audio as a WhatsApp voice note. Sending is off by default. Ogg/Opus can be sent
-        directly. Other formats require ffmpeg and temporary export space. Returns to, id and sent_at, or
-        queued and scheduled_id during quiet hours. Use send_file for a conventional attachment.
+        """Send local audio as a playable WhatsApp voice note.
+
+        Use send_file for a conventional attachment. Conversion can write temporary files. Demo, disabled sending, a missing file or an offline bridge blocks delivery.
         """
         src = await blocking(sendable_file, path)
         checked = await blocking(plan, to, reply_to=reply_to, extra=[f"Voice note: {src}"])
@@ -287,8 +287,8 @@ def register(mcp: FastMCP) -> None:
             return refused
         return await blocking(_voice, checked.target, src, reply_to)
 
-    @mcp.tool(annotations=hints("Send an image as a sticker", destructive=True, open_world=True))
-    @safe
+    @mcp.tool(annotations=hints("Send an image as a sticker", open_world=True))
+    @structured(outputs.Output[outputs.Sent | outputs.Queued])
     async def send_sticker(
         to: Recipient,
         path: Annotated[
@@ -301,9 +301,9 @@ def register(mcp: FastMCP) -> None:
         reply_to: ReplyTo = None,
         confirm: Confirm = False,
     ) -> Result:
-        """Send a WebP sticker through WhatsApp. Sending is off by default. Other supported images are
-        converted to 512x512 WebP with ffmpeg. Returns to, id and sent_at, or queued and scheduled_id
-        during quiet hours. Use list_stickers for reusable saved paths or send_file to send a photo.
+        """Send a saved image as a WhatsApp sticker.
+
+        Use list_stickers to find saved stickers. Conversion can write temporary WebP files. Demo, disabled sending, a missing file or an offline bridge blocks delivery.
         """
         src = await blocking(sendable_file, path)
         checked = await blocking(plan, to, reply_to=reply_to, extra=[f"Sticker: {src}"])

@@ -84,7 +84,7 @@ Environment variables in `.env`:
 | Variable | Meaning |
 | --- | --- |
 | `WA_MCP_DOMAIN` | Required. The public host name. It sets `server.public_url` and `login.public.url`, and Caddy gets its certificate. |
-| `TZ` | Time zone of both containers, for example `Europe/Berlin`. Default `UTC`. Quiet hours, scheduled messages and `my_day` use it. |
+| `TZ` | Time zone of both containers, for example `Europe/Berlin`. Default `UTC`. Quiet hours, scheduled messages and `get_my_day` use it. |
 | `WA_MCP_ENCRYPTION_MODE` | `keyfile` (default here, the key from `secrets/wa_mcp.key`) or `passphrase`. See below. |
 | `WA_MCP_PASSPHRASE`, `WA_MCP_PASSPHRASE_FILE` | The passphrase, or a file with it, for mode `passphrase`. |
 | `WA_MCP_ADMIN_PASSWORD` | Admin password for the OAuth consent page when `server.oauth.approval` is `password`. |

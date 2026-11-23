@@ -111,7 +111,7 @@ The MCP server reads the same `config.json` and needs no extra setup. Restart th
 
 - Every tool takes an optional `account`. Without it a tool works on `default`. Ask: "Search the work account
   for invoice." The assistant calls `list_messages` with `account` set to `work`.
-- `my_day` without `account` covers all accounts. Every group and item then has an `account` field.
+- `get_my_day` without `account` covers all accounts. Every group and item then has an `account` field.
 - Send tools use the sending settings of the chosen account, and the approval question names the account
   that the message goes out from.
 - Sending limits, quiet hours and duplicate checks are counted per number, because every bridge keeps its own

@@ -75,7 +75,7 @@ In `config.json`:
 ```
 
 `vision.languages` lists the Tesseract language codes. Each code needs its data file. RapidOCR ignores the
-list. Restart the client so that the server reads the file, then ask: "Run bridge_status." You should see
+list. Restart the client so that the server reads the file, then ask: "Run get_bridge_status." You should see
 `ocr_engine` with your choice and `ocr_ready` as `true`. If it is `false`, `ocr_hint` says what is missing.
 
 ### 4. Read the text of the images

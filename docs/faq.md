@@ -101,14 +101,14 @@ dates are English. Add your words under `tasks.keywords`, `insight.words` and `i
 
 ### The analytics use a language model
 
-`chat_analytics`, `detect_tasks`, the tracker and the structured `my_day` result use local rules.
-With `summary=true`, `my_day` can ask your configured AI provider to write a briefing.
+`get_chat_analytics`, `detect_tasks`, the tracker and the structured `get_my_day` result use local rules.
+With `summary=true`, `get_my_day` can ask your configured AI provider to write a briefing.
 
 ### Task statuses
 
 The tracker uses the statuses `new`, `in_progress`, `waiting`, `done`, `cancelled` and `stale`. An open task
 with no activity for `tasks.stale_days` days (60 by default) becomes `stale` and is no longer shown by
-`my_day`. Finished and stale tasks older than `tasks.keep_days` (365 by default) are removed from the
+`get_my_day`. Finished and stale tasks older than `tasks.keep_days` (365 by default) are removed from the
 tracker. The tracker rebuilds from your chats, and `refresh_tasks` runs the rebuild on demand. Your
 messages are not touched. `find_mentions` answers with `has_more` set to `true` when more matches exist, and
 you page through them with `offset`.
@@ -121,13 +121,13 @@ appear in normal results with that `kind`.
 
 ### Blue ticks
 
-Reading through an assistant does not send read receipts. Use `mark_as_read`, or turn on
+Reading through an assistant does not send read receipts. Use `mark_messages_read`, or turn on
 `read_receipts.auto_mark_read`. A reply marks the chat read first unless you set
 `sending.mark_read_before_reply` to `false`.
 
 ### Group messages
 
-Groups appear as chats with `is_group` set. Task detection and `my_day` treat a group message as yours
+Groups appear as chats with `is_group` set. Task detection and `get_my_day` treat a group message as yours
 only when it mentions you, replies to you or uses one of your names (`insight.my_names`).
 
 ### Sending does nothing
@@ -136,7 +136,7 @@ Check these in order: `sending.enabled` is `true` and the bridge was restarted, 
 that the client showed (or, in a client without that question, `sending.allow_confirm_flag` is enabled and the call included `confirm=true`), the
 recipient is a JID, a phone number, an alias or an exact address-book name, the file is in an allowed
 folder, and the answer is not a limit, a duplicate or quiet hours. A queued message during quiet hours shows
-up in `list_scheduled` as pending.
+up in `list_scheduled_messages` as pending.
 
 ## Problems
 

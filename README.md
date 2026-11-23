@@ -11,7 +11,7 @@
   <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-4f7c9a?style=flat">
   <img alt="MCP compatible" src="https://img.shields.io/badge/MCP-compatible-5f8a7a?style=flat">
   <img alt="Platform: Windows, macOS, Linux" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-5f8a7a?style=flat">
-  <a href="CHANGELOG.md"><img alt="Version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-6c7a89?style=flat"></a>
+  <a href="CHANGELOG.md"><img alt="Version 0.2.1" src="https://img.shields.io/badge/version-0.2.1-6c7a89?style=flat"></a>
 </p>
 
 <p align="center">
@@ -31,7 +31,7 @@
 
 ## Try it without a phone
 
-With uv installed, `uvx wa-mcp-server --demo` starts a fictional archive of eight chats. The demo needs WA MCP 0.2.0 or later and runs offline after installation. Use the [install buttons](#quick-start) or copy the config for your client.
+With uv installed, `uvx wa-mcp-server --demo` starts a fictional archive of eight chats. The demo needs WA MCP 0.2.1 or later and runs offline after installation. Use the [install buttons](#quick-start) or copy the config for your client.
 
 **Claude Code**
 
@@ -75,7 +75,7 @@ Ask “What are my tasks today?”, then search for “blue umbrella” and read
 | Area | What it does |
 | --- | --- |
 | Login window | Links your account from a small local window with a QR code or a pairing code for your phone number. The terminal prints the QR code as a fallback. |
-| Several accounts | More than one WhatsApp number in one MCP server: one bridge per number with its own store and sending limits, `wa-bridge run-all` keeps them running, every tool takes an `account` argument and `my_day` covers all numbers. A config without accounts works as before. See [Several accounts](docs/guides/accounts.md). |
+| Several accounts | More than one WhatsApp number in one MCP server: one bridge per number with its own store and sending limits, `wa-bridge run-all` keeps them running, every tool takes an `account` argument and `get_my_day` covers all numbers. A config without accounts works as before. See [Several accounts](docs/guides/accounts.md). |
 | History | Stores live messages and the history your phone sends after linking, and applies edits, deletions and reactions. Tools ask the phone for older pages, per chat or for the whole archive. |
 | Chat import | Loads a WhatsApp "Export chat" file (`.txt`, or `.zip` with media) into the store, for history older than what the phone syncs. Reads Android and iPhone layouts in many date and clock formats, detects the date order, skips messages that are already stored and can be run again safely. Run it as a dry run first. |
 | Media | Downloads images, video, audio, voice notes, documents and stickers. When the WhatsApp copy has expired, the bridge asks your phone to upload it again. |
@@ -85,7 +85,7 @@ Ask “What are my tasks today?”, then search for “blue umbrella” and read
 | Documents and archives | Reads text from PDF, DOCX, XLSX, PPTX, plain text and HTML files, lists ZIP and RAR archives without unpacking them, and reads public Google Docs links. |
 | Chat analytics | Message volume, reply timing in both directions, message length, emoji, stickers, voice notes, formality and group roles. Compares up to 8 chats. |
 | Tasks | Detects requests in chats with plain rules, tracks their status and finds watched words. No language model is involved. |
-| `my_day` | One call that lists what needs you today: open requests, your own promises that are due, chats waiting for your answer, missed calls and scheduled sends. |
+| `get_my_day` | One call that lists what needs you today: open requests, your own promises that are due, chats waiting for your answer, missed calls and scheduled sends. |
 | Sending | Text, files, voice notes and stickers, with replies and mentions. Off by default. You approve each send in your client when it supports that; other clients need `sending.allow_confirm_flag`. |
 | Human-like sending | Sending paces itself like a person would. The bridge marks the chat read first, shows the typing indicator for a time that depends on the message length, leaves a pause between messages, and follows quiet hours and per-hour limits. This makes automated sending look less mechanical. It does not guarantee anything. |
 | Read receipts | Marks messages as read on request, or automatically if you turn that on. |
@@ -97,10 +97,10 @@ Ask “What are my tasks today?”, then search for “blue umbrella” and read
 | Embedding | The Go package `bridge/pkg/wabridge` runs the bridge inside another program, with hooks for every stored message and chat, extra HTTP routes and access to sending, media and history. `wa_mcp_server.embed.register` adds chosen tools to another MCP server. |
 | Remote access | `wa-mcp serve --http` serves MCP over Streamable HTTP for remote clients such as claude.ai custom connectors, Claude Code, Cursor and VS Code. Per-device bearer tokens (stored hashed) or OAuth 2.1 with PKCE, dynamic registration and an owner approval page. Rate limits, Host and Origin checks, no CORS by default, and TLS proxy support. See [Connect remotely](docs/guides/remote-clients.md). |
 | Server deployment | Docker images for the bridge and the server (non-root, read-only file system, health checks) and a Compose file with optional Caddy for automatic HTTPS. The login page works through the proxy with a one-time link. See [Run on a server](docs/guides/server.md). Public images are available for v0.1.0. CI builds them and starts the preview stack on pushes to `main`. |
-| AI providers (optional) | Off by default: your assistant does the thinking. You can set one background provider, Ollama, an OpenAI-compatible server or Anthropic, for `my_day` summaries and image descriptions. Keys come from environment variables, and daily call and input limits guard the cost. |
+| AI providers (optional) | Off by default: your assistant does the thinking. You can set one background provider, Ollama, an OpenAI-compatible server or Anthropic, for `get_my_day` summaries and image descriptions. Keys come from environment variables, and daily call and input limits guard the cost. |
 | Python SDK | The `wa_mcp` package: bridge client, read access to the local database, transcription and exports. |
 | Encryption | On by default: message text, attachment names, reactions, transcripts and media keys in the database are encrypted with a key kept in the OS keystore (Windows DPAPI, macOS Keychain, Linux Secret Service), or with a passphrase or key file. The API token is kept there too, and on Windows the store folder gets EFS. See [Encryption and keys](docs/guides/encryption.md). |
-| Session alerts | Records a remote logout, another client using this session, a new device on the account and a different account at login, and shows them in `bridge_status`, `GET /api/v1/status` and a `security` webhook. |
+| Session alerts | Records a remote logout, another client using this session, a new device on the account and a different account at login, and shows them in `get_bridge_status`, `GET /api/v1/status` and a `security` webhook. |
 
 ## How it compares
 
@@ -191,7 +191,7 @@ wa-mcp --help
 ```
 
 The buttons include the SDK extras for encrypted messages and file text extraction. A pipx client
-can launch `wa-mcp` directly with `--config` and the absolute config path. Run `bridge_status` in
+can launch `wa-mcp` directly with `--config` and the absolute config path. Run `get_bridge_status` in
 your client to check the database and phone connection. See [Getting started](docs/getting-started.md)
 and [Connect an MCP client](docs/guides/mcp-clients.md) for manual setup.
 
@@ -206,7 +206,7 @@ several accounts, Docker, remote access, webhooks and security are in the
 ```text
 You:        What are my tasks today?
 
-Assistant:  (calls my_day for 2026-11-23)
+Assistant:  (calls get_my_day for 2026-11-23)
 
             Four things need you today.
 
@@ -221,7 +221,7 @@ Assistant:  (calls my_day for 2026-11-23)
             A reminder for the Book club is scheduled to go out at 18:00.
 ```
 
-`my_day` runs on your machine and uses plain rules. The assistant only phrases the result.
+`get_my_day` runs on your machine and uses plain rules. The assistant only phrases the result.
 
 ## Toolsets
 
@@ -348,7 +348,7 @@ More in [Webhooks](docs/guides/webhooks.md), the [HTTP API](docs/reference/http-
   another Windows account cannot be read. On Windows the store folder, including the WhatsApp session, is
   encrypted with EFS as well; on macOS and Linux use full disk encryption for the session file.
 - The bridge reports session events, such as another client using this session or a new linked device,
-  in `bridge_status`, the status endpoint and a `security` webhook.
+  in `get_bridge_status`, the status endpoint and a `security` webhook.
 - Sending is disabled by default. You approve each send in your client when it can ask. Clients that
   cannot ask can send only if you set `sending.allow_confirm_flag`; they then pass `confirm=true`, which
   the model sets itself, so that path is a weaker check. The

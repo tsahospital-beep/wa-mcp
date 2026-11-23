@@ -102,7 +102,7 @@ The MCP server reads the same `config.json` and needs no extra setup.
   store folder.
 - To search only the work account, use `list_messages(query="invoice", account="work")`.
   `list_messages(query="invoice")` searches `default`.
-- `my_day` without `account` covers all accounts. Every group and item then has an `account` field, and
+- `get_my_day` without `account` covers all accounts. Every group and item then has an `account` field, and
   accounts without a database yet are listed under `skipped`.
 - Send tools use the sending settings of the chosen account, and the approval prompt names the account the
   message goes out from.

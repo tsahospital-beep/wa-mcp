@@ -1,4 +1,4 @@
-"""Image text, image descriptions and the my_day summary through the real MCP stdio server.
+"""Image text, image descriptions and the get_my_day summary through the real MCP stdio server.
 
 The AI provider is a small HTTP server on 127.0.0.1 that speaks the OpenAI chat completions format.
 OCR runs a fake tesseract program that is put first on PATH.
@@ -126,14 +126,14 @@ def with_provider(tmp_path_factory: pytest.TempPathFactory, ai_server: str) -> d
     )
     FakeAI.requests.clear()
     calls: list[tuple[str, dict[str, Any]]] = [
-        ("bridge_status", {}),
+        ("get_bridge_status", {}),
         ("read_images", {"chat": "Alice", "describe": True}),
         ("list_messages", {"chat": "Alice", "query": "4711"}),
         ("get_media_text", {"chat": "Alice", "message_id": "IMG1"}),
         ("read_images", {"chat": "Alice", "describe": True}),
-        ("my_day", {"date": T0_DAY, "summary": True}),
-        ("my_day", {"date": T0_DAY}),
-        ("my_day", {"date": T0_DAY, "summary": True}),
+        ("get_my_day", {"date": T0_DAY, "summary": True}),
+        ("get_my_day", {"date": T0_DAY}),
+        ("get_my_day", {"date": T0_DAY, "summary": True}),
         ("read_images", {"chat": "Alice", "describe": True, "force": True}),
     ]
     results = asyncio.run(_session(cfg, calls, path_first=folder))
@@ -144,7 +144,7 @@ def with_provider(tmp_path_factory: pytest.TempPathFactory, ai_server: str) -> d
 
 
 def test_status_reports_ocr_and_provider(with_provider: dict[str, Any]) -> None:
-    status = with_provider["by"]["bridge_status"][0]
+    status = with_provider["by"]["get_bridge_status"][0]
     assert status["ai_provider"] == "openai-compatible" and status["ocr_engine"] == "tesseract"
     assert status["ocr_ready"] is True
 
@@ -177,7 +177,7 @@ def test_second_run_skips_finished_images(with_provider: dict[str, Any]) -> None
 
 
 def test_my_day_summary_and_the_default(with_provider: dict[str, Any]) -> None:
-    day = with_provider["by"]["my_day"]
+    day = with_provider["by"]["get_my_day"]
     assert day[0]["ok"] and day[0]["ai_summary"] == "Two things need you today."
     assert day[0]["ai_provider"] == "openai-compatible" and isinstance(day[0]["people"], list)
     assert "ai_summary" not in day[1] and "ai_note" not in day[1] and day[1]["summary"].startswith(T0_DAY)
@@ -185,7 +185,7 @@ def test_my_day_summary_and_the_default(with_provider: dict[str, Any]) -> None:
 
 
 def test_daily_limit_stops_ai_calls(with_provider: dict[str, Any]) -> None:
-    limited = with_provider["by"]["my_day"][2]
+    limited = with_provider["by"]["get_my_day"][2]
     assert limited["ok"] is True and limited["ai_summary"] is None
     assert "ai.max_calls_per_day is 3" in limited["ai_error"] and limited["people"]
     forced = with_provider["by"]["read_images"][2]
@@ -216,10 +216,10 @@ def test_without_a_provider_or_ocr(tmp_path: Path) -> None:
         ["IMG1"],
     )
     calls: list[tuple[str, dict[str, Any]]] = [
-        ("bridge_status", {}),
+        ("get_bridge_status", {}),
         ("read_images", {"chat": "Alice"}),
         ("read_images", {"chat": "Alice", "describe": True}),
-        ("my_day", {"date": T0_DAY, "summary": True}),
+        ("get_my_day", {"date": T0_DAY, "summary": True}),
         ("get_media_text", {"chat": "Alice", "message_id": "IMG1"}),
     ]
     status, plain, described, day, media = asyncio.run(_session(cfg, calls))

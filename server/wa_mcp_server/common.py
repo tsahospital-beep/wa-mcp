@@ -16,7 +16,7 @@ from typing import Annotated, Any, ParamSpec, TypeVar, overload
 
 import anyio.to_thread
 from mcp.types import ToolAnnotations
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from wa_mcp import accounts, db, people
 from wa_mcp import config as config_mod
@@ -53,7 +53,7 @@ def hints(
     )
 
 
-# Optional tool modules that failed to load, with the reason (shown by bridge_status).
+# Optional tool modules that failed to load, with the reason (shown by get_bridge_status).
 load_errors: dict[str, str] = {}
 
 P = ParamSpec("P")
@@ -69,7 +69,9 @@ ACCOUNT_PARAM = inspect.Parameter(
     default=None,
     annotation=Annotated[
         str | None,
-        Field(description="Account name from list_accounts, such as work. Omit to use the default account."),
+        Field(
+            description="Account name from list_accounts, such as work. Omit to use the default account. An unknown account name fails."
+        ),
     ],
 )
 
@@ -171,6 +173,22 @@ def safe(fn: Callable[P, Any]) -> Callable[P, Coroutine[Any, Any, Result]]:
             return _error(fn.__name__, exc)
 
     return _with_account(fn, run, own)
+
+
+def structured(
+    model: type[BaseModel],
+) -> Callable[[Callable[P, Any]], Callable[P, Coroutine[Any, Any, Result]]]:
+    """Expose the validated wire type while keeping handlers and text clients dictionary-based."""
+
+    def decorate(fn: Callable[P, Any]) -> Callable[P, Coroutine[Any, Any, Result]]:
+        handler = safe(fn)
+        # Each description is also used by clients that display a tool in isolation.
+        if "account" not in inspect.signature(fn).parameters:
+            handler.__doc__ = f"{inspect.getdoc(fn)} Omit account for the default. Unknown accounts fail."
+        handler.__signature__ = inspect.signature(handler).replace(return_annotation=model)  # type: ignore[attr-defined]
+        return handler
+
+    return decorate
 
 
 def _with_account(fn: Callable[..., Any], wrapper: Callable[..., T], own: bool) -> Callable[..., T]:

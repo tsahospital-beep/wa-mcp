@@ -6,6 +6,7 @@ from mcp.server.fastmcp import FastMCP
 from pydantic import Field
 
 from wa_mcp import db, people
+from wa_mcp_server import outputs
 from wa_mcp_server.common import (
     UNTRUSTED,
     Result,
@@ -14,15 +15,15 @@ from wa_mcp_server.common import (
     display_name,
     hints,
     ok,
-    safe,
     shape_messages,
+    structured,
 )
 from wa_mcp_server.tools.inputs import Chat, Offset, PageSize
 
 
 def register(mcp: FastMCP) -> None:
     @mcp.tool(annotations=hints("Search contacts", read_only=True))
-    @safe
+    @structured(outputs.Output[outputs.Contacts])
     def search_contacts(
         query: Annotated[
             str,
@@ -34,15 +35,15 @@ def register(mcp: FastMCP) -> None:
             int, Field(description="Maximum matching contacts, up to 200. Zero or negative uses 20.")
         ] = 20,
     ) -> Result:
-        """Resolve a name, alias or phone fragment in the local directory. Returns count and contacts with
-        name, name_source, phone and jids. Use a returned JID for an unambiguous lookup. Use list_chats to
-        browse conversations by activity.
+        """Find a contact by name, alias or phone fragment in the local directory.
+
+        Use list_chats to browse by recent activity. Works offline and in demo. Blank queries and unmatched names give an empty list.
         """
         found = people.search(query, limit=clamp(limit, 20))
         return ok(contacts=found, count=len(found), note=UNTRUSTED)
 
     @mcp.tool(annotations=hints("List recent chats", read_only=True))
-    @safe
+    @structured(outputs.Output[outputs.Chats])
     def list_chats(
         query: Annotated[
             str | None,
@@ -53,9 +54,9 @@ def register(mcp: FastMCP) -> None:
         limit: PageSize = 50,
         offset: Offset = 0,
     ) -> Result:
-        """Browse stored conversations by most recent activity. Returns chats with jid, jids, name, is_group
-        and last_activity. Linked phone and LID identities are merged within the page. Page with
-        next_offset. Use search_contacts for a person by alias or phone and get_chat to inspect one conversation.
+        """Browse conversations in the local archive, most recently active first.
+
+        Use search_contacts for a person or get_chat for one conversation. Works offline and in demo. An empty archive or unmatched filter gives an empty page.
         """
         offset = max(offset, 0)
         rows = db.conversations(query=query, limit=clamp(limit), offset=offset)
@@ -78,16 +79,16 @@ def register(mcp: FastMCP) -> None:
         return ok(chats=list(merged.values()), offset=offset, next_offset=offset + len(rows), note=UNTRUSTED)
 
     @mcp.tool(annotations=hints("Inspect one chat", read_only=True))
-    @safe
+    @structured(outputs.Output[outputs.ChatFound | outputs.Missing])
     def get_chat(
         chat: Chat,
         recent: Annotated[
             int, Field(description="Number of recent messages, up to 200. Zero or negative uses 5.")
         ] = 5,
     ) -> Result:
-        """Look up a stored person or group. Returns found, chat metadata (jid, jids, name, phone and
-        is_group) and recent_messages, newest first. A resolved JID absent from the store gives
-        found=false. Use list_messages for a longer or filtered history.
+        """Inspect one conversation and its newest stored messages.
+
+        Use list_messages for a longer history. Works offline and in demo. An unknown name fails, an absent JID gives found=false, and a chat without messages has an empty preview.
         """
         jids = chat_jids(chat)
         info = next((c for c in (db.conversation(j) for j in jids) if c), None)
@@ -109,11 +110,11 @@ def register(mcp: FastMCP) -> None:
         )
 
     @mcp.tool(annotations=hints("Get the last exchange", read_only=True))
-    @safe
+    @structured(outputs.Output[outputs.Interaction])
     def get_last_interaction(chat: Chat) -> Result:
-        """Check who wrote last in one stored conversation. Returns chat, name, last, last_from_them and
-        last_from_me. Each message has id, time, from and text, or is null when absent. Use
-        get_message_context for the surrounding exchange.
+        """Find the latest exchange with one contact or group.
+
+        Use get_message_context for neighboring messages. Reads the archive offline and in demo. An unknown name fails, and a direction with no history gives null.
         """
         jids = chat_jids(chat)
         rows = [

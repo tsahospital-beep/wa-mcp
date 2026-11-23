@@ -13,7 +13,7 @@
   <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-4f7c9a?style=flat">
   <img alt="Compatível com MCP" src="https://img.shields.io/badge/MCP-compatible-5f8a7a?style=flat">
   <img alt="Plataformas: Windows, macOS, Linux" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-5f8a7a?style=flat">
-  <a href="../../CHANGELOG.md"><img alt="Versão 0.2.0" src="https://img.shields.io/badge/version-0.2.0-6c7a89?style=flat"></a>
+  <a href="../../CHANGELOG.md"><img alt="Versão 0.2.1" src="https://img.shields.io/badge/version-0.2.1-6c7a89?style=flat"></a>
 </p>
 
 <p align="center">
@@ -32,7 +32,7 @@
 
 ## Experimente sem celular
 
-Com o uv instalado, `uvx wa-mcp-server --demo` abre um arquivo fictício com oito conversas. A demonstração requer o WA MCP 0.2.0 ou superior. Depois da instalação, funciona sem internet e sem a ponte em Go.
+Com o uv instalado, `uvx wa-mcp-server --demo` abre um arquivo fictício com oito conversas. A demonstração requer o WA MCP 0.2.1 ou superior. Depois da instalação, funciona sem internet e sem a ponte em Go.
 
 [![Testar no Cursor](https://img.shields.io/badge/Testar%20no%20Cursor-4f7c9a?style=flat)](https://cursor.com/install-mcp?name=wa-mcp-demo&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJ3YS1tY3Atc2VydmVyIiwiLS1kZW1vIl19)
 [![Testar no VS Code](https://img.shields.io/badge/Testar%20no%20VS%20Code-4f7c9a?style=flat)](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp-demo%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522wa-mcp-server%2522%252C%2522--demo%2522%255D%257D)
@@ -79,7 +79,7 @@ Pergunte “Quais são as minhas tarefas de hoje?”. Depois, procure por “blu
 | Área | O que faz |
 | --- | --- |
 | Janela de login | Vincule sua conta em uma janela local com um QR code ou um código de pareamento para o seu número. O terminal também exibe o QR code. |
-| Várias contas | Use vários números do WhatsApp no mesmo servidor MCP. Cada número tem uma ponte com armazenamento e limites de envio próprios. `wa-bridge run-all` mantém as pontes em execução. Todas as ferramentas aceitam o argumento `account`, e `my_day` consulta todos os números. Configurações sem contas continuam funcionando como antes. Veja [Várias contas](../guides/accounts.md). |
+| Várias contas | Use vários números do WhatsApp no mesmo servidor MCP. Cada número tem uma ponte com armazenamento e limites de envio próprios. `wa-bridge run-all` mantém as pontes em execução. Todas as ferramentas aceitam o argumento `account`, e `get_my_day` consulta todos os números. Configurações sem contas continuam funcionando como antes. Veja [Várias contas](../guides/accounts.md). |
 | Histórico | A ponte armazena as mensagens que chegam e o histórico que o celular envia após a vinculação. Ela também aplica edições, exclusões e reações. As ferramentas podem pedir ao celular trechos mais antigos de uma conversa ou de todo o histórico. |
 | Importação de conversas | Importe um arquivo gerado pela opção “Exportar conversa” do WhatsApp (`.txt` ou `.zip` com mídia) para recuperar mensagens anteriores ao período sincronizado pelo celular. A importação reconhece arquivos do Android e do iPhone, aceita vários formatos de data e hora e detecta a ordem dos componentes da data. Você pode repetir a importação, pois ela ignora mensagens já armazenadas. Faça uma simulação primeiro. |
 | Mídia | Baixe imagens, vídeos, áudios, mensagens de voz, documentos e figurinhas. Se a cópia do WhatsApp tiver expirado, a ponte pede ao celular que envie o arquivo novamente. |
@@ -89,7 +89,7 @@ Pergunte “Quais são as minhas tarefas de hoje?”. Depois, procure por “blu
 | Documentos e arquivos compactados | Extraia texto de arquivos PDF, DOCX, XLSX, PPTX, de texto simples e HTML. Consulte o conteúdo de arquivos ZIP e RAR sem descompactá-los e leia documentos públicos por links do Google Docs. |
 | Análise de conversas | Compare até oito conversas por volume e tamanho das mensagens, tempo de resposta de cada lado, uso de emojis, figurinhas e mensagens de voz, grau de formalidade e papéis no grupo. |
 | Tarefas | Regras simples identificam pedidos nas conversas, acompanham seu status e localizam palavras que você escolheu monitorar. O recurso dispensa modelos de linguagem. |
-| `my_day` | Uma chamada lista os pedidos em aberto, os compromissos que você assumiu e vencem hoje, as conversas que aguardam sua resposta, as chamadas perdidas e os envios agendados. |
+| `get_my_day` | Uma chamada lista os pedidos em aberto, os compromissos que você assumiu e vencem hoje, as conversas que aguardam sua resposta, as chamadas perdidas e os envios agendados. |
 | Envio | Envie texto, arquivos, mensagens de voz e figurinhas, com respostas e menções. O envio vem desativado. Você aprova cada envio nos clientes que permitem confirmação. Nos demais, é preciso habilitar `sending.allow_confirm_flag`. |
 | Ritmo de envio | A ponte marca a conversa como lida, mostra o indicador de digitação por um tempo proporcional ao tamanho da mensagem e faz uma pausa entre os envios. Respeita os horários de silêncio e os limites por hora. Isso dá um ritmo mais natural aos envios automáticos, mas não oferece garantias. |
 | Confirmações de leitura | Marque mensagens como lidas sob demanda ou ative a marcação automática. |
@@ -101,10 +101,10 @@ Pergunte “Quais são as minhas tarefas de hoje?”. Depois, procure por “blu
 | Integração em outros programas | O pacote Go `bridge/pkg/wabridge` executa a ponte dentro de outro programa, com hooks para cada mensagem e conversa armazenada, rotas HTTP adicionais e acesso a envio, mídia e histórico. Use `wa_mcp_server.embed.register` para registrar ferramentas específicas em outro servidor MCP. |
 | Acesso remoto | `wa-mcp serve --http` disponibiliza MCP por Streamable HTTP para clientes remotos como conectores personalizados do claude.ai, Claude Code, Cursor e VS Code. Use tokens bearer por dispositivo, armazenados como hashes, ou OAuth 2.1 com PKCE, registro dinâmico e uma página de aprovação para o proprietário. Há limites de requisições, verificação de Host e Origin e suporte a proxy TLS. O CORS vem desativado. Veja [Acesso remoto](../guides/remote-clients.md). |
 | Implantação em servidor | Imagens Docker para a ponte e o servidor rodam sem root, com sistema de arquivos somente leitura e verificações de integridade. O arquivo Compose oferece Caddy como opção para HTTPS automático. A página de login funciona pelo proxy com um link de uso único. Veja [Execução em servidor](../guides/server.md). As imagens ainda não foram compiladas em um host Docker real. A cada push para `main`, a CI compila as imagens e inicia o ambiente de prévia. |
-| Provedores de IA (opcional) | Por padrão, o assistente faz a análise. Se quiser resumos em `my_day` e descrições de imagens, configure um provedor em segundo plano: Ollama, um servidor compatível com OpenAI ou Anthropic. As chaves vêm de variáveis de ambiente. Limites diários de chamadas e de entrada ajudam a controlar os custos. |
+| Provedores de IA (opcional) | Por padrão, o assistente faz a análise. Se quiser resumos em `get_my_day` e descrições de imagens, configure um provedor em segundo plano: Ollama, um servidor compatível com OpenAI ou Anthropic. As chaves vêm de variáveis de ambiente. Limites diários de chamadas e de entrada ajudam a controlar os custos. |
 | SDK Python | O pacote `wa_mcp` oferece um cliente para a ponte, leitura do banco de dados local, transcrição e exportação. |
 | Criptografia | Ativada por padrão para o texto das mensagens, nomes de anexos, reações, transcrições e chaves de mídia no banco de dados. A chave fica no cofre do sistema (Windows DPAPI, macOS Keychain ou Linux Secret Service). Também é possível usar uma frase secreta ou um arquivo de chave. O token da API tem a mesma proteção. No Windows, a pasta de armazenamento usa EFS. Veja [Criptografia e chaves](../guides/encryption.md). |
-| Alertas de sessão | A ponte registra quando a sessão é encerrada remotamente, outro cliente usa a mesma sessão, um novo dispositivo é vinculado ou o login é feito com outra conta. Os alertas aparecem em `bridge_status`, em `GET /api/v1/status` e no webhook `security`. |
+| Alertas de sessão | A ponte registra quando a sessão é encerrada remotamente, outro cliente usa a mesma sessão, um novo dispositivo é vinculado ou o login é feito com outra conta. Os alertas aparecem em `get_bridge_status`, em `GET /api/v1/status` e no webhook `security`. |
 
 ## Comparação com outros projetos
 
@@ -194,7 +194,7 @@ No VS Code, em `.vscode/mcp.json`:
 }
 ```
 
-Depois, peça ao assistente que execute `bridge_status` para verificar a configuração.
+Depois, peça ao assistente que execute `get_bridge_status` para verificar a configuração.
 
 ## Tutoriais
 
@@ -205,7 +205,7 @@ O [índice de tutoriais](../tutorials/README.md) reúne instruções passo a pas
 ```text
 You:        What are my tasks today?
 
-Assistant:  (calls my_day for 2026-11-23)
+Assistant:  (calls get_my_day for 2026-11-23)
 
             Four things need you today.
 
@@ -220,7 +220,7 @@ Assistant:  (calls my_day for 2026-11-23)
             A reminder for the Book club is scheduled to go out at 18:00.
 ```
 
-O `my_day` roda na sua máquina e usa regras simples. O assistente apenas apresenta o resultado em palavras.
+O `get_my_day` roda na sua máquina e usa regras simples. O assistente apenas apresenta o resultado em palavras.
 
 ## Configuração
 
@@ -322,7 +322,7 @@ Saiba mais em [Webhooks](../guides/webhooks.md), na [referência da API HTTP](..
 - Por padrão, a ponte armazena as conversas localmente e só aceita requisições de API e de login pela interface de loopback. O cliente MCP recebe os resultados das ferramentas que solicita.
 - Os endpoints de `/api/v1` exigem um token bearer. Execute `wa-bridge api-token` para consultá-lo. Só o seu usuário tem acesso à pasta de armazenamento. Os links de login são de uso único.
 - O texto das mensagens no banco de dados é criptografado por padrão. A chave é protegida pelo Windows DPAPI, pelo Keychain do macOS ou pelo Secret Service do Linux para o seu usuário. Uma cópia do banco em outro computador ou em outra conta do Windows não pode ser lida. No Windows, o EFS também criptografa a pasta de armazenamento, inclusive a sessão do WhatsApp. No macOS e no Linux, use criptografia de disco inteiro para proteger o arquivo de sessão.
-- A ponte informa eventos como o uso da sessão por outro cliente ou a vinculação de um novo dispositivo em `bridge_status`, no endpoint de status e no webhook `security`.
+- A ponte informa eventos como o uso da sessão por outro cliente ou a vinculação de um novo dispositivo em `get_bridge_status`, no endpoint de status e no webhook `security`.
 - O envio vem desativado. Se o cliente consegue pedir confirmação, você aprova cada envio. Nos demais clientes, é preciso definir `sending.allow_confirm_flag` para que eles possam passar `confirm=true`. Essa verificação é mais fraca porque o próprio modelo define o valor. A ponte impõe limites, respeita horários de silêncio e evita duplicatas. Por padrão, só envia arquivos das pastas de downloads e exportações, a menos que você permita outras.
 - O texto das mensagens é uma entrada não confiável. O servidor orienta os clientes a ignorar instruções encontradas nele.
 - Quando um segredo de webhook está configurado, a assinatura cobre o timestamp, o ID de entrega e o corpo bruto. Processe cada ID verificado só uma vez. O ID é o mesmo nas novas tentativas.

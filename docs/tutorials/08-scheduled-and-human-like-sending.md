@@ -127,7 +127,7 @@ Ask: "Schedule the message Good morning to my own number for five minutes from n
 Then ask: "List my scheduled messages." You should see the entry as `pending`. After its time, with the
 bridge running and connected, it becomes `sent` and the message appears in the chat. The bridge looks for due
 messages every 15 seconds and sends even if no assistant is open. Cancel a pending entry by asking: "Cancel
-scheduled message 7", which calls `cancel_scheduled`.
+scheduled message 7", which calls `cancel_scheduled_message`.
 
 A failed send is tried up to five times, with waits of 1, 5, 15 and 30 minutes. A run that the bridge missed
 while it was off is sent once, not once per missed run.
@@ -143,7 +143,7 @@ ffmpeg.
 ### 8. Turn read receipts on or off
 
 Reading through an assistant does not mark messages as read. Ask: "Mark the latest message from Alice as
-read." The assistant calls `mark_as_read`. To mark every new message as read when it arrives, set
+read." The assistant calls `mark_messages_read`. To mark every new message as read when it arrives, set
 `read_receipts.auto_mark_read` to `true`. To forbid read receipts on request, set
 `read_receipts.allow_mark_read` to `false`.
 

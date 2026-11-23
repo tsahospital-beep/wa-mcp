@@ -3121,7 +3121,7 @@ wheels = [
 
 [[package]]
 name = "wa-mcp-sdk"
-version = "0.2.0"
+version = "0.2.1"
 source = { editable = "sdk/python" }
 dependencies = [
     { name = "httpx" },
@@ -3161,7 +3161,7 @@ provides-extras = ["encryption", "faster-whisper", "openai-whisper", "files", "o
 
 [[package]]
 name = "wa-mcp-server"
-version = "0.2.0"
+version = "0.2.1"
 source = { editable = "server" }
 dependencies = [
     { name = "mcp" },
@@ -3176,7 +3176,7 @@ requires-dist = [
 
 [[package]]
 name = "wa-mcp-workspace"
-version = "0.2.0"
+version = "0.2.1"
 source = { virtual = "." }
 dependencies = [
     { name = "wa-mcp-sdk", extra = ["encryption", "files"] },

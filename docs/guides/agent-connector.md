@@ -90,13 +90,13 @@ For a local HTTP round trip, run `uv run python examples/agents/http_agent.py` i
 
 | Mode | Behavior |
 | --- | --- |
-| `draft` (default) | Save a suggestion. Read it with `agent_drafts`. |
-| `approve` | Ask in the worker terminal. A headless worker keeps the draft pending for `agent_approve_draft` in your MCP client. |
+| `draft` (default) | Save a suggestion. Read it with `list_agent_drafts`. |
+| `approve` | Ask in the worker terminal. A headless worker keeps the draft pending for `approve_agent_draft` in your MCP client. |
 | `auto` | Submit eligible replies to the bridge. Choosing this mode authorizes unattended sends. |
 
 Set `sending.enabled=true` to send in any mode. The MCP approval tool uses the existing elicitation and confirm-flag fallback, even when other sends have `sending.require_confirm=false`. Voice approvals include a local file to listen to. Text and voice sends use the bridge's pacing, quiet hours, duplicate checks and limits. A quiet-hours queue reports `queued` until its schedule completes. [Sending](sending.md)
 
-`agent_status` shows the mode, pause switch, pending draft count and time of the worker's last successful poll. `agent_pause` persists across restarts and cancels pending agent schedules. A send already handed to WhatsApp may complete. The bridge checks the config revision and pause switch again after pacing and before releasing a queued reply. Editing the config invalidates agent sends queued under its previous revision. `agent_resume` accepts fresh events. Setting `agent.enabled=false` stops the worker on its next check. Restart the bridge after changing bridge settings. Use `agent.dry_run=true` to exercise live generation and save drafts. The `agent_test` MCP tool and `wa-mcp agent-test` CLI send a synthetic sample to the provider. They return a preview, timing and any generated local voice file. The test works before linking a number. Provider usage charges still apply.
+`get_agent_status` shows the mode, pause switch, pending draft count and time of the worker's last successful poll. `pause_agent` persists across restarts and cancels pending agent schedules. A send already handed to WhatsApp may complete. The bridge checks the config revision and pause switch again after pacing and before releasing a queued reply. Editing the config invalidates agent sends queued under its previous revision. `resume_agent` accepts fresh events. Setting `agent.enabled=false` stops the worker on its next check. Restart the bridge after changing bridge settings. Use `agent.dry_run=true` to exercise live generation and save drafts. The `test_agent_provider` MCP tool and `wa-mcp agent-test` CLI send a synthetic sample to the provider. They return a preview, timing and any generated local voice file. The test works before linking a number. Provider usage charges still apply.
 
 Run one worker per number with `wa-mcp agent --account work`. Each account has its own feed, claims, drafts, pause switch and send counters. The bridge holds up to 256 live references. The worker skips references older than two minutes. History sync cannot trigger replies. A stopped or overloaded worker can miss events.
 

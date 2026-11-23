@@ -6,7 +6,8 @@ from mcp.server.fastmcp import FastMCP
 from pydantic import Field
 
 from wa_mcp import history
-from wa_mcp_server.common import Result, bridge, chat_jids, hints, ok, safe
+from wa_mcp_server import outputs
+from wa_mcp_server.common import Result, bridge, chat_jids, hints, ok, structured
 from wa_mcp_server.tools.inputs import BackTo, Budget, Chat, PageWait
 
 MAX_BUDGET_SECONDS = 600
@@ -14,7 +15,7 @@ MAX_BUDGET_SECONDS = 600
 
 def register(mcp: FastMCP) -> None:
     @mcp.tool(annotations=hints("Request one older history page", open_world=True))
-    @safe
+    @structured(outputs.Output[outputs.HistoryRequest])
     def request_chat_history(
         chat: Chat,
         count: Annotated[
@@ -24,10 +25,9 @@ def register(mcp: FastMCP) -> None:
             ),
         ] = 50,
     ) -> Result:
-        """Ask the linked phone once for messages older than the oldest synced message in one chat. Returns
-        requested, anchor_id and oldest_known immediately. Available messages arrive in the local archive
-        asynchronously. Imported messages cannot anchor the request. Use sync_chat_history to wait and
-        page back to a date.
+        """Ask the linked phone for one older page and return before it arrives.
+
+        Use sync_chat_history to wait for progress. Requires a stored synced anchor and an online bridge. Demo refuses. The phone may supply no older messages.
         """
         jids = chat_jids(chat)
         _, anchor, source = history.oldest_anchor(jids)
@@ -38,7 +38,7 @@ def register(mcp: FastMCP) -> None:
         return ok(**{k: v for k, v in res.items() if k != "ok"})
 
     @mcp.tool(annotations=hints("Sync one chat back to a date", open_world=True))
-    @safe
+    @structured(outputs.Output[outputs.ChatSync])
     def sync_chat_history(
         chat: Chat,
         back_to: BackTo,
@@ -48,10 +48,9 @@ def register(mcp: FastMCP) -> None:
         wait_seconds: PageWait = 20.0,
         time_budget_seconds: Budget = 120,
     ) -> Result:
-        """Request and wait for older history from the linked phone until the chat reaches back_to, three
-        pages yield nothing older, or a cap is reached. Returns chat, pages, oldest_time, state (reached,
-        pending or exhausted) and stopped. Repeat a pending call to continue. Use request_chat_history for
-        one background request.
+        """Fetch older pages for one chat until it reaches a date or a limit.
+
+        Use request_chat_history for one background request. Bridge or anchor errors stop progress. Repeated empty pages exhaust the chat. Demo refuses.
         """
         res = history.sync_chat_history(
             bridge(),
@@ -64,7 +63,7 @@ def register(mcp: FastMCP) -> None:
         return ok(**res.as_dict())
 
     @mcp.tool(annotations=hints("Sync older history across chats", destructive=True, open_world=True))
-    @safe
+    @structured(outputs.Output[outputs.HistorySync])
     def sync_all_history(
         active_since: Annotated[
             str,
@@ -88,9 +87,9 @@ def register(mcp: FastMCP) -> None:
         wait_seconds: PageWait = 20.0,
         time_budget_seconds: Budget = 120,
     ) -> Result:
-        """Request older messages from the phone for active chats and save progress per account. Returns
-        chats with per-chat state, total_active, remaining and complete. If incomplete, repeat with
-        restart=false to resume. Use sync_chat_history for one chat.
+        """Fetch older history for active chats and save progress for the next call.
+
+        Use sync_chat_history for one chat. An offline bridge stops the batch, and no active chats completes it immediately. Restart clears saved progress. Demo refuses.
         """
         res = history.sync_all_history(
             bridge(),

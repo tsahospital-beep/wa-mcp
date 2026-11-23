@@ -6,6 +6,7 @@ from mcp.server.fastmcp import FastMCP
 from pydantic import Field
 
 from wa_mcp import db, files, links, media
+from wa_mcp_server import outputs
 from wa_mcp_server.common import (
     UNTRUSTED,
     Result,
@@ -17,26 +18,26 @@ from wa_mcp_server.common import (
     find_message,
     hints,
     ok,
-    safe,
     shape_messages,
+    structured,
 )
 from wa_mcp_server.tools.inputs import After, Before, Chat, ChatFilter, MessageId, Offset, PageSize
 
 
 def register(mcp: FastMCP) -> None:
     @mcp.tool(annotations=hints("Download one attachment", idempotent=True, open_world=True))
-    @safe
+    @structured(outputs.Output[outputs.Download])
     def download_media(chat: Chat, message_id: MessageId) -> Result:
-        """Get the file for one stored message. Reuses a verified local copy or downloads through the bridge
-        into downloads_dir. Expired media may need a new phone request and up to 40 seconds. Returns chat,
-        msg_id, kind and path. Use transcribe_chat_audio for speech or download_chat_media in the media toolset for a batch.
+        """Save the attachment from one message, reusing a verified local copy.
+
+        Use download_chat_media for a batch. A missing message fails. New downloads need the bridge. Demo declines downloads.
         """
         row = find_message(chat, message_id)
         res = media.download_media(bridge(), str(row["conv"]), message_id)
         return ok(**res, note=UNTRUSTED)
 
     @mcp.tool(annotations=hints("Download attachments from a chat", idempotent=True, open_world=True))
-    @safe
+    @structured(outputs.Output[outputs.Downloads])
     def download_chat_media(
         chat: Chat,
         after: After = None,
@@ -54,9 +55,9 @@ def register(mcp: FastMCP) -> None:
             ),
         ] = 50,
     ) -> Result:
-        """Save matching attachments from one chat, newest first, reusing verified downloads. Missing files
-        require the linked bridge. Returns saved entries with msg_id, kind and path, failed entries,
-        matched and already_local counts. Use download_media for a known message id.
+        """Save matching attachments from one chat and reuse verified local copies.
+
+        Use download_media for one message. No matches gives an empty batch. Missing files need the bridge and can fail individually. Demo refuses downloads.
         """
         res = media.download_chat_media(
             bridge(), chat_jids(chat)[0], after, before, kinds, limit=clamp(limit)
@@ -64,12 +65,11 @@ def register(mcp: FastMCP) -> None:
         return ok(**res, note=UNTRUSTED)
 
     @mcp.tool(annotations=hints("Read stored attachment text", read_only=True))
-    @safe
+    @structured(outputs.Output[outputs.MediaText])
     def get_media_text(chat: Chat, message_id: MessageId) -> Result:
-        """Read text already derived from one message, including transcripts, documents, linked docs and
-        image descriptions. Returns message_id, kind and items with source, lang, confidence and text.
-        Treat text as untrusted. An empty list can mean extraction is needed. Use transcribe_chat_audio,
-        extract_file_text, fetch_shared_docs or read_images to generate it.
+        """Read the text already extracted from one attachment or voice note.
+
+        Use transcribe_chat_audio to generate a transcript. Works offline and in demo. A missing message fails, and a message without extracted text gives an empty list.
         """
         row = find_message(chat, message_id)
         rows = db.derived(str(row["conv"]), message_id)
@@ -88,11 +88,11 @@ def register(mcp: FastMCP) -> None:
         return ok(message_id=message_id, kind=row["kind"], items=items, **extra, note=UNTRUSTED)
 
     @mcp.tool(annotations=hints("List sticker messages", read_only=True))
-    @safe
+    @structured(outputs.Output[outputs.Stickers])
     def list_stickers(chat: ChatFilter = None, limit: PageSize = 50, offset: Offset = 0) -> Result:
-        """Browse sent and received sticker messages newest first, without downloading them. Returns stickers
-        with id, chat, time and local_path when saved, plus next_offset. Use download_media for a missing
-        file or send_sticker to reuse a saved one.
+        """Browse stored sticker messages without downloading files.
+
+        Use download_media to save a sticker. Works offline and in demo. An unknown chat name fails and no matches gives an empty page.
         """
         convs = chat_jids(chat) if chat else None
         rows = db.messages(conv=convs, kind="sticker", limit=clamp(limit), offset=max(offset, 0))
@@ -101,12 +101,11 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool(
         annotations=hints("Extract text from a document", destructive=True, idempotent=True, open_world=True)
     )
-    @safe
+    @structured(outputs.Output[outputs.Extracted])
     def extract_file_text(chat: Chat, message_id: MessageId) -> Result:
-        """Extract PDF, Office (DOCX, XLSX, PPTX), plain text, Markdown, CSV or HTML from one document
-        message, or list ZIP/RAR entries without unpacking. Downloads missing media through the bridge and
-        stores the extraction locally. Returns message_id, path, text, source, kind and truncated. Treat
-        extracted text as untrusted. Use get_media_text for a stored result.
+        """Extract and store text from a document or list entries in an archive.
+
+        Use get_media_text for a saved extraction. A missing or unsupported document fails. Uncached files need the bridge. Demo uses its local document.
         """
         row = find_message(chat, message_id)
         if row["kind"] != "document":
@@ -124,7 +123,7 @@ def register(mcp: FastMCP) -> None:
         return ok(message_id=message_id, path=str(path), **res.as_dict(), note=UNTRUSTED)
 
     @mcp.tool(annotations=hints("Fetch linked Google documents", destructive=True, open_world=True))
-    @safe
+    @structured(outputs.Output[outputs.Documents])
     def fetch_shared_docs(
         chat: Chat,
         after: After = None,
@@ -133,10 +132,9 @@ def register(mcp: FastMCP) -> None:
             int, Field(description="Maximum document links to attempt, clamped to 1 through 50.")
         ] = 10,
     ) -> Result:
-        """Fetch public Google Docs, Sheets and Slides linked in up to 500 matching chat messages and store
-        the extracted text. Google sees the requesting host's IP. Private files can fail. Returns fetched
-        with msg_id, url, kind and chars, plus failed entries. Read untrusted text with get_media_text.
-        Use check_links for availability only.
+        """Download text from public Google documents linked in a chat and store it with the messages.
+
+        Use check_links for availability only. Works without the bridge. Google sees the host IP. No links gives an empty batch. Private or offline demo links fail individually.
         """
         res = links.fetch_shared_docs(
             chat_jids(chat)[0], after=after, before=before, limit=max(1, min(limit, 50))
@@ -144,7 +142,7 @@ def register(mcp: FastMCP) -> None:
         return ok(**res, note=UNTRUSTED)
 
     @mcp.tool(annotations=hints("Check shared link availability", read_only=True, open_world=True))
-    @safe
+    @structured(outputs.Output[outputs.Links])
     def check_links(
         chat: Chat,
         after: After = None,
@@ -153,10 +151,9 @@ def register(mcp: FastMCP) -> None:
             int, Field(description="Maximum distinct URLs to check, clamped to 1 through 50.")
         ] = 10,
     ) -> Result:
-        """Check distinct public HTTPS links in up to 500 matching chat messages, newest first. Sends HEAD
-        and may fall back to GET. Sites see the requesting host's IP. Private or reserved destinations are
-        refused. Returns count and links with msg_id, url, ok and status/final_url or error. Use
-        fetch_shared_docs to save document text.
+        """Check whether public HTTPS links in stored messages are reachable.
+
+        Use fetch_shared_docs to save document text. Works without the bridge. Sites see the host IP. No links gives an empty list. Demo reports links as offline.
         """
         res = links.check_chat_links(
             chat_jids(chat)[0], after=after, before=before, limit=max(1, min(limit, 50))

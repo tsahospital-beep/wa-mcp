@@ -84,7 +84,7 @@ no wheel for your Python version, pick a version it supports, for example
 
 ## Checking the setup
 
-`bridge_status` reports `ocr_engine` and `ocr_ready`. When the engine is not usable, `ocr_hint` says what is
+`get_bridge_status` reports `ocr_engine` and `ocr_ready`. When the engine is not usable, `ocr_hint` says what is
 missing.
 
 ## Privacy

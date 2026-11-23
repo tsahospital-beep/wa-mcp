@@ -19,7 +19,7 @@ def review_terminal(result: worker.Data) -> None:
     if result["reason"] != "approve":
         return
     if not sys.stdin.isatty() or not worker.current().sending.enabled:
-        logging.getLogger(__name__).info("approval pending: agent_approve_draft %s", result["draft_id"])
+        logging.getLogger(__name__).info("approval pending: approve_agent_draft %s", result["draft_id"])
         return
     with review(result["draft_id"]) as (draft, checked):
         prompt = checked.prompt("Send this agent reply?")

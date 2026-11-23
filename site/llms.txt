@@ -2,7 +2,9 @@
 
 > A self-hosted WhatsApp MCP server for Claude, Cursor and VS Code. The Go bridge links a phone and stores messages locally. A Python server exposes the store to MCP clients.
 
-The v0.2.0 source checkout has 11 default tools and 53 across all toolsets. The published v0.1.1 release includes the Claude Desktop extension. Field encryption is on by default. Sending starts disabled. A hosted assistant processes the tool results it requests.
+The v0.2.1 source checkout has 11 default tools and 53 across all toolsets. The published v0.1.1 release includes the Claude Desktop extension. Field encryption is on by default. Sending starts disabled. A hosted assistant processes the tool results it requests.
+
+Start with get_bridge_status to check the selected account, list_chats to find a conversation, or get_my_day for a daily briefing.
 
 WA MCP uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or ban the linked account even with sending limits.
 

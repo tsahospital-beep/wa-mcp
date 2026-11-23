@@ -39,7 +39,7 @@ With sending off, the send tools answer `sending is disabled`, the API returns 4
 Check whether your client asks: with sending on, the first `send_message` call should show a question
 before it returns.
 
-With `require_confirm` set to `false` there is no approval step. `mark_as_read` and `cancel_scheduled` do
+With `require_confirm` set to `false` there is no approval step. `mark_messages_read` and `cancel_scheduled_message` do
 not ask either, but they carry a hint for clients that this tool changes data, so some clients ask by
 themselves.
 
@@ -61,7 +61,7 @@ pause and the gap between sends. A queued action checks the source again before 
 
 | Tool | Operation |
 | --- | --- |
-| `react_to_message` | Set a reaction or pass an empty string to remove your reaction. |
+| `set_message_reaction` | Set a reaction or pass an empty string to remove your reaction. |
 | `edit_message` | Replace your own text within the WhatsApp edit window. |
 | `delete_message` | Request deletion of your own message for everyone in the conversation. |
 | `forward_message` | Show the source, destination and full text for approval, then send it with WhatsApp's forwarded marker. |
@@ -224,18 +224,18 @@ saved schedule because the previous schema did not record how they were created.
   own `human` flag. The entry stores this, so the later send matches the request. The MCP tool schedules
   text or a plain file.
 
-Status values are `pending`, `sending`, `sent`, `failed` and `cancelled`. List them with `list_scheduled`
-and cancel a pending one with `cancel_scheduled`. The same is available over the
+Status values are `pending`, `sending`, `sent`, `failed` and `cancelled`. List them with `list_scheduled_messages`
+and cancel a pending one with `cancel_scheduled_message`. The same is available over the
 [HTTP API](../reference/http-api.md#schedule).
 
 ## Read receipts
 
-Reading through an assistant does not mark messages as read. Use the `mark_as_read` tool when you want blue
+Reading through an assistant does not mark messages as read. Use the `mark_messages_read` tool when you want blue
 ticks. Three settings change the default:
 
 - `read_receipts.auto_mark_read` marks every new incoming message as read when it arrives.
 - `sending.mark_read_before_reply` marks a chat read just before a reply goes out.
-- `read_receipts.allow_mark_read` set to `false` blocks `mark_as_read` and the `/read` endpoint.
+- `read_receipts.allow_mark_read` set to `false` blocks `mark_messages_read` and the `/read` endpoint.
 
 ## Python
 

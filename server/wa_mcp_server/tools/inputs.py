@@ -7,13 +7,13 @@ from pydantic import Field
 Chat = Annotated[
     str,
     Field(
-        description="Chat JID from list_chats (15550100001@s.whatsapp.net or 120363000000001@g.us), international phone number or chat name."
+        description="Chat JID from list_chats (15550100001@s.whatsapp.net or 120363000000001@g.us), international phone number or chat name. Unknown names fail. Ambiguous names return candidates."
     ),
 ]
 ChatFilter = Annotated[
     str | None,
     Field(
-        description="Restrict to one chat by JID (15550100001@s.whatsapp.net or 120363000000001@g.us), international number or name. Omit for all chats."
+        description="Restrict to one chat by JID (15550100001@s.whatsapp.net or 120363000000001@g.us), international number or name. Omit for all chats. Unknown names fail. Ambiguous names return candidates."
     ),
 ]
 After = Annotated[

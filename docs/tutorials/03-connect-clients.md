@@ -117,7 +117,7 @@ in the client's list of servers, with its tools.
 
 ### 5. Check the setup
 
-Ask the assistant: "Run bridge_status." You should see an answer with `"database": true` and, under
+Ask the assistant: "Run get_bridge_status." You should see an answer with `"database": true` and, under
 `bridge`, `"connected": true` and `"logged_in": true`. Other fields tell you whether sending is enabled and
 whether a transcription backend and an OCR engine are ready. `tool_modules_failed` lists optional tool
 modules that could not load, with the reason.
@@ -128,7 +128,7 @@ Then try:
 - "What did I talk about with Alice last week?"
 - "What are my tasks today?"
 
-You should see the assistant call tools such as `list_chats`, `list_messages` and `my_day`. Most clients
+You should see the assistant call tools such as `list_chats`, `list_messages` and `get_my_day`. Most clients
 show each call.
 
 ## Troubleshooting

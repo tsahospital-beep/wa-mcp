@@ -1,6 +1,6 @@
 [project]
 name = "wa-mcp-sdk"
-version = "0.2.0"
+version = "0.2.1"
 description = "Python library for the wa-mcp WhatsApp bridge: local database, bridge API, transcription, exports"
 license = "MIT"
 authors = [{ name = "tsahospital-beep" }]

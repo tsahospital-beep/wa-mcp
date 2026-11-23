@@ -96,7 +96,7 @@ test group is named, Docker is not installed, you declined a confirmation.
 | `schedule` | A message scheduled 2 minutes ahead is sent within 2 minutes of its time and is stored. A second entry is scheduled and cancelled. | Type `yes`. Wait up to 5 minutes. | No |
 | `calls` | A test call appears in the call log through the API and through `list_calls`. | Call the linked account from a second phone, then answer or reject it. | Yes, by your own action |
 | `webhook` | A receiver the script starts on a random port gets a signed `message` delivery for a message the script sends to you. A forged signature is refused with 401. | Add the printed webhook entry to `config.json` and restart the bridge. Type `yes`. | No |
-| `http_mcp` | `wa-mcp serve --http` on a random loopback port: no token and a wrong token get 401, a new token can initialize, list tools and call `bridge_status`, and the token stops working after it is revoked. | Type `yes`. | No |
+| `http_mcp` | `wa-mcp serve --http` on a random loopback port: no token and a wrong token get 401, a new token can initialize, list tools and call `get_bridge_status`, and the token stops working after it is revoked. | Type `yes`. | No |
 | `docker` | Optional. The containers of the `wa-mcp` Compose project are healthy, have a read-only root file system, and the health checks answer. | Run the script on the Docker host. | No |
 | `encryption` | Optional. A read-only snapshot of `wa.db` has sealed values in all 12 protected columns and none of the test text in plain form, and it cannot be opened with another key. The snapshot is deleted. | Nothing. | No |
 | `accounts` | Optional. With an `accounts` block: `list_accounts` matches the config, stores and ports differ, and every bridge answers. | Nothing. | No |

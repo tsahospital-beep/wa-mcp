@@ -1,4 +1,4 @@
-"""bridge_status through the real MCP stdio client shows session security events and protection."""
+"""get_bridge_status through the real MCP stdio client shows session security events and protection."""
 
 from __future__ import annotations
 
@@ -77,7 +77,7 @@ async def _status(cfg: Path) -> dict[str, Any]:
     params = StdioServerParameters(command=command, args=args, env=env)
     async with stdio_client(params) as (read, write), ClientSession(read, write) as session:
         await session.initialize()
-        res = await session.call_tool("bridge_status", {})
+        res = await session.call_tool("get_bridge_status", {})
         data: dict[str, Any] = json.loads("".join(getattr(c, "text", "") for c in res.content))
         return data
 

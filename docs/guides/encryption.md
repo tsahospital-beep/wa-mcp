@@ -138,4 +138,4 @@ The startup log shows the database path, schema, encryption mode and key source.
 Schema 5 added `wa_contacts` and `wa_lid_map`. Field encryption covers the copied contact names.
 The LID map remains readable. The bridge writes schema 6 to track multipart sends.
 Its minimum reader schema is still 5. The Python reader checks `meta.min_reader_schema`
-when opening `wa.db`. `bridge_status` and `GET /api/v1/status` report encryption in `protection`.
+when opening `wa.db`. `get_bridge_status` and `GET /api/v1/status` report encryption in `protection`.

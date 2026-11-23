@@ -8,7 +8,7 @@ from typing import Any, cast
 from mcp.server.fastmcp import FastMCP
 
 from wa_mcp import config as config_mod
-from wa_mcp_server import app, common
+from wa_mcp_server import app, common, toolsets
 
 Tool = Callable[..., Any]
 
@@ -27,10 +27,23 @@ class _Picker:
     def tool(self, name: str | None = None, *args: Any, **kwargs: Any) -> Callable[[Tool], Tool]:
         def decorate(fn: Tool) -> Tool:
             tool_name = name or fn.__name__
-            self.seen.add(tool_name)
-            if self._target is not None and tool_name in self._include:
-                final = self._rename.get(tool_name, tool_name)
-                self._target.tool(final, *args, **kwargs)(fn)
+            # task_detail has its own handler for its historical query argument.
+            aliases = [
+                old for old, new in toolsets.LEGACY_NAMES.items() if new == tool_name and old != "task_detail"
+            ]
+            for public in [tool_name, *aliases]:
+                if public not in toolsets.LEGACY_NAMES:
+                    self.seen.add(public)
+                if self._target is None or public not in self._include:
+                    continue
+                final = self._rename.get(public, public)
+                options = dict(kwargs)
+                if public in toolsets.LEGACY_NAMES:
+                    options["description"] = (
+                        f"Deprecated alias for {toolsets.LEGACY_NAMES[public]}. {fn.__doc__ or ''}"
+                    )
+                options.update(title=kwargs["annotations"].title, structured_output=True)
+                self._target.tool(final, *args, **options)(fn)
                 self.added.append(final)
             return fn
 
@@ -42,7 +55,7 @@ class _Picker:
 
 def add_selected(mcp: FastMCP, wanted: set[str], names: Mapping[str, str]) -> list[str]:
     picker = _Picker(mcp, wanted, names)
-    app.register_modules(cast(FastMCP, picker))
+    app.register_modules(cast(FastMCP, picker), legacy_detail="task_detail" in wanted)
     return picker.added
 
 
@@ -68,7 +81,7 @@ def register(
     """
     wanted = set(include)
     names = dict(rename or {})
-    unknown = (wanted | set(names)) - tool_names(cfg)
+    unknown = (wanted | set(names)) - (tool_names(cfg) | toolsets.LEGACY_NAMES.keys())
     if unknown:
         raise ValueError(f"unknown wa-mcp tools: {', '.join(sorted(unknown))}")
     return add_selected(mcp, wanted, names)

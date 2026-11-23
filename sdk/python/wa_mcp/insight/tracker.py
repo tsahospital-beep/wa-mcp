@@ -575,7 +575,9 @@ def _steps(conn: sqlite3.Connection, task: str) -> list[dict[str, Any]]:
 
 
 def detail(task: str | None = None, query: str | None = None) -> dict[str, Any]:
-    with state.connect() as conn:
+    with state.read_existing("tasks") as conn:
+        if conn is None:
+            return {"found": False}
         row = conn.execute("SELECT * FROM tasks WHERE id = ?", (task,)).fetchone() if task else None
         if row is None and query:
             found = overview(query=query, open_only=False, limit=200)["tasks"]
@@ -587,7 +589,9 @@ def detail(task: str | None = None, query: str | None = None) -> dict[str, Any]:
 
 
 def which(message_id: str, convs: list[str] | None = None) -> dict[str, Any]:
-    with state.connect() as conn:
+    with state.read_existing("tasks") as conn:
+        if conn is None:
+            return {"found": False}
         rows = conn.execute("SELECT * FROM task_steps WHERE msg_id = ?", (message_id,)).fetchall()
         rows = [r for r in rows if not convs or r["conv"] in convs]
         if not rows:

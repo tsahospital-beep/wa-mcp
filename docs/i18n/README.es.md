@@ -13,7 +13,7 @@
   <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-4f7c9a?style=flat">
   <img alt="Compatible con MCP" src="https://img.shields.io/badge/MCP-compatible-5f8a7a?style=flat">
   <img alt="Plataformas: Windows, macOS, Linux" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-5f8a7a?style=flat">
-  <a href="../../CHANGELOG.md"><img alt="Versión 0.2.0" src="https://img.shields.io/badge/version-0.2.0-6c7a89?style=flat"></a>
+  <a href="../../CHANGELOG.md"><img alt="Versión 0.2.1" src="https://img.shields.io/badge/version-0.2.1-6c7a89?style=flat"></a>
 </p>
 
 <p align="center">
@@ -32,7 +32,7 @@
 
 ## Pruébalo sin teléfono
 
-Si tienes uv instalado, `uvx wa-mcp-server --demo` abre un archivo ficticio con ocho chats. La demo requiere WA MCP 0.2.0 o posterior. Una vez instalada, funciona sin conexión y sin el puente de Go.
+Si tienes uv instalado, `uvx wa-mcp-server --demo` abre un archivo ficticio con ocho chats. La demo requiere WA MCP 0.2.1 o posterior. Una vez instalada, funciona sin conexión y sin el puente de Go.
 
 [![Probar en Cursor](https://img.shields.io/badge/Probar%20en%20Cursor-4f7c9a?style=flat)](https://cursor.com/install-mcp?name=wa-mcp-demo&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJ3YS1tY3Atc2VydmVyIiwiLS1kZW1vIl19)
 [![Probar en VS Code](https://img.shields.io/badge/Probar%20en%20VS%20Code-4f7c9a?style=flat)](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp-demo%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522wa-mcp-server%2522%252C%2522--demo%2522%255D%257D)
@@ -79,7 +79,7 @@ Pregunta «¿Qué tareas tengo hoy?». Luego busca «blue umbrella» y lee la tr
 | Área | Función |
 | --- | --- |
 | Ventana de inicio de sesión | Vincula tu cuenta desde una ventana local con un código QR o un código de vinculación para tu número de teléfono. También puedes escanear el código QR desde el terminal. |
-| Varias cuentas | Usa varios números de WhatsApp en un mismo servidor MCP. Cada número tiene su propio puente, almacenamiento y límites de envío. `wa-bridge run-all` mantiene los puentes en marcha. Todas las herramientas aceptan el argumento `account` y `my_day` consulta todos los números. Las configuraciones sin cuentas siguen funcionando como antes. Consulta [Varias cuentas](../guides/accounts.md). |
+| Varias cuentas | Usa varios números de WhatsApp en un mismo servidor MCP. Cada número tiene su propio puente, almacenamiento y límites de envío. `wa-bridge run-all` mantiene los puentes en marcha. Todas las herramientas aceptan el argumento `account` y `get_my_day` consulta todos los números. Las configuraciones sin cuentas siguen funcionando como antes. Consulta [Varias cuentas](../guides/accounts.md). |
 | Historial | Guarda los mensajes que llegan y el historial que envía el teléfono al vincularlo. Aplica las ediciones, eliminaciones y reacciones. Las herramientas pueden pedir al teléfono mensajes anteriores por chat o para todo el historial. |
 | Importación de chats | Importa un archivo generado con «Exportar chat» de WhatsApp (`.txt` o `.zip` con archivos multimedia) para recuperar mensajes anteriores a los que sincroniza el teléfono. Admite archivos de Android y iPhone con distintos formatos de fecha y hora y detecta el orden de los componentes de la fecha. Puedes repetir la importación porque omite los mensajes que ya están guardados. Haz primero una simulación. |
 | Archivos multimedia | Descarga imágenes, vídeos, audio, notas de voz, documentos y stickers. Si la copia de WhatsApp ha caducado, el puente pide al teléfono que vuelva a subir el archivo. |
@@ -89,7 +89,7 @@ Pregunta «¿Qué tareas tengo hoy?». Luego busca «blue umbrella» y lee la tr
 | Documentos y archivos comprimidos | Lee texto de archivos PDF, DOCX, XLSX, PPTX, de texto plano y HTML. Enumera el contenido de archivos ZIP y RAR sin descomprimirlos y lee documentos públicos mediante enlaces de Google Docs. |
 | Análisis de chats | Compara hasta ocho chats por volumen y longitud de los mensajes, tiempo de respuesta en ambos sentidos, uso de emojis, stickers y notas de voz, grado de formalidad y roles dentro del grupo. |
 | Tareas | Identifica peticiones en los chats mediante reglas sencillas, sigue su estado y busca las palabras que hayas elegido supervisar. Funciona sin un modelo de lenguaje. |
-| `my_day` | Con una llamada puedes consultar las peticiones abiertas, los compromisos tuyos que vencen hoy, los chats pendientes de respuesta, las llamadas perdidas y los envíos programados. |
+| `get_my_day` | Con una llamada puedes consultar las peticiones abiertas, los compromisos tuyos que vencen hoy, los chats pendientes de respuesta, las llamadas perdidas y los envíos programados. |
 | Envío | Envía texto, archivos, notas de voz y stickers, con respuestas y menciones. El envío está desactivado por defecto. Apruebas cada envío en el cliente si este admite confirmaciones. Los demás clientes necesitan `sending.allow_confirm_flag`. |
 | Ritmo de envío | El puente marca primero el chat como leído, muestra el indicador de escritura durante un tiempo que depende de la longitud del mensaje y deja una pausa entre envíos. Respeta las horas de silencio y los límites por hora. Los envíos automáticos tienen así un ritmo más natural, aunque esto no ofrece ninguna garantía. |
 | Confirmaciones de lectura | Marca los mensajes como leídos cuando lo pidas o activa la confirmación automática. |
@@ -101,10 +101,10 @@ Pregunta «¿Qué tareas tengo hoy?». Luego busca «blue umbrella» y lee la tr
 | Integración en otros programas | El paquete de Go `bridge/pkg/wabridge` ejecuta el puente dentro de otro programa, con hooks para cada mensaje y chat guardado, rutas HTTP adicionales y acceso a las funciones de envío, archivos multimedia e historial. Con `wa_mcp_server.embed.register` puedes añadir herramientas concretas a otro servidor MCP. |
 | Acceso remoto | `wa-mcp serve --http` ofrece MCP mediante Streamable HTTP a clientes remotos como los conectores personalizados de claude.ai, Claude Code, Cursor y VS Code. Admite tokens bearer por dispositivo, almacenados como hashes, u OAuth 2.1 con PKCE, registro dinámico y una página de aprobación para el propietario. Incluye límites de peticiones, comprobaciones de Host y Origin y soporte para un proxy TLS. CORS está desactivado por defecto. Consulta [Conexión remota](../guides/remote-clients.md). |
 | Despliegue en un servidor | Las imágenes Docker del puente y el servidor se ejecutan sin root, con un sistema de archivos de solo lectura y comprobaciones de estado. El archivo de Compose permite usar Caddy para configurar HTTPS automáticamente. La página de inicio de sesión funciona a través del proxy con un enlace de un solo uso. Consulta [Ejecución en un servidor](../guides/server.md). Las imágenes aún no se han compilado en un host Docker real. La integración continua las compila y levanta el entorno de prueba con cada push a `main`. |
-| Proveedores de IA (opcional) | Por defecto, el asistente se encarga del análisis. Puedes configurar un proveedor en segundo plano para los resúmenes de `my_day` y las descripciones de imágenes: Ollama, un servidor compatible con OpenAI o Anthropic. Las claves se leen de variables de entorno. Los límites diarios de llamadas y de datos de entrada ayudan a controlar el coste. |
+| Proveedores de IA (opcional) | Por defecto, el asistente se encarga del análisis. Puedes configurar un proveedor en segundo plano para los resúmenes de `get_my_day` y las descripciones de imágenes: Ollama, un servidor compatible con OpenAI o Anthropic. Las claves se leen de variables de entorno. Los límites diarios de llamadas y de datos de entrada ayudan a controlar el coste. |
 | SDK de Python | El paquete `wa_mcp` incluye un cliente para el puente, acceso de lectura a la base de datos local, transcripción y exportación. |
 | Cifrado | Está activado por defecto para el texto de los mensajes, nombres de adjuntos, reacciones, transcripciones y claves de los archivos multimedia de la base de datos. La clave se guarda en el almacén del sistema (Windows DPAPI, macOS Keychain o Linux Secret Service). También puedes usar una frase de contraseña o un archivo de clave. El token de la API recibe la misma protección. En Windows, la carpeta de almacenamiento también se cifra con EFS. Consulta [Cifrado y claves](../guides/encryption.md). |
-| Alertas de sesión | Registra los cierres de sesión remotos, el uso de la sesión por otro cliente, la vinculación de un dispositivo nuevo y los inicios de sesión con otra cuenta. Puedes ver estos eventos en `bridge_status`, en `GET /api/v1/status` y en el webhook `security`. |
+| Alertas de sesión | Registra los cierres de sesión remotos, el uso de la sesión por otro cliente, la vinculación de un dispositivo nuevo y los inicios de sesión con otra cuenta. Puedes ver estos eventos en `get_bridge_status`, en `GET /api/v1/status` y en el webhook `security`. |
 
 ## Comparación con otros proyectos
 
@@ -194,7 +194,7 @@ En VS Code, dentro de `.vscode/mcp.json`:
 }
 ```
 
-Después, pide al asistente que ejecute `bridge_status` para comprobar la configuración.
+Después, pide al asistente que ejecute `get_bridge_status` para comprobar la configuración.
 
 ## Tutoriales
 
@@ -205,7 +205,7 @@ El [índice de tutoriales](../tutorials/README.md) reúne instrucciones paso a p
 ```text
 You:        What are my tasks today?
 
-Assistant:  (calls my_day for 2026-11-23)
+Assistant:  (calls get_my_day for 2026-11-23)
 
             Four things need you today.
 
@@ -220,7 +220,7 @@ Assistant:  (calls my_day for 2026-11-23)
             A reminder for the Book club is scheduled to go out at 18:00.
 ```
 
-`my_day` se ejecuta en tu equipo y aplica reglas sencillas. El asistente se limita a redactar el resultado.
+`get_my_day` se ejecuta en tu equipo y aplica reglas sencillas. El asistente se limita a redactar el resultado.
 
 ## Configuración
 
@@ -322,7 +322,7 @@ Consulta [Webhooks](../guides/webhooks.md), la [referencia de la API HTTP](../re
 - Por defecto, el puente guarda los chats en tu equipo y solo escucha en la interfaz de loopback para la API y el inicio de sesión. El cliente MCP recibe los resultados de las herramientas que solicita.
 - Los endpoints de `/api/v1` requieren un token bearer. Ejecuta `wa-bridge api-token` para consultarlo. Solo tu usuario tiene acceso a la carpeta de almacenamiento. Los enlaces de inicio de sesión son de un solo uso.
 - El texto de los mensajes de la base de datos se cifra por defecto. Windows DPAPI, el Llavero de macOS o Secret Service en Linux protegen la clave para tu usuario. Una copia de la base de datos no se puede leer en otro equipo ni desde otra cuenta de Windows. En Windows, EFS también cifra la carpeta de almacenamiento, incluida la sesión de WhatsApp. En macOS y Linux, usa cifrado de disco completo para proteger el archivo de sesión.
-- El puente registra eventos como el uso de la sesión por otro cliente o la vinculación de un dispositivo nuevo. Puedes consultarlos en `bridge_status`, en el endpoint de estado y en el webhook `security`.
+- El puente registra eventos como el uso de la sesión por otro cliente o la vinculación de un dispositivo nuevo. Puedes consultarlos en `get_bridge_status`, en el endpoint de estado y en el webhook `security`.
 - El envío está desactivado por defecto. Apruebas cada envío desde el cliente si admite confirmaciones. Los clientes que no pueden pedir confirmación solo pueden enviar si habilitas `sending.allow_confirm_flag`. En ese caso pasan `confirm=true`, un control más débil porque el modelo asigna el valor por su cuenta. El puente aplica límites, respeta las horas de silencio y evita duplicados. Solo envía archivos desde las carpetas de descargas y exportaciones, salvo que autorices otras.
 - El texto de los mensajes se trata como entrada no fiable. El servidor indica a los clientes que ignoren las instrucciones que aparezcan en él.
 - Si configuras un secreto para el webhook, la firma cubre la marca de tiempo, el ID de entrega y el cuerpo sin procesar. Procesa una sola vez cada ID verificado. Los reintentos reutilizan el mismo ID.

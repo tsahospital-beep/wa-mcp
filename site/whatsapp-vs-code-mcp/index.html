@@ -83,7 +83,7 @@
                 "name": "Where do I look if a tool is missing?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Check tool_modules_failed in bridge_status for optional modules that could not load. If there are no tools at all, test uvx in a terminal and verify the config path before checking the editor's MCP log."
+                  "text": "Check tool_modules_failed in get_bridge_status for optional modules that could not load. If there are no tools at all, test uvx in a terminal and verify the config path before checking the editor's MCP log."
                 }
               },
               {
@@ -323,7 +323,7 @@
                 bridge API for live actions.
               </p>
               <p>
-                Open chat in agent mode and ask the assistant to run bridge_status. Check the database result and the
+                Open chat in agent mode and ask the assistant to run get_bridge_status. Check the database result and the
                 bridge&#x27;s connected and logged_in flags. A missing database can indicate the wrong directory or a
                 bridge that has never started there. A missing API token can indicate that the editor is running as a
                 different operating system user from the bridge.
@@ -406,7 +406,7 @@
                   </svg>
                 </summary>
                 <p>
-                  Check tool_modules_failed in bridge_status for optional modules that could not load. If there are no
+                  Check tool_modules_failed in get_bridge_status for optional modules that could not load. If there are no
                   tools at all, test uvx in a terminal and verify the config path before checking the editor&#x27;s MCP
                   log.
                 </p>

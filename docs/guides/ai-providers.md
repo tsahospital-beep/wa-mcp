@@ -2,14 +2,14 @@
 
 By default WA MCP uses no AI model of its own. The assistant you connect (Claude, Cursor, a local model in
 your client) does the thinking: it calls the tools, reads the results and writes the answer. Tasks,
-analytics and `my_day` use plain rules on your machine.
+analytics and `get_my_day` use plain rules on your machine.
 
 You can add one optional background provider. It is off until you set `ai.provider`, and it is used by two
 features only:
 
 | Feature | What the provider does | Calls |
 | --- | --- | --- |
-| `my_day` with `summary=true` | Writes a short briefing from the structured result. | Up to 1 per request |
+| `get_my_day` with `summary=true` | Writes a short briefing from the structured result. | Up to 1 per request |
 | `read_images` with `describe=true` | Describes an image in up to three sentences. | 1 per new description |
 
 Nothing else calls the provider, and the provider cannot call tools. It only returns text, which the server
@@ -104,7 +104,7 @@ These settings apply to local and hosted providers.
 
 The daily count is kept in `store/insight.db`, in a table that holds only a date and a number. A call is
 counted before it is sent, and a call that fails is still counted, because a failed request can be billed.
-`read_images` stops cleanly when the limit is reached and reports it in `stopped`. `my_day` still returns
+`read_images` stops cleanly when the limit is reached and reports it in `stopped`. `get_my_day` still returns
 its structured result and puts the reason in `ai_error`.
 
 The client requests up to 600 output tokens for a summary and 400 for a description. `read_images`
@@ -118,11 +118,11 @@ receives the data below. Your MCP client also receives the tool result.
 
 | Feature | Sent to the provider |
 | --- | --- |
-| `my_day` with `summary=true` | The date, the counts, the names of people and groups as the tools show them (a phone number when no name is known), the type and status of each item, due hints, waiting times, and one line of each item's context clipped to 120 characters. The summary omits dedicated ID fields. Names and context can contain phone numbers or other identifiers. |
+| `get_my_day` with `summary=true` | The date, the counts, the names of people and groups as the tools show them (a phone number when no name is known), the type and status of each item, due hints, waiting times, and one line of each item's context clipped to 120 characters. The summary omits dedicated ID fields. Names and context can contain phone numbers or other identifiers. |
 | `read_images` with `describe=true` | The image file itself. The OCR text is not sent. |
 
 No other message text is sent. The tool descriptions say when a call may reach a remote service, and
-`bridge_status` shows the configured provider as `ai_provider`.
+`get_bridge_status` shows the configured provider as `ai_provider`.
 
 ## Untrusted content
 

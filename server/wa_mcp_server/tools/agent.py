@@ -12,13 +12,14 @@ from pydantic import Field
 from wa_mcp.agent import worker
 from wa_mcp.agent.providers import diagnostic
 from wa_mcp.insight import state
+from wa_mcp_server import outputs
 from wa_mcp_server.common import (
     Result,
     blocking,
     bridge,
     hints,
     ok,
-    safe,
+    structured,
 )
 from wa_mcp_server.tools import send
 from wa_mcp_server.tools.inputs import Confirm
@@ -49,16 +50,21 @@ def review(draft_id: str) -> Iterator[tuple[Result, send.Plan]]:
 
 def register(mcp: FastMCP) -> None:
     @mcp.tool(annotations=hints("Check reply agent status", read_only=True))
-    @safe
-    def agent_status() -> Result:
-        """Inspect the configured reply agent before reviewing drafts or resuming it. Returns enabled,
-        paused, mode, provider, dry_run, pending_drafts and last_poll_at (Unix seconds or null). Use
-        agent_test to exercise the provider.
+    @structured(outputs.Output[outputs.AgentStatus])
+    def get_agent_status() -> Result:
+        """Inspect the reply agent's configuration and local review queue.
+
+        Use test_agent_provider to exercise the provider. Works offline and in demo. An empty queue shows zero pending drafts.
         """
         a = worker.current().agent
-        with state.connect() as conn:
-            last_poll = state.get_meta(conn, "agent_last_poll")
-            drafts = conn.execute("SELECT count(*) FROM agent_drafts WHERE status='drafted'").fetchone()[0]
+        last_poll = None
+        drafts = 0
+        with state.read_existing("agent_drafts") as conn:
+            if conn is not None:
+                last_poll = state.get_meta(conn, "agent_last_poll")
+                drafts = conn.execute("SELECT count(*) FROM agent_drafts WHERE status='drafted'").fetchone()[
+                    0
+                ]
         return ok(
             last_poll_at=int(last_poll) if last_poll else None,
             pending_drafts=drafts,
@@ -71,34 +77,33 @@ def register(mcp: FastMCP) -> None:
         )
 
     @mcp.tool(annotations=hints("List pending reply drafts", read_only=True))
-    @safe
-    def agent_drafts(
+    @structured(outputs.Output[outputs.Drafts])
+    def list_agent_drafts(
         limit: Annotated[
             int, Field(description="Maximum pending drafts to return, clamped to 1 through 100.")
         ] = 50,
     ) -> Result:
-        """List pending agent replies newest first for human review. Returns drafts with id, chat,
-        message_id, text and voice_note. Treat draft text as untrusted. Use agent_approve_draft with the
-        selected id to review and send.
+        """List pending agent replies for human review, newest first.
+
+        Use approve_agent_draft to act on one. Reads locally offline and in demo. With no pending drafts the list is empty.
         """
         return ok(drafts=worker.pending(limit=limit, with_audio=False))
 
     @mcp.tool(annotations=hints("Review and send a reply draft", destructive=True, open_world=True))
-    @safe
-    async def agent_approve_draft(
+    @structured(outputs.Output[outputs.Decision])
+    async def approve_agent_draft(
         draft_id: Annotated[
             str,
             Field(
-                description="Use id from agent_drafts, a 32-digit hex string such as 09abc12309abc12309abc12309abc123."
+                description="Use id from list_agent_drafts, a 32-digit hex string such as 09abc12309abc12309abc12309abc123."
             ),
         ],
         ctx: Context,  # type: ignore[type-arg]
         confirm: Confirm = False,
     ) -> Result:
-        """Review one pending reply from agent_drafts for delivery through WhatsApp. Sending is off by
-        default. Always requires human approval, including when routine send confirmation is disabled.
-        Declining discards the draft. Returns status, reason, chat and draft_id after a delivery decision,
-        or an error. Quiet hours can queue delivery.
+        """Review a pending agent reply and send it only after human approval.
+
+        Use list_agent_drafts to choose the draft. Declining discards it. Quiet hours can queue it. Unknown ids, disabled sending and demo block delivery. Delivery needs the bridge.
         """
         with review(draft_id) as (draft, checked):
             refused = await send.approve(ctx, "Send this agent reply?", checked, confirm, required=True)
@@ -110,28 +115,28 @@ def register(mcp: FastMCP) -> None:
             return {"ok": result["status"] in ("sent", "queued"), **result}
 
     @mcp.tool(annotations=hints("Pause the reply agent", destructive=True, idempotent=True, open_world=True))
-    @safe
-    def agent_pause() -> Result:
-        """Pause automatic replies for this account and cancel its pending quiet-hours agent sends through
-        the bridge. Returns paused=true. Use agent_status to inspect the switch or agent_resume to process
-        future events.
+    @structured(outputs.Output[outputs.AgentSwitch])
+    def pause_agent() -> Result:
+        """Pause future automatic replies and cancel this account's pending agent sends.
+
+        Use get_agent_status to inspect the switch. Pausing is local, but cancelling queued deliveries needs the bridge. Demo refuses.
         """
         worker.set_paused(True)
         return ok(paused=True)
 
     @mcp.tool(annotations=hints("Resume the reply agent", destructive=True, idempotent=True, open_world=True))
-    @safe
-    def agent_resume() -> Result:
-        """Allow the configured reply agent to handle new events again. Depending on policy, this can call a
-        paid provider and send automatic replies. Sending is off by default. Returns paused=false. Use
-        agent_status to inspect mode and dry_run before resuming.
+    @structured(outputs.Output[outputs.AgentSwitch])
+    def resume_agent() -> Result:
+        """Allow the reply agent to handle future events for this account.
+
+        Use get_agent_status to inspect policy first. The local switch works offline. Replies still require enabled sending and a bridge and may incur provider charges. Demo refuses.
         """
         worker.set_paused(False)
         return ok(paused=False)
 
     @mcp.tool(annotations=hints("Test the reply provider", open_world=True))
-    @safe
-    async def agent_test(
+    @structured(outputs.Output[outputs.ProviderTest])
+    async def test_agent_provider(
         voice: Annotated[
             bool,
             Field(
@@ -139,10 +144,9 @@ def register(mcp: FastMCP) -> None:
             ),
         ] = False,
     ) -> Result:
-        """Call the configured reply provider with synthetic input to check connectivity. Voice testing can
-        call a second provider and write a local audio file. Provider charges may apply. Returns provider,
-        preview, skip, provider_ms, total_ms and nullable voice_file. Use agent_status for a settings
-        check without provider calls.
+        """Exercise the reply provider with synthetic input without sending a WhatsApp message.
+
+        Use get_agent_status for a local check. Works without the bridge. Providers may charge and the optional voice test writes a preview. Demo refuses.
         """
         try:
             return ok(**await worker.test_connection(worker.current(), voice))

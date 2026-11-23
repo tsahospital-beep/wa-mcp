@@ -151,7 +151,7 @@ supports, for example `uv sync --python 3.13 --all-packages --inexact --extra fa
 
 ## Check that it works
 
-Ask the assistant to run `bridge_status`, or call the tool yourself. The answer includes
+Ask the assistant to run `get_bridge_status`, or call the tool yourself. The answer includes
 `transcription_backend` and `transcription_ready`. When the backend is not ready, `transcription_hint`
 says what is missing.
 

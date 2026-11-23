@@ -188,10 +188,10 @@ from wa_mcp_server.embed import register
 
 mcp = FastMCP("book-club")
 cfg = config.load("config.json")
-register(mcp, include=["my_day", "list_calls"], cfg=cfg, rename={"list_calls": "wa_calls"})
+register(mcp, include=["get_my_day", "list_calls"], cfg=cfg, rename={"list_calls": "wa_calls"})
 mcp.run("stdio")
 ```
 
 `register` returns the names the tools got. `rename` gives a tool another name when your server already uses
 that name. Names that no wa-mcp tool has raise `ValueError` before anything is added. `tool_names(cfg)` lists
-all names. The added tools share one config per process.
+the current names. An explicit include can also use a deprecated name. The added tools share one config per process.

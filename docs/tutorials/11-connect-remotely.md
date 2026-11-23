@@ -119,7 +119,7 @@ The `claude_desktop_config.json` file of Claude Desktop starts local programs. T
 }
 ```
 
-Then ask the assistant to run `bridge_status`. You should see the same answer as with a local server.
+Then ask the assistant to run `get_bridge_status`. You should see the same answer as with a local server.
 
 ### 5. List and revoke tokens
 

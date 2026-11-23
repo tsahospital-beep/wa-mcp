@@ -127,13 +127,13 @@ def run(env: dict[str, Any]) -> dict[str, Any]:
         ("list_messages", {"query": "quarterly", "account": "work"}),
         ("get_chat", {"chat": "Dana", "account": "work"}),
         ("get_chat", {"chat": "Dana"}),
-        ("bridge_status", {"account": "work"}),
-        ("bridge_status", {}),
+        ("get_bridge_status", {"account": "work"}),
+        ("get_bridge_status", {}),
         ("send_message", {"to": synth.DANA, "text": "On it", "confirm": True}),
         ("send_message", {"to": synth.DANA, "text": "On it", "confirm": True, "account": "work"}),
         ("list_chats", {"account": "club"}),
-        ("my_day", {"date": T0_DAY}),
-        ("my_day", {"date": T0_DAY, "account": "work"}),
+        ("get_my_day", {"date": T0_DAY}),
+        ("get_my_day", {"date": T0_DAY, "account": "work"}),
         ("list_accounts", {"account": "work"}),
     ]
     return asyncio.run(_session(env["cfg"], calls))
@@ -222,7 +222,7 @@ def test_single_account_output_has_no_account_fields(tmp_path: Path) -> None:
     cfg = synth.make_config(tmp_path, port=1)
     synth.build_wa_db(tmp_path / "store" / "wa.db")
     synth.build_session_db(tmp_path / "store" / "session.db")
-    out = asyncio.run(_session(cfg, [("my_day", {"date": T0_DAY}), ("list_accounts", {})]))
+    out = asyncio.run(_session(cfg, [("get_my_day", {"date": T0_DAY}), ("list_accounts", {})]))
     day, listing = out["results"]
     assert day["ok"] and "accounts" not in day
     assert all("account" not in g for g in day["people"])

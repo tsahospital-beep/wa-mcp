@@ -210,7 +210,9 @@ def build_event(cfg: config.Config, bridge: Bridge, ref: Data, row: Data) -> Eve
 
 def pending(draft_id: str = "", limit: int = 50, *, with_audio: bool = True) -> list[Data]:
     result = []
-    with state.connect() as conn:
+    with state.connect() if with_audio else state.read_existing("agent_drafts") as conn:
+        if conn is None:
+            return []
         query = "SELECT * FROM agent_drafts WHERE status='drafted'"
         if draft_id:
             rows = conn.execute(query + " AND id=?", (draft_id,))

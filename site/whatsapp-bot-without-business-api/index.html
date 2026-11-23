@@ -115,7 +115,7 @@
               {
                 "@type": "HowToStep",
                 "name": "Inspect a draft and the decision",
-                "text": "In a source checkout with toolset selection, enable the agent tools along with core tools in the MCP server configuration, then restart the client connection. Use agent_status to inspect the mode, pending count and most recent successful poll. Use agent_drafts to inspect the suggestion. If a generated answer is inappropriate, leave it pending and adjust the prompt or the amount of context before another test.",
+                "text": "In a source checkout with toolset selection, enable the agent tools along with core tools in the MCP server configuration, then restart the client connection. Use get_agent_status to inspect the mode, pending count and most recent successful poll. Use list_agent_drafts to inspect the suggestion. If a generated answer is inappropriate, leave it pending and adjust the prompt or the amount of context before another test.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/#section-4"
               },
               {
@@ -297,7 +297,7 @@
             </section>
             <section id="section-4">
             <h2>Inspect a draft and the decision</h2>
-            <p>In a source checkout with toolset selection, enable the agent tools along with core tools in the MCP server configuration, then restart the client connection. Use <code>agent_status</code> to inspect the mode, pending count and most recent successful poll. Use <code>agent_drafts</code> to inspect the suggestion. If a generated answer is inappropriate, leave it pending and adjust the prompt or the amount of context before another test.</p>
+            <p>In a source checkout with toolset selection, enable the agent tools along with core tools in the MCP server configuration, then restart the client connection. Use <code>get_agent_status</code> to inspect the mode, pending count and most recent successful poll. Use <code>list_agent_drafts</code> to inspect the suggestion. If a generated answer is inappropriate, leave it pending and adjust the prompt or the amount of context before another test.</p>
             <p>An empty draft list can have several explanations. Confirm that the worker was running when the new message arrived. Check the exact allowed chat and whether a deny rule applies. Outgoing messages are skipped. A group must be listed explicitly, and the account must actually be mentioned. A per-chat cooldown also suppresses repeated triggers. Test with a fresh direct message after the interval.</p>
             </section>
             <section id="section-5">

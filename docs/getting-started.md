@@ -8,7 +8,7 @@ link a phone to read your own messages. Sending stays off by default.
 With [uv](https://docs.astral.sh/uv/getting-started/installation/) installed, configure your client to
 run `uvx wa-mcp-server --demo`. Claude Desktop bundle users can select **Demo mode** and leave the
 bridge configuration blank. Ask “What are my tasks today?” to read the fictional daily briefing.
-The demo requires version 0.2.0 or newer. For a checkout of the unreleased version, use
+The demo requires version 0.2.1 or newer. For a checkout of the unreleased version, use
 `uv run --directory /absolute/path/to/wa-mcp wa-mcp-server --demo` as the client command.
 See the [client configurations](../README.md#try-it-without-a-phone) and the
 [two-minute demo](tutorials/00-demo.md).
@@ -200,7 +200,7 @@ that path. Each argument is a separate string, including paths with spaces.
 With pipx, set the command to `wa-mcp` and keep just `["--config", "CONFIG_FILE"]` as the arguments.
 Restart the client. See [Connect an MCP client](guides/mcp-clients.md) for client-specific settings.
 
-Run `bridge_status` in your client. It reports whether the database exists, whether the
+Run `get_bridge_status` in your client. It reports whether the database exists, whether the
 bridge is reachable and logged in, whether sending is enabled and which transcription backend is set.
 After that try:
 

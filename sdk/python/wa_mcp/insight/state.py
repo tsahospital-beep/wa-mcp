@@ -146,6 +146,33 @@ def connect() -> Iterator[sqlite3.Connection]:
 
 
 @contextmanager
+def read_existing(table: str) -> Iterator[sqlite3.Connection | None]:
+    """Read an existing table without creating, migrating or pruning the state database."""
+    target = path()
+    if not target.is_file():
+        yield None
+        return
+    try:
+        conn = sqlite3.connect(target.resolve().as_uri() + "?mode=ro", uri=True, timeout=8)
+        try:
+            conn.row_factory = sqlite3.Row
+            conn.execute("BEGIN")
+            exists = conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)
+            ).fetchone()
+            if not exists:
+                yield None
+                return
+            if _encrypted() and get_meta(conn, "text_mode") != "sealed":
+                raise db.StoreError("run refresh_tasks to update the insight database for encrypted storage")
+            yield conn
+        finally:
+            conn.close()
+    except sqlite3.Error as exc:
+        raise db.StoreError(f"cannot read insight database: {exc}") from exc
+
+
+@contextmanager
 def transaction(conn: sqlite3.Connection) -> Iterator[sqlite3.Connection]:
     """BEGIN IMMEDIATE ... COMMIT, rolled back on error."""
     conn.execute("BEGIN IMMEDIATE")

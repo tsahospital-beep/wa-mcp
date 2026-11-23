@@ -2,7 +2,7 @@
 
 > A self-hosted WhatsApp MCP server for Claude, Cursor and VS Code. The Go bridge links a phone and stores messages locally. A Python server exposes the store to MCP clients.
 
-The v0.2.0 source checkout has 11 default tools and 53 across all toolsets. The published v0.1.1 release includes the Claude Desktop extension. Field encryption is on by default. Sending starts disabled. A hosted assistant processes the tool results it requests.
+The v0.2.1 source checkout has 11 default tools and 53 across all toolsets. The published v0.1.1 release includes the Claude Desktop extension. Field encryption is on by default. Sending starts disabled. A hosted assistant processes the tool results it requests.
 
 WA MCP uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or ban the linked account even with sending limits.
 
@@ -40,7 +40,7 @@ pipx install wa-mcp-server
 pipx inject --force wa-mcp-server 'wa-mcp-sdk[encryption,files]'
 ~~~
 
-Set your client command to wa-mcp with --config and the absolute config path. Check the connection with bridge_status.
+Set your client command to wa-mcp with --config and the absolute config path. Check the connection with get_bridge_status.
 
 ## Common questions
 
@@ -66,7 +66,7 @@ Sending is off by default. If enabled, a client with MCP elicitation asks for ap
 
 ## [How the WhatsApp MCP server works](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-server/)
 
-The WhatsApp MCP server gives an assistant access to a linked account. A Go bridge collects messages and a Python server reads the store. The v0.2.0 source checkout exposes 11 core tools by default, with 53 across all toolsets.
+The WhatsApp MCP server gives an assistant access to a linked account. A Go bridge collects messages and a Python server reads the store. The v0.2.1 source checkout exposes 11 core tools by default, with 53 across all toolsets.
 
 ### Follow a message from phone to client
 
@@ -78,7 +78,7 @@ For example, ask for the last conversation about an invoice. The client can call
 
 Build the bridge with Go 1.26 or newer, or run the published bridge image. Copy the example configuration and start the bridge. Open Linked devices on your phone and scan the QR code in its login window. If the window does not open, the terminal also displays the code. The login window offers pairing by phone number when you cannot scan.
 
-Install uv so your client can launch the Python server with uvx. Give it the absolute path of the same config.json that the bridge uses. Relative configuration paths can lead the client to look for an empty store in its working directory. Start with bridge_status and check three separate results: the database is readable, the bridge is connected and the phone account is logged in.
+Install uv so your client can launch the Python server with uvx. Give it the absolute path of the same config.json that the bridge uses. Relative configuration paths can lead the client to look for an empty store in its working directory. Start with get_bridge_status and check three separate results: the database is readable, the bridge is connected and the phone account is logged in.
 
 ### Choose a transport
 
@@ -100,7 +100,7 @@ Message text is encrypted in the database by default. The server reads it as the
 
 **Which tools does the WhatsApp MCP server load?**
 
-The v0.2.0 checkout loads core by default. Add named groups to mcp.toolsets in config.json and restart the MCP server. For example, add history alongside core to make chat export and import available.
+The v0.2.1 checkout loads core by default. Add named groups to mcp.toolsets in config.json and restart the MCP server. For example, add history alongside core to make chat export and import available.
 
 **Is there a required background model?**
 
@@ -218,7 +218,7 @@ The SDK extras allow this environment to read encrypted message fields and extra
 
 ### Check what Claude can read
 
-Ask Claude to run bridge_status. Look for a true database result, then check the connected and logged_in values under bridge. If the database result fails, check which configuration file you selected. If only the bridge is unreachable, check that the bridge process is running with the same API address and that both processes run as the user who linked the account.
+Ask Claude to run get_bridge_status. Look for a true database result, then check the connected and logged_in values under bridge. If the database result fails, check which configuration file you selected. If only the bridge is unreachable, check that the bridge process is running with the same API address and that both processes run as the user who linked the account.
 
 Try asking for your five most recent chats. Pick one and ask for the context around its last invoice or meeting request. This checks that Claude can retrieve the original conversation after finding a match. If recent chats appear but an older exchange is missing, ask for history back to a particular date while the phone is online.
 
@@ -240,7 +240,7 @@ A claude.ai custom connector uses a remote MCP service. Configure an HTTPS endpo
 
 **How do I connect WhatsApp to Claude Desktop with the extension?**
 
-Open wa-mcp.mcpb from the v0.1.1 release, choose Install and select the config.json used by the running bridge. Restart Claude Desktop and ask it to run bridge_status.
+Open wa-mcp.mcpb from the v0.1.1 release, choose Install and select the config.json used by the running bridge. Restart Claude Desktop and ask it to run get_bridge_status.
 
 **Can Claude send a message after installation?**
 
@@ -295,7 +295,7 @@ For work split across phone numbers, ask for the configured accounts first. Spec
 
 ### Diagnose an empty tool list
 
-Run the published command with the help flag in a terminal to check the executable and package before debugging a chat. If Cursor lists the server but tools fail, ask for bridge_status. A readable database means Cursor can reach stored messages. A disconnected bridge explains why an attachment download or a request for older messages cannot proceed.
+Run the published command with the help flag in a terminal to check the executable and package before debugging a chat. If Cursor lists the server but tools fail, ask for get_bridge_status. A readable database means Cursor can reach stored messages. A disconnected bridge explains why an attachment download or a request for older messages cannot proceed.
 
 A recent installation may have few conversations because the phone has only sent its first batch of history. Ask to list recent chats with their dates, choose one, then request older pages for that chat. Keep the phone online and repeat the request if the sync reports that its time budget expired with work remaining.
 
@@ -357,7 +357,7 @@ To configure a workspace manually, create .vscode/mcp.json in that workspace. Fo
 
 Replace CONFIG_FILE in the example with the file your bridge uses, including its full directory. A config inside the current project is unnecessary when the bridge lives elsewhere. The file tells the Python server where to read stored messages, which encryption settings to use and where it can reach the bridge API for live actions.
 
-Open chat in agent mode and ask the assistant to run bridge_status. Check the database result and the bridge's connected and logged_in flags. A missing database can indicate the wrong directory or a bridge that has never started there. A missing API token can indicate that the editor is running as a different operating system user from the bridge.
+Open chat in agent mode and ask the assistant to run get_bridge_status. Check the database result and the bridge's connected and logged_in flags. A missing database can indicate the wrong directory or a bridge that has never started there. A missing API token can indicate that the editor is running as a different operating system user from the bridge.
 
 ### Read a thread while working
 
@@ -405,7 +405,7 @@ Yes. Use the MCP: Open User Configuration command for a user-wide entry. A .vsco
 
 **Where do I look if a tool is missing?**
 
-Check tool_modules_failed in bridge_status for optional modules that could not load. If there are no tools at all, test uvx in a terminal and verify the config path before checking the editor's MCP log.
+Check tool_modules_failed in get_bridge_status for optional modules that could not load. If there are no tools at all, test uvx in a terminal and verify the config path before checking the editor's MCP log.
 
 **Can stored history be read when the bridge stops?**
 
@@ -425,13 +425,13 @@ The project's example includes an open invoice request, a promise to send photos
 
 ### Set the date and scope
 
-With no date supplied, my_day uses today. Ask for a particular date to review another day, or provide the chat to focus on one conversation. With several configured accounts, a call without an account combines the overview from all numbers and labels the results. Supply an account name for a briefing limited to that number.
+With no date supplied, get_my_day uses today. Ask for a particular date to review another day, or provide the chat to focus on one conversation. With several configured accounts, a call without an account combines the overview from all numbers and labels the results. Supply an account name for a briefing limited to that number.
 
 Check the history before relying on an empty overview. List a few recent conversations and their last message dates. If the store has little history, ask to page back in one chat with the phone online. When a sync reports incomplete work, another call can continue it. Imported archive messages are excluded from task detection unless you explicitly include them.
 
 ### Understand the task tracker
 
-Use tasks_overview to find open tasks, task_detail to see the steps of a task and which_task to trace an individual message to its task. A detail view can show why a message was attached to an existing request. For changes over a recent period, ask what moved in the last day with whats_new.
+Use list_tasks to find open tasks, get_task to see the steps of a task and find_task_for_message to trace an individual message to its task. A detail view can show why a message was attached to an existing request. For changes over a recent period, ask what moved in the last day with list_whats_new.
 
 The tracker distinguishes new, in progress, waiting, done, cancelled and stale tasks. An inactive open request becomes stale after 60 days with the default settings. It disappears from the daily list but remains in the tracker until the retention period passes. If a recent request is missing after messages changed, refresh the tracker and check the wording in the source chat.
 
@@ -507,7 +507,7 @@ Start or restart the bridge with that config. Run uv run wa-mcp agent with the s
 
 ### Inspect a draft and the decision
 
-In a source checkout with toolset selection, enable the agent tools along with core tools in the MCP server configuration, then restart the client connection. Use agent_status to inspect the mode, pending count and most recent successful poll. Use agent_drafts to inspect the suggestion. If a generated answer is inappropriate, leave it pending and adjust the prompt or the amount of context before another test.
+In a source checkout with toolset selection, enable the agent tools along with core tools in the MCP server configuration, then restart the client connection. Use get_agent_status to inspect the mode, pending count and most recent successful poll. Use list_agent_drafts to inspect the suggestion. If a generated answer is inappropriate, leave it pending and adjust the prompt or the amount of context before another test.
 
 An empty draft list can have several explanations. Confirm that the worker was running when the new message arrived. Check the exact allowed chat and whether a deny rule applies. Outgoing messages are skipped. A group must be listed explicitly, and the account must actually be mentioned. A per-chat cooldown also suppresses repeated triggers. Test with a fresh direct message after the interval.
 
@@ -609,7 +609,7 @@ scripts\install_whisper.ps1 -Backend faster-whisper -Model large-v3 -Download
 ```
 
 
-Ask for bridge_status and inspect transcription_backend, transcription_ready and transcription_hint. Read the hint before testing a long recording. It can distinguish a missing program or package from a problem retrieving the voice note itself. When using a source environment with optional packages, make sure the client launches the server from that environment.
+Ask for get_bridge_status and inspect transcription_backend, transcription_ready and transcription_hint. Read the hint before testing a long recording. It can distinguish a missing program or package from a problem retrieving the voice note itself. When using a source environment with optional packages, make sure the client launches the server from that environment.
 
 ### Transcribe one conversation
 
@@ -663,7 +663,7 @@ A dry run reports the time range, proposed message count, duplicates, missing me
 
 ### Run the import
 
-In the v0.2.0 checkout, include history alongside core in mcp.toolsets and restart the MCP server to expose the import tool.
+In the v0.2.1 checkout, include history alongside core in mcp.toolsets and restart the MCP server to expose the import tool.
 
 With the bridge running, ask the assistant to use import_chat_export on a file in the configured downloads or exports directory, or another allowed directory. Use dry_run first, then repeat with the same arguments and dry_run disabled. The HTTP API also accepts a form upload. For the command line importer, stop the bridge before opening the store directly.
 
@@ -689,7 +689,7 @@ Use Export chat on the phone and import the file into the local WA MCP store. Le
 
 **Will old requests appear in today's task list?**
 
-By default the task tracker, task detection and my_day skip imported messages. Enable tasks.include_imported when you intend old exports to contribute to those results.
+By default the task tracker, task detection and get_my_day skip imported messages. Enable tasks.include_imported when you intend old exports to contribute to those results.
 
 **Does an import notify anyone?**
 
@@ -863,7 +863,7 @@ Quiet hours, limits and duplicate protection also apply to sends. By default att
 
 ### Inspect a session warning
 
-Ask for bridge_status and review its protection details and recent security events. The status endpoint retains the latest 20 session events, including a remote logout, another client using the session and changes to linked devices. A security webhook can deliver those events to a configured receiver. Review an unfamiliar linked device on your phone under Linked devices.
+Ask for get_bridge_status and review its protection details and recent security events. The status endpoint retains the latest 20 session events, including a remote logout, another client using the session and changes to linked devices. A security webhook can deliver those events to a configured receiver. Review an unfamiliar linked device on your phone under Linked devices.
 
 ### Questions
 

@@ -1,5 +1,5 @@
 {
-  "mcp": {"toolsets": ["core"]},
+  "mcp": {"toolsets": ["core"], "legacy_tool_names": false},
   "store_dir": "store",
   "downloads_dir": "downloads",
   "exports_dir": "exports",

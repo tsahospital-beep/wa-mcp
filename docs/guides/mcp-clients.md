@@ -140,7 +140,7 @@ system keychain if there is one.
 
 ## Check the connection
 
-Ask the assistant to run `bridge_status`. A healthy answer has `"database": true` and, under `bridge`,
+Ask the assistant to run `get_bridge_status`. A healthy answer has `"database": true` and, under `bridge`,
 `"connected": true` and `"logged_in": true`. `tool_modules_failed` lists optional tool modules that could
 not load, with the reason. If the bridge is not running, the tools that only read the
 database still answer and the tools that need the bridge report that it is not reachable.

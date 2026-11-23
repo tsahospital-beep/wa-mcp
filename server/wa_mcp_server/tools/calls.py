@@ -6,13 +6,14 @@ from mcp.server.fastmcp import FastMCP
 from pydantic import Field
 
 from wa_mcp import db
-from wa_mcp_server.common import UNTRUSTED, Result, clamp, display_name, hints, ok, safe
+from wa_mcp_server import outputs
+from wa_mcp_server.common import UNTRUSTED, Result, clamp, display_name, hints, ok, structured
 from wa_mcp_server.tools.inputs import Offset, PageSize
 
 
 def register(mcp: FastMCP) -> None:
     @mcp.tool(annotations=hints("List recorded calls", read_only=True))
-    @safe
+    @structured(outputs.Output[outputs.Calls])
     def list_calls(
         since: Annotated[
             str | None,
@@ -23,9 +24,9 @@ def register(mcp: FastMCP) -> None:
         limit: PageSize = 50,
         offset: Offset = 0,
     ) -> Result:
-        """Read the local voice and video call log, newest first. Returns calls with id, peer, time,
-        direction, video, outcome and duration_seconds, plus next_offset. Phone-originated calls depend on
-        synced records. Use my_day for missed calls still awaiting a response.
+        """Browse stored voice and video calls, newest first.
+
+        Use get_my_day for missed calls awaiting a response. Works offline and in demo. No matching call records gives an empty page.
         """
         start = max(offset, 0)
         rows = db.calls(since=since, limit=clamp(limit), offset=start)

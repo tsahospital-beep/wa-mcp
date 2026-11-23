@@ -11,7 +11,7 @@ You need uv and an MCP client. The demo includes eight chats from the past 30 da
    claude mcp add wa-mcp-demo -- uvx wa-mcp-server --demo
    ```
 
-2. **Ask “What are my tasks today?”** The assistant calls `my_day`. Look for Mira Vale's invoice request,
+2. **Ask “What are my tasks today?”** The assistant calls `get_my_day`. Look for Mira Vale's invoice request,
    your promise to call Teo Lark, and a missed call from Nia Reed.
 
 3. **Ask “Search my messages for blue umbrella.”** The assistant calls `list_messages` with

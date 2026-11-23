@@ -176,7 +176,7 @@ no colon, which is the usual case.
 
 Imported messages are marked as read, so they do not show up as unread. Edits, deletions, reactions and
 replies are not part of an export, so none are stored. Message tools mark imported rows with `imported: true`.
-Task detection, the task tracker and `my_day` skip imported messages unless `tasks.include_imported` is true.
+Task detection, the task tracker and `get_my_day` skip imported messages unless `tasks.include_imported` is true.
 
 ## Ids and duplicates
 

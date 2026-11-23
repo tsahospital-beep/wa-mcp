@@ -40,13 +40,13 @@ def test_register_picks_and_renames(cfg_path: Path) -> None:
 
     added = register(
         host,
-        include=["list_calls", "bridge_status", "list_chats"],
+        include=["list_calls", "get_bridge_status", "list_chats"],
         cfg=config.load(cfg_path),
         rename={"list_chats": "wa_list_chats"},
     )
-    assert set(added) == {"wa_list_chats", "list_calls", "bridge_status"}
+    assert set(added) == {"wa_list_chats", "list_calls", "get_bridge_status"}
     names = {t.name for t in asyncio.run(host.list_tools())}
-    assert names == {"list_chats", "wa_list_chats", "list_calls", "bridge_status"}
+    assert names == {"list_chats", "wa_list_chats", "list_calls", "get_bridge_status"}
     assert "send_message" in tool_names(config.load(cfg_path))
     with pytest.raises(ValueError, match="no_such_tool"):
         register(FastMCP("x"), include=["no_such_tool"], cfg=config.load(cfg_path))

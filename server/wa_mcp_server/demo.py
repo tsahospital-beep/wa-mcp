@@ -17,7 +17,7 @@ LINK_NOTICE = (
 
 # Only these tools may execute their bodies against the fictional archive.
 OFFLINE_TOOLS = {
-    "bridge_status",
+    "get_bridge_status",
     "list_accounts",
     "list_chats",
     "search_contacts",
@@ -35,20 +35,21 @@ OFFLINE_TOOLS = {
     "transcribe_chat_audio",
     "check_links",
     "fetch_shared_docs",
-    "my_day",
-    "chat_analytics",
-    "chat_analytics_compare",
+    "get_my_day",
+    "get_chat_analytics",
+    "compare_chat_analytics",
     "find_mentions",
     "detect_tasks",
-    "tasks_overview",
+    "list_tasks",
+    "get_task",
     "task_detail",
-    "which_task",
+    "find_task_for_message",
     "refresh_tasks",
-    "project_overview",
-    "whats_new",
-    "list_scheduled",
-    "agent_status",
-    "agent_drafts",
+    "get_project_overview",
+    "list_whats_new",
+    "list_scheduled_messages",
+    "get_agent_status",
+    "list_agent_drafts",
 }
 
 

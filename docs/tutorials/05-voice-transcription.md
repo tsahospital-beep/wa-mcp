@@ -120,7 +120,7 @@ Restart the client so that the MCP server reads the file.
 
 ### 5. Check that the backend is ready
 
-Ask the assistant: "Run bridge_status." You should see `transcription_backend` with the name you set and
+Ask the assistant: "Run get_bridge_status." You should see `transcription_backend` with the name you set and
 `transcription_ready` as `true`. If it is `false`, `transcription_hint` says what is missing.
 
 ### 6. Transcribe a chat

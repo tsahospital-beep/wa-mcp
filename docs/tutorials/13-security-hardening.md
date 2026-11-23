@@ -14,7 +14,7 @@ tutorial verifies that and adds the parts that need your action.
 
 ### 1. Check what protects the store
 
-Ask the assistant: "Run bridge_status." Or ask the bridge directly.
+Ask the assistant: "Run get_bridge_status." Or ask the bridge directly.
 
 macOS and Linux:
 
@@ -110,7 +110,7 @@ Remove entries that you do not recognize. Do this every few weeks.
 
 The bridge also watches for signs that someone else uses the session: another client with the keys of this
 session (`session_replaced`), a remote logout (`logged_out`), a new device on your account (`device_added`)
-and a different account at login (`account_mismatch`). Ask the assistant to run `bridge_status` and read the
+and a different account at login (`account_mismatch`). Ask the assistant to run `get_bridge_status` and read the
 security events, or look at `security_events` in the status answer. You can also receive them as a
 `security` webhook, see [Webhooks and the Python SDK](12-webhooks-and-python-sdk.md).
 

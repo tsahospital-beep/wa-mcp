@@ -20,7 +20,7 @@ listens on the network, what is protected and what is not. To report a problem, 
 - On Windows the store folder, including the WhatsApp session, is also encrypted with EFS by default. On
   macOS and Linux, full disk encryption protects the session file.
 - The bridge records session events (a remote logout, another client with this session, a new device on
-  the account) and shows them in `bridge_status`, the status endpoint and a `security` webhook.
+  the account) and shows them in `get_bridge_status`, the status endpoint and a `security` webhook.
 - Anyone who can run code as your user, including an administrator or malware, can read your data and your
   token. Check **Linked devices** on your phone regularly.
 
@@ -133,7 +133,7 @@ token. The Host header cannot tell the two apart, because a remote client choose
   default is a server on your own machine. If you point it to a remote service, that service receives the
   audio.
 - Webhooks send events, including message text, to the URLs you configure.
-- When `ai.provider` is set, `my_day` with `summary=true` sends names, item types, due hints and short
+- When `ai.provider` is set, `get_my_day` with `summary=true` sends names, item types, due hints and short
   clipped context lines to that provider, and `read_images` with `describe=true` sends the image. The
   default provider address is your own machine for Ollama. A hosted provider receives the data. Both
   features are off unless you call them. See [AI features and providers](guides/ai-providers.md).
@@ -299,7 +299,7 @@ and records them:
 | `paired` | info | This bridge was linked as a new device. |
 
 Each event is logged as a warning or a note, kept in `wa.db` (the last 20, also after a restart), returned
-in `security_events` by `GET /api/v1/status` and by `bridge_status`, sets `security_alert` for 7 days when
+in `security_events` by `GET /api/v1/status` and by `get_bridge_status`, sets `security_alert` for 7 days when
 it is a warning, and is sent to webhooks as event `security`. Details mask phone numbers and never contain
 message text or keys. The WhatsApp library emits no event when a device is added to your own account; it
 only updates its device cache, which is why the bridge compares the list. `IdentityChange` is about other
@@ -340,7 +340,7 @@ people's primary devices, so it is not used.
    `allowed_media_dirs`, quiet hours and low limits.
 4. Open **Linked devices** in WhatsApp now and then. The bridge appears as `WA MCP`. Remove entries you do
    not recognize.
-5. If you suspect that `session.db` or the token leaked, or `bridge_status` shows a `session_replaced` or
+5. If you suspect that `session.db` or the token leaked, or `get_bridge_status` shows a `session_replaced` or
    `device_added` warning you cannot explain, remove the device in WhatsApp, delete the `store` folder and
    link again.
 6. Keep the repository folder out of cloud sync and shared drives, and keep `exports_dir` private.

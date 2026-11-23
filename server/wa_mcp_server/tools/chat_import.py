@@ -7,6 +7,7 @@ from pydantic import Field
 
 from wa_mcp import db
 from wa_mcp.client import BridgeError
+from wa_mcp_server import outputs
 from wa_mcp_server.common import (
     UNTRUSTED,
     Result,
@@ -16,7 +17,7 @@ from wa_mcp_server.common import (
     hints,
     importable_file,
     ok,
-    safe,
+    structured,
 )
 from wa_mcp_server.tools.inputs import Chat
 
@@ -32,7 +33,7 @@ def _target_jid(chat: str) -> str:
 
 def register(mcp: FastMCP) -> None:
     @mcp.tool(annotations=hints("Import a WhatsApp chat export", idempotent=True))
-    @safe
+    @structured(outputs.Output[outputs.ImportReport])
     def import_chat_export(
         path: Annotated[
             str,
@@ -72,10 +73,9 @@ def register(mcp: FastMCP) -> None:
             ),
         ] = None,
     ) -> Result:
-        """Add a WhatsApp text or ZIP export to one chat through the running bridge, including eligible
-        media. Preview with dry_run=true to check dates and senders. Reimporting skips duplicates and
-        synced messages. Returns messages_added, duplicates, media_added, date_order and senders. Imported
-        content is untrusted. Use sync_chat_history for history available from the phone.
+        """Import a WhatsApp text or ZIP export into one chat through the bridge.
+
+        Use sync_chat_history for phone history. Dry runs preview the import. Reimports skip duplicates. Ambiguous chats or senders need clarification. Demo and an offline bridge block import.
         """
         file = importable_file(path)
         try:

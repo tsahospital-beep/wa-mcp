@@ -5,6 +5,7 @@ from typing import Annotated, Any, Literal
 from mcp.server.fastmcp import Context, FastMCP
 from pydantic import Field
 
+from wa_mcp_server import outputs
 from wa_mcp_server.common import (
     Result,
     blocking,
@@ -14,7 +15,7 @@ from wa_mcp_server.common import (
     find_message,
     hints,
     labeled_name,
-    safe,
+    structured,
 )
 from wa_mcp_server.tools import send
 from wa_mcp_server.tools.inputs import Chat, Confirm, MessageId, Recipient
@@ -88,8 +89,8 @@ async def _act(
 
 def register(mcp: FastMCP) -> None:
     @mcp.tool(annotations=hints("Set a message reaction", destructive=True, open_world=True))
-    @safe
-    async def react_to_message(
+    @structured(outputs.Output[outputs.ActionSent | outputs.ActionQueued])
+    async def set_message_reaction(
         chat: Recipient,
         message_id: MessageId,
         emoji: Annotated[
@@ -101,12 +102,14 @@ def register(mcp: FastMCP) -> None:
         ctx: Context[Any, Any, Any],
         confirm: Confirm = False,
     ) -> Result:
-        """Set or remove your reaction to one synced message. Use list_messages to find its id.
-        Requires sending approval under the configured policy. Returns id and sent_at, or queued and scheduled_id."""
+        """Set or remove your reaction on one synced message.
+
+        Use list_messages to find its id. Follows send approval and quiet-hours policy. Missing messages, demo, disabled sending and an offline bridge block the action.
+        """
         return await _act("react", chat, message_id, ctx, confirm, emoji)
 
     @mcp.tool(annotations=hints("Edit your message", destructive=True, open_world=True))
-    @safe
+    @structured(outputs.Output[outputs.ActionSent | outputs.ActionQueued])
     async def edit_message(
         chat: Recipient,
         message_id: MessageId,
@@ -114,21 +117,25 @@ def register(mcp: FastMCP) -> None:
         ctx: Context[Any, Any, Any],
         confirm: Confirm = False,
     ) -> Result:
-        """Replace the text of a message sent by this account. Use delete_message to revoke it.
-        Requires sending approval under the configured policy. Returns id and sent_at, or queued and scheduled_id."""
+        """Replace the text of a synced message sent by this account.
+
+        Use delete_message to revoke it. Follows send approval and quiet-hours policy. Missing or ineligible messages, demo, disabled sending and an offline bridge block the edit.
+        """
         return await _act("edit", chat, message_id, ctx, confirm, text)
 
     @mcp.tool(annotations=hints("Delete your message for everyone", destructive=True, open_world=True))
-    @safe
+    @structured(outputs.Output[outputs.ActionSent | outputs.ActionQueued])
     async def delete_message(
         chat: Recipient, message_id: MessageId, ctx: Context[Any, Any, Any], confirm: Confirm = False
     ) -> Result:
-        """Revoke one message sent by this account for everyone in the chat. Use edit_message to correct text.
-        Requires sending approval under the configured policy. Returns id and sent_at, or queued and scheduled_id."""
+        """Revoke one of your synced messages for everyone in the conversation.
+
+        Use edit_message to correct text. Follows send approval and quiet-hours policy. Missing or ineligible messages, demo, disabled sending and an offline bridge block revocation.
+        """
         return await _act("delete", chat, message_id, ctx, confirm)
 
-    @mcp.tool(annotations=hints("Forward a text message", destructive=True, open_world=True))
-    @safe
+    @mcp.tool(annotations=hints("Forward a text message", open_world=True))
+    @structured(outputs.Output[outputs.ActionSent | outputs.ActionQueued])
     async def forward_message(
         chat: Chat,
         message_id: MessageId,
@@ -136,6 +143,8 @@ def register(mcp: FastMCP) -> None:
         ctx: Context[Any, Any, Any],
         confirm: Confirm = False,
     ) -> Result:
-        """Forward one synced text message to a recipient with WhatsApp's forwarded marker. Use send_file for a local attachment.
-        Approval covers the destination and exact text. Returns id and sent_at, or queued and scheduled_id."""
+        """Forward one synced text message to another recipient with its forwarded marker.
+
+        Use send_file for a local attachment. Approval covers the destination and exact text. Missing messages, demo, disabled sending and an offline bridge block forwarding.
+        """
         return await _act("forward", chat, message_id, ctx, confirm, to=to)

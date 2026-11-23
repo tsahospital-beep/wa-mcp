@@ -23,7 +23,7 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 from wa_mcp.console import configure_console
-from wa_mcp_server.toolsets import TOOLSETS
+from wa_mcp_server.toolsets import LEGACY_NAMES, TOOLSETS
 
 ROOT = Path(__file__).resolve().parent.parent
 TARGET = ROOT / "docs" / "reference" / "tools.md"
@@ -121,9 +121,19 @@ def render(tools: list[Any], instructions: str) -> str:
         "This page is generated from the running server by `scripts/gen_tool_reference.py`.",
         f"The core toolset exposes {len(TOOLSETS['core'])} tools by default. Select `all` for all {len(tools)} tools. Arguments marked `required` have no default.",
         "",
+        "Each tool advertises its result type in `tools/list`. A call returns the same JSON object in `structuredContent` and the text response. Tool-level failures use `ok: false`. Invalid MCP arguments can also produce a protocol validation error.",
+        "",
         "Server instructions sent to the client:",
         "",
         f"> {clean(instructions)}",
+        "",
+    ]
+    out += [
+        "Deprecated names remain callable when their toolset is enabled. Set `mcp.legacy_tool_names` to true to list them as well.",
+        "",
+        "| Deprecated name | Current name |",
+        "| --- | --- |",
+        *(f"| `{old}` | `{current}` |" for old, current in LEGACY_NAMES.items()),
         "",
     ]
     for title, names in TOOLSETS.items():

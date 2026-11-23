@@ -220,19 +220,17 @@ def test_insight_tool_annotations() -> None:
     insight.register(mcp)
     ann = {t.name: t.annotations for t in asyncio.run(mcp.list_tools())}
     writes = {
-        "my_day",
-        "chat_analytics",
-        "chat_analytics_compare",
-        "tasks_overview",
-        "task_detail",
-        "which_task",
+        "get_my_day",
+        "get_chat_analytics",
+        "compare_chat_analytics",
+        "list_tasks",
         "refresh_tasks",
-        "project_overview",
-        "whats_new",
+        "get_project_overview",
+        "list_whats_new",
     }
     for name in writes:
         a = ann[name]
         assert a is not None and a.readOnlyHint is False, name
-        assert a.destructiveHint == (name != "chat_analytics_compare"), name
+        assert a.destructiveHint == (name != "compare_chat_analytics"), name
     for name in set(ann) - writes:
         assert ann[name] is not None and ann[name].readOnlyHint is True, name

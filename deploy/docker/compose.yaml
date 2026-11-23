@@ -94,7 +94,7 @@ services:
     logging: *logging
 
   caddy:
-    image: caddy:2.10.2-alpine
+    image: caddy:2.11.9-alpine
     profiles: [caddy]
     restart: unless-stopped
     depends_on:

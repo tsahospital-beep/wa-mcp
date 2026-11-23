@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions: {}
+
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Check the release version
+        id: release
+        run: |
+          version=$(jq -er '.version' server.json)
+          test "$GITHUB_REF_NAME" = "v$version"
+          image="ghcr.io/tsahospital-beep/wa-mcp-server:$version"
+          jq -e --arg image "$image" 'any(.packages[]; .registryType == "oci" and .identifier == $image)' server.json
+          grep -Fq "## [$version] -" CHANGELOG.md
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push the bridge
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: deploy/docker/Dockerfile.bridge
+          platforms: linux/amd64,linux/arm64
+          build-args: VERSION=${{ steps.release.outputs.version }}
+          tags: ghcr.io/tsahospital-beep/wa-mcp-bridge:${{ steps.release.outputs.version }}
+          push: true
+
+      - name: Build and push the server
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: deploy/docker/Dockerfile.server
+          platforms: linux/amd64,linux/arm64
+          tags: ghcr.io/tsahospital-beep/wa-mcp-server:${{ steps.release.outputs.version }}
+          push: true
+
+  release:
+    needs: images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          notes="$RUNNER_TEMP/release-notes.md"
+          awk -v version="${GITHUB_REF_NAME#v}" '
+            /^## / { if (found) exit; found = ($2 == "[" version "]"); next }
+            /^\[[^]]+\]: / { next }
+            found { print }
+          ' CHANGELOG.md > "$notes"
+          grep -q '[^[:space:]]' "$notes"
+          sed -i "s|](docs/|](https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/docs/|g" "$notes"
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --notes-file "$notes"

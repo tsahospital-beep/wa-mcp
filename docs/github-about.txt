@@ -1,0 +1,14 @@
+Description:
+WhatsApp MCP for AI assistants. Local bridge and MCP server to search, read and send.
+
+Topics:
+mcp
+model-context-protocol
+whatsapp
+whatsmeow
+claude
+ai-assistant
+go
+python
+llm-tools
+automation

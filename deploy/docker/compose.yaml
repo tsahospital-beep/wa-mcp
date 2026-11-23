@@ -1,0 +1,145 @@
+# WA MCP on a server: the bridge, the MCP server over HTTP and, with the "caddy" profile, automatic
+# HTTPS for your domain. Guide: docs/guides/server.md
+#
+#   cp env.example .env                      # set WA_MCP_DOMAIN (and TZ)
+#   sh secrets/make-key.sh                   # the database key, readable by the containers only
+#   docker compose --profile caddy up -d --build
+#   docker compose exec bridge wa-bridge login-url    # one-time link to the login page
+#
+# The server shares the network namespace of the bridge, so the bridge API stays on 127.0.0.1:8080
+# and only the MCP port (8765) and the login page (8766) are reachable from the proxy. session.db is in
+# the volume wa-session, which only the bridge mounts; the server reads names from wa.db.
+
+name: wa-mcp
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  bridge:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.bridge
+    image: wa-mcp-bridge:local
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      TZ: ${TZ:-UTC}
+      WA_MCP_LOGIN_PUBLIC_URL: https://${WA_MCP_DOMAIN:?set WA_MCP_DOMAIN in .env}/login/
+      # A server has no OS keystore. Default: a key file from a Docker secret (secrets/wa_mcp.key).
+      # Alternative: WA_MCP_ENCRYPTION_MODE=passphrase with WA_MCP_PASSPHRASE or WA_MCP_PASSPHRASE_FILE.
+      WA_MCP_ENCRYPTION_MODE: ${WA_MCP_ENCRYPTION_MODE:-keyfile}
+      WA_MCP_KEY_FILE: ${WA_MCP_KEY_FILE:-/run/secrets/wa_mcp_key}
+      WA_MCP_PASSPHRASE: ${WA_MCP_PASSPHRASE:-}
+      WA_MCP_PASSPHRASE_FILE: ${WA_MCP_PASSPHRASE_FILE:-}
+      WA_MCP_LOG_LEVEL: ${WA_MCP_LOG_LEVEL:-WARN}
+    secrets:
+      - wa_mcp_key
+    volumes:
+      - wa-data:/data
+      # session.db (the keys of the linked device) lives here, in a volume only the bridge mounts.
+      - wa-session:/session
+      # Your own settings (a copy of config.container.json) instead of the built-in ones:
+      # - ./config.json:/config/config.json:ro
+    networks: [wa]
+    ports:
+      # The MCP server of the "server" service, on the host loopback only (for an SSH tunnel or a
+      # proxy on the host). Leave WA_MCP_PORT empty for a random port.
+      - "127.0.0.1:${WA_MCP_PORT-8765}:8765"
+    stop_grace_period: 30s
+    logging: *logging
+
+  server:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.server
+    image: wa-mcp-server:local
+    restart: unless-stopped
+    network_mode: service:bridge
+    depends_on:
+      bridge:
+        condition: service_healthy
+        # The server lives in the bridge's network namespace: restart it with the bridge.
+        restart: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      TZ: ${TZ:-UTC}
+      WA_MCP_SERVER_PUBLIC_URL: https://${WA_MCP_DOMAIN:?set WA_MCP_DOMAIN in .env}
+      WA_MCP_ADMIN_PASSWORD: ${WA_MCP_ADMIN_PASSWORD:-}
+      WA_MCP_ENCRYPTION_MODE: ${WA_MCP_ENCRYPTION_MODE:-keyfile}
+      WA_MCP_KEY_FILE: ${WA_MCP_KEY_FILE:-/run/secrets/wa_mcp_key}
+      WA_MCP_PASSPHRASE: ${WA_MCP_PASSPHRASE:-}
+      WA_MCP_PASSPHRASE_FILE: ${WA_MCP_PASSPHRASE_FILE:-}
+      # The admin password from a Docker secret instead of .env:
+      # WA_MCP_ADMIN_PASSWORD_FILE: /run/secrets/wa_mcp_admin_password
+    secrets:
+      - wa_mcp_key
+      # - wa_mcp_admin_password
+    volumes:
+      - wa-data:/data
+      # - ./config.json:/config/config.json:ro
+    stop_grace_period: 15s
+    logging: *logging
+
+  caddy:
+    image: caddy:2.10.2-alpine
+    profiles: [caddy]
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_healthy
+        restart: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      WA_MCP_DOMAIN: ${WA_MCP_DOMAIN:?set WA_MCP_DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    networks: [wa]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    logging: *logging
+
+networks:
+  # Fixed subnet: server.trusted_proxies in config.container.json names it, so only Caddy and the host
+  # port mapping (its gateway) count as the TLS proxy. Change both together if it collides with a network
+  # on your host.
+  wa:
+    ipam:
+      config:
+        - subnet: 172.30.87.0/24
+
+volumes:
+  wa-data:
+  wa-session:
+  caddy-data:
+  caddy-config:
+
+secrets:
+  # 32 random bytes as 64 hex characters, owned by user 65532 with mode 0600 (secrets/make-key.sh).
+  wa_mcp_key:
+    file: ./secrets/wa_mcp.key
+  # wa_mcp_admin_password:
+  #   file: ./secrets/admin_password.txt

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="referrer" content="no-referrer">
+$refresh<title>WA MCP: $title</title>
+<style>
+:root{
+  --bg:#eef2f0; --card:#fff; --ink:#111b21; --ink2:#54656f; --ink3:#8696a0;
+  --line:#e9edef; --soft:#f0f2f5; --acc:#00a884; --acc2:#008069; --accsoft:#e7f6f0;
+  --red:#d64545; --amber:#e9a23b; --r:24px;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px;
+  background:radial-gradient(120% 60% at 50% -12%,#d9f1e6 0%,rgba(217,241,230,0) 62%),var(--bg);
+  font:14px/1.45 "Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.card{
+  width:100%;max-width:420px;display:flex;flex-direction:column;background:var(--card);border-radius:var(--r);padding:20px 24px 14px;
+  box-shadow:0 1px 2px rgba(11,20,26,.05),0 10px 28px rgba(11,20,26,.07),0 28px 60px rgba(11,20,26,.06);
+  opacity:0;transform:translateY(12px) scale(.97);animation:card-in .55s var(--ease) .05s forwards;
+}
+@keyframes card-in{to{opacity:1;transform:none}}
+.head{display:flex;align-items:center;gap:12px}
+.mark{width:40px;height:40px;flex:none;filter:drop-shadow(0 3px 8px rgba(0,168,132,.28))}
+h1{font-size:17px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+.sub{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.tag{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--acc2);background:var(--accsoft);padding:5px 10px 5px 8px;border-radius:999px}
+.body{padding:18px 2px 8px}
+h2{font-size:19px;font-weight:600;letter-spacing:-.01em}
+p{font-size:13.5px;color:var(--ink2);margin-top:6px}
+.app{margin-top:16px;padding:14px 16px;border-radius:16px;background:var(--soft)}
+.app .name{font-size:15px;font-weight:600;color:var(--ink);word-break:break-word}
+.app dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin-top:8px;font-size:12.5px}
+.app dt{color:var(--ink3)}
+.app dd{color:var(--ink2);word-break:break-all}
+.req{font:600 13px/1 ui-monospace,"Cascadia Mono","SF Mono",Menlo,Consolas,monospace;letter-spacing:.08em;color:var(--ink)}
+.lbl2{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin:18px 0 6px}
+.field{display:flex;align-items:center;height:48px;padding:0 14px;border:1.5px solid var(--line);border-radius:12px;transition:border-color .2s,box-shadow .2s}
+.field:focus-within{border-color:var(--acc);box-shadow:0 0 0 4px rgba(0,168,132,.12)}
+.field input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:16px;color:var(--ink)}
+.ferr{font-size:12.5px;color:var(--red);margin-top:10px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.btn{width:100%;height:46px;border-radius:12px;background:var(--acc);color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .1s}
+.btn:hover{background:var(--acc2)}
+.btn:active{transform:scale(.99)}
+.btn.ghost{background:var(--soft);color:var(--ink)}
+.btn.ghost:hover{background:#e5e8eb}
+.wait{display:flex;align-items:center;gap:12px;margin-top:16px;padding:12px 14px;border-radius:12px;background:var(--accsoft);font-size:13px;color:var(--acc2)}
+.spin{flex:none;width:20px;height:20px;border-radius:50%;border:3px solid rgba(0,128,105,.18);border-top-color:var(--acc);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+code{font:12.5px ui-monospace,"Cascadia Mono","SF Mono",Menlo,Consolas,monospace;background:var(--soft);padding:1px 5px;border-radius:5px;color:var(--ink)}
+.done{text-align:center;padding:14px 6px 18px}
+.check{width:64px;height:64px;margin:0 auto 14px;display:block}
+.check circle{fill:var(--acc)}
+.check path{fill:none;stroke:#fff;stroke-width:4.2;stroke-linecap:round;stroke-linejoin:round}
+.check.warn circle{fill:#fdf3e2}
+.check.warn path{stroke:var(--amber);stroke-width:4}
+.foot{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink3)}
+@media (prefers-reduced-motion:reduce){*,*::before{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="mg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2fd383"/><stop offset="1" stop-color="#009a74"/>
+    </linearGradient>
+    <symbol id="mark" viewBox="0 0 48 48">
+      <rect width="48" height="48" rx="13" fill="url(#mg)"/>
+      <path d="M24 11.5c-7 0-12.5 5.1-12.5 11.5 0 3.3 1.5 6.3 3.9 8.4l-1.2 5 5.2-2.6c1.4.5 3 .7 4.6.7 7 0 12.5-5.1 12.5-11.5S31 11.5 24 11.5z" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/>
+      <path d="M19.6 23.6l8-3.9M19.6 23.6l8 3.9" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/>
+      <circle cx="19.2" cy="23.6" r="2.5" fill="#fff"/><circle cx="28.6" cy="19.3" r="2.5" fill="#fff"/><circle cx="28.6" cy="27.9" r="2.5" fill="#fff"/>
+    </symbol>
+    <symbol id="lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></g></symbol>
+  </defs>
+</svg>
+<main class="card">
+  <header class="head">
+    <svg class="mark" aria-hidden="true"><use href="#mark"/></svg>
+    <div>
+      <h1>WA MCP</h1>
+      <p class="sub">Connect an app</p>
+    </div>
+    <span class="tag"><svg width="12" height="12" aria-hidden="true"><use href="#lock"/></svg>Owner approval</span>
+  </header>
+  <section class="body">
+$content
+  </section>
+  <footer class="foot"><svg width="12" height="12" aria-hidden="true"><use href="#lock"/></svg>Only the owner of this server can approve access.</footer>
+</main>
+</body>
+</html>

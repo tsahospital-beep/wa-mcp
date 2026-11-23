@@ -1,0 +1,25 @@
+# HTTPS for WA MCP with an automatic certificate for WA_MCP_DOMAIN (ports 80 and 443 must be open).
+# Access logs are off: approval and login links carry one-time values in their query strings.
+{
+	admin off
+}
+
+{$WA_MCP_DOMAIN} {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+
+	# The login page of the bridge. It answers only with the one-time link from `wa-bridge login-url`
+	# and only while no device is linked.
+	handle /login/* {
+		reverse_proxy bridge:8766
+	}
+
+	# MCP (/mcp), OAuth (/authorize, /token, /register, /revoke, /oauth/*, /.well-known/*) and /health.
+	handle {
+		reverse_proxy bridge:8765 {
+			flush_interval -1
+		}
+	}
+}

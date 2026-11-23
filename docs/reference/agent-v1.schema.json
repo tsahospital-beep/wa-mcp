@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:wa-mcp:agent:v1",
+  "title": "WA MCP agent HTTP contract v1",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/response"
+    }
+  ],
+  "$defs": {
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "account": {
+          "type": "string"
+        },
+        "chat": {
+          "type": "string"
+        },
+        "chat_name": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "from_name": {
+          "type": "string"
+        },
+        "message_id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "transcript": {
+          "type": "string"
+        },
+        "media_kind": {
+          "type": "string"
+        },
+        "language_hint": {
+          "type": "string"
+        },
+        "event": {
+          "enum": [
+            "message",
+            "missed_call",
+            "rejected_call",
+            "call_offer"
+          ]
+        },
+        "history": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "required": [
+              "from",
+              "text",
+              "kind"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "from": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "account",
+        "chat",
+        "chat_name",
+        "from",
+        "from_name",
+        "message_id",
+        "text",
+        "transcript",
+        "media_kind",
+        "language_hint",
+        "event",
+        "history"
+      ]
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reply_text": {
+          "type": "string",
+          "maxLength": 12000
+        },
+        "reply_audio_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https?://",
+          "description": "Public HTTPS or HTTP on the configured loopback agent's origin. The connector checks the origin and resolved addresses."
+        },
+        "reply_audio_base64": {
+          "type": "string",
+          "contentEncoding": "base64",
+          "maxLength": 11184812
+        },
+        "audio_mime": {
+          "type": "string"
+        },
+        "voice_note": {
+          "type": "boolean"
+        },
+        "skip": {
+          "type": "boolean"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "skip"
+          ],
+          "properties": {
+            "skip": {
+              "const": true
+            }
+          }
+        },
+        {
+          "required": [
+            "reply_text"
+          ],
+          "properties": {
+            "reply_text": {
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "required": [
+            "reply_audio_url"
+          ],
+          "properties": {
+            "reply_audio_url": {
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "required": [
+            "reply_audio_base64"
+          ],
+          "properties": {
+            "reply_audio_base64": {
+              "minLength": 1
+            }
+          }
+        }
+      ],
+      "not": {
+        "required": [
+          "reply_audio_url",
+          "reply_audio_base64"
+        ]
+      }
+    }
+  }
+}

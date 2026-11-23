@@ -1,0 +1,72 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.tsahospital-beep/wa-mcp",
+  "description": "Read, search and send WhatsApp messages through a linked WA MCP bridge.",
+  "repository": {
+    "url": "https://github.com/tsahospital-beep/wa-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/tsahospital-beep/wa-mcp-server:0.1.0",
+      "transport": { "type": "stdio" },
+      "runtimeHint": "docker",
+      "runtimeArguments": [
+        { "type": "positional", "value": "--interactive", "isRequired": true },
+        {
+          "type": "named",
+          "name": "--network",
+          "isRequired": true,
+          "value": "container:{bridge}",
+          "variables": {
+            "bridge": {
+              "description": "Name or ID of the running, linked bridge container.",
+              "default": "wa-mcp-bridge-1",
+              "isRequired": true
+            }
+          }
+        },
+        {
+          "type": "named",
+          "name": "--volume",
+          "isRequired": true,
+          "value": "{volume}:/data",
+          "variables": {
+            "volume": {
+              "description": "Existing bridge data volume, which holds messages and the API token.",
+              "default": "wa-mcp_wa-data",
+              "isRequired": true
+            }
+          }
+        },
+        {
+          "type": "named",
+          "name": "--mount",
+          "isRequired": true,
+          "value": "type=bind,source={key},target=/run/secrets/wa_mcp_key,readonly",
+          "variables": {
+            "key": {
+              "description": "Absolute path to the key file used by the bridge.",
+              "format": "filepath",
+              "isRequired": true
+            }
+          }
+        },
+        { "type": "positional", "value": "--no-healthcheck", "isRequired": true }
+      ],
+      "packageArguments": [
+        { "type": "named", "name": "--log-level", "value": "WARNING", "isRequired": true }
+      ],
+      "environmentVariables": [
+        { "name": "WA_MCP_CONFIG", "description": "Configuration file inside the container.", "default": "/config/config.json" },
+        { "name": "WA_MCP_STORE_DIR", "description": "Message database directory inside the shared volume.", "default": "/data/store" },
+        { "name": "WA_MCP_API_LISTEN", "description": "Bridge API host and port.", "default": "127.0.0.1:8080" },
+        { "name": "WA_MCP_API_TOKEN", "description": "Bridge API token if the bridge uses an explicit token.", "isSecret": true },
+        { "name": "WA_MCP_ENCRYPTION_MODE", "value": "keyfile" },
+        { "name": "WA_MCP_KEY_FILE", "value": "/run/secrets/wa_mcp_key" }
+      ]
+    }
+  ]
+}

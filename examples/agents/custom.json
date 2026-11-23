@@ -1,0 +1,9 @@
+{
+  "agent": {
+    "enabled": true,
+    "provider": "agents.custom_provider:Assistant",
+    "allow_chats": [
+      "Alice"
+    ]
+  }
+}

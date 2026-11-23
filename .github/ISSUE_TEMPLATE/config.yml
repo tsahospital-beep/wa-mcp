@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security problem
+    url: https://github.com/tsahospital-beep/wa-mcp/security/policy
+    about: Do not open a public issue for a vulnerability. Follow the security policy instead.
+  - name: Read the documentation
+    url: https://github.com/tsahospital-beep/wa-mcp/tree/main/docs
+    about: Setup, configuration, the tool reference and the FAQ.

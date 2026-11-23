@@ -1,0 +1,13 @@
+{
+  "agent": {
+    "enabled": true,
+    "provider": "openai",
+    "allow_chats": [
+      "Alice"
+    ],
+    "voice": {
+      "provider": "http-tts",
+      "url": "http://127.0.0.1:9003/v1/audio/speech"
+    }
+  }
+}

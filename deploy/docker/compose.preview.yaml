@@ -1,0 +1,10 @@
+# Preview: the bridge shows the login page with fake codes and never connects to WhatsApp. Everything
+# else is the normal setup, so this checks the documented steps (.env, make-key.sh, up) and the health
+# checks. CI runs exactly this:
+#   cp env.example .env && sh secrets/make-key.sh
+#   docker compose -f compose.yaml -f compose.preview.yaml up -d --build --wait
+#   curl "http://$(docker compose -f compose.yaml -f compose.preview.yaml port bridge 8765)/health"
+
+services:
+  bridge:
+    command: ["--login-preview"]

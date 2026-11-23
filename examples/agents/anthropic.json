@@ -1,0 +1,9 @@
+{
+  "agent": {
+    "enabled": true,
+    "provider": "anthropic",
+    "allow_chats": [
+      "Alice"
+    ]
+  }
+}

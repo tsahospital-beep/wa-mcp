@@ -1,0 +1,13 @@
+{
+  "agent": {
+    "enabled": true,
+    "provider": "openai",
+    "allow_chats": [
+      "Alice"
+    ],
+    "voice": {
+      "provider": "elevenlabs",
+      "voice_id": "YOUR_VOICE_ID"
+    }
+  }
+}

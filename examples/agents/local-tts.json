@@ -1,0 +1,18 @@
+{
+  "agent": {
+    "enabled": true,
+    "provider": "ollama",
+    "allow_chats": [
+      "Alice"
+    ],
+    "voice": {
+      "provider": "command",
+      "argv": [
+        "espeak-ng",
+        "--stdin",
+        "-w",
+        "{file}"
+      ]
+    }
+  }
+}

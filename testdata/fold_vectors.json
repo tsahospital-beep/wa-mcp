@@ -1,0 +1,24 @@
+{
+  "description": "Case folding shared by the Go bridge (golang.org/x/text/cases Fold) and the Python package (str.casefold). Each fold entry: folding input gives folded. Each search entry: folded query is a substring of folded text exactly when match is true.",
+  "fold": [
+    {"input": "Book CLUB", "folded": "book club"},
+    {"input": "Straße", "folded": "strasse"},
+    {"input": "ẞ", "folded": "ss"},
+    {"input": "ΣΊΣΥΦΟΣ", "folded": "σίσυφοσ"},
+    {"input": "ﬁle", "folded": "file"},
+    {"input": "K", "folded": "k"},
+    {"input": "µ", "folded": "μ"},
+    {"input": "ÉCOLE", "folded": "école"},
+    {"input": "Ǆ", "folded": "ǆ"},
+    {"input": "İ", "folded": "i̇"},
+    {"input": "ŉ", "folded": "ʼn"}
+  ],
+  "search": [
+    {"text": "Meet at Hauptstraße 5", "query": "HAUPTSTRASSE", "match": true},
+    {"text": "ﬁle report", "query": "FILE", "match": true},
+    {"text": "Greetings from ΑΘΗΝΑ", "query": "αθηνα", "match": true},
+    {"text": "Ein Brief ÜBER Äpfel", "query": "über äpfel", "match": true},
+    {"text": "Book club", "query": "book clubs", "match": false},
+    {"text": "50% off, under_score", "query": "R_S", "match": true}
+  ]
+}

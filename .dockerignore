@@ -1,0 +1,31 @@
+# Build context of deploy/docker/Dockerfile.*: only the sources the images need.
+.git
+.github
+**/__pycache__
+**/*.py[cod]
+**/.venv
+**/.mypy_cache
+**/.ruff_cache
+**/.pytest_cache
+**/tests
+testdata
+docs
+assets
+# Local data and secrets (root folders only; bridge/internal/store is source code).
+/store
+/downloads
+/exports
+/config.json
+**/*.db
+**/*.db-wal
+**/*.db-shm
+**/api.token
+**/server.key
+.env
+.env.*
+deploy/docker/.env
+**/secrets
+**/*.key
+**/*_key
+/wa-bridge
+/wa-bridge.exe

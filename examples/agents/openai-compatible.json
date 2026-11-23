@@ -1,0 +1,10 @@
+{
+  "agent": {
+    "enabled": true,
+    "provider": "openai-compatible",
+    "allow_chats": [
+      "Alice"
+    ],
+    "url": "http://127.0.0.1:9001/v1"
+  }
+}

@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import importlib
-import importlib.util
-import logging
 from collections.abc import Callable, Iterable, Mapping
 from typing import Any, cast
 
@@ -12,8 +9,6 @@ from mcp.server.fastmcp import FastMCP
 
 from wa_mcp import config as config_mod
 from wa_mcp_server import app, common
-
-log = logging.getLogger("wa_mcp_server")
 
 Tool = Callable[..., Any]
 
@@ -45,25 +40,17 @@ class _Picker:
         return getattr(self._target or self._scratch, attr)
 
 
-def _register_all(picker: _Picker) -> None:
-    mcp = cast(FastMCP, picker)
-    for module in app.MODULES:
-        module.register(mcp)
-    for name in app.OPTIONAL_MODULES:
-        if importlib.util.find_spec(name) is None:
-            continue
-        try:
-            importlib.import_module(name).register(mcp)
-        except Exception as exc:
-            log.exception("optional tool module %s failed to load", name)
-            common.load_errors[name] = f"{exc.__class__.__name__}: {exc}"
+def add_selected(mcp: FastMCP, wanted: set[str], names: Mapping[str, str]) -> list[str]:
+    picker = _Picker(mcp, wanted, names)
+    app.register_modules(cast(FastMCP, picker))
+    return picker.added
 
 
 def tool_names(cfg: config_mod.Config | None = None) -> set[str]:
     """Names of all wa-mcp tools that register() can add."""
     common.setup(cfg or config_mod.load())
     picker = _Picker(None, set(), {})
-    _register_all(picker)
+    app.register_modules(cast(FastMCP, picker))
     return picker.seen
 
 
@@ -84,6 +71,4 @@ def register(
     unknown = (wanted | set(names)) - tool_names(cfg)
     if unknown:
         raise ValueError(f"unknown wa-mcp tools: {', '.join(sorted(unknown))}")
-    picker = _Picker(mcp, wanted, names)
-    _register_all(picker)
-    return picker.added
+    return add_selected(mcp, wanted, names)

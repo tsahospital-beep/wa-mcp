@@ -23,97 +23,10 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 from wa_mcp.console import configure_console
+from wa_mcp_server.toolsets import TOOLSETS
 
 ROOT = Path(__file__).resolve().parent.parent
 TARGET = ROOT / "docs" / "reference" / "tools.md"
-
-GROUPS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
-    (
-        "Status",
-        "Check that the setup works, and list the WhatsApp numbers when several are set up. Every tool takes "
-        "an optional `account` (see [Several accounts](../guides/accounts.md)).",
-        ("bridge_status", "list_accounts"),
-    ),
-    (
-        "Contacts and chats",
-        "Find people and chats. Chats can be given as a JID, a phone number with country code, or a name.",
-        ("search_contacts", "list_chats", "get_chat", "get_last_interaction"),
-    ),
-    (
-        "Messages",
-        "Read stored messages. Voice transcripts and extracted file text appear inline.",
-        (
-            "list_messages",
-            "get_message_context",
-            "mark_as_read",
-            "export_chat",
-            "export_period",
-        ),
-    ),
-    (
-        "History",
-        "Ask the phone for messages older than the ones stored.",
-        ("request_chat_history", "sync_chat_history", "sync_all_history"),
-    ),
-    (
-        "Media and files",
-        "Download attachments, read images and documents, or inspect shared links.",
-        (
-            "download_media",
-            "download_chat_media",
-            "get_media_text",
-            "list_stickers",
-            "extract_file_text",
-            "fetch_shared_docs",
-            "check_links",
-            "read_images",
-        ),
-    ),
-    ("Chat imports", "Add older messages from a local WhatsApp export.", ("import_chat_export",)),
-    (
-        "Voice transcription",
-        "Turn voice notes and audio messages into text with the configured backend.",
-        ("transcribe_chat_audio",),
-    ),
-    (
-        "Agent connector",
-        "Review and control the external reply provider for one account.",
-        ("agent_status", "agent_test", "agent_drafts", "agent_approve_draft", "agent_pause", "agent_resume"),
-    ),
-    (
-        "Calls",
-        "Read the call log.",
-        ("list_calls",),
-    ),
-    (
-        "Sending",
-        "Off by default. Each call needs `sending.enabled`. With `sending.require_confirm` the server asks the user "
-        "through the client (MCP elicitation). The fallback also requires `sending.allow_confirm_flag`.",
-        ("send_message", "send_file", "send_voice_note", "send_sticker"),
-    ),
-    (
-        "Scheduled messages",
-        "Messages the bridge sends later, once or on a repeat.",
-        ("schedule_message", "list_scheduled", "cancel_scheduled"),
-    ),
-    (
-        "Analytics and tasks",
-        "Analyze the local archive. Only the optional summary in `my_day` uses a model provider.",
-        (
-            "my_day",
-            "chat_analytics",
-            "chat_analytics_compare",
-            "detect_tasks",
-            "tasks_overview",
-            "task_detail",
-            "which_task",
-            "refresh_tasks",
-            "project_overview",
-            "whats_new",
-            "find_mentions",
-        ),
-    ),
-)
 
 TYPE_NAMES = {
     "string": "string",
@@ -206,25 +119,25 @@ def render(tools: list[Any], instructions: str) -> str:
         "# MCP tools",
         "",
         "This page is generated from the running server by `scripts/gen_tool_reference.py`.",
-        f"The server exposes {len(tools)} tools over stdio. Arguments marked `required` have no default.",
+        f"The core toolset exposes {len(TOOLSETS['core'])} tools by default. Select `all` for all {len(tools)} tools. Arguments marked `required` have no default.",
         "",
         "Server instructions sent to the client:",
         "",
         f"> {clean(instructions)}",
         "",
     ]
-    for title, blurb, names in GROUPS:
-        present = [n for n in names if n in by_name]
-        if not present:
-            continue
-        out += [f"## {title}", "", blurb, ""]
-        for name in present:
+    for title, names in TOOLSETS.items():
+        out += [
+            f"## {title}",
+            "",
+            "Enabled by default." if title == "core" else "Enable this toolset by name.",
+            "",
+        ]
+        for name in names:
             out.append(render_tool(by_name[name]))
             used.add(name)
-    rest = [t for t in tools if t.name not in used]
-    if rest:
-        out += ["## Other", ""]
-        out += [render_tool(t) for t in rest]
+    if used != set(by_name):
+        raise ValueError(f"tools missing from toolsets: {set(by_name) - used}")
     return "\n".join(out).rstrip() + "\n"
 
 
@@ -235,7 +148,7 @@ async def collect() -> str:
         env = {k: v for k, v in os.environ.items() if not k.startswith("WA_MCP_")}
         params = StdioServerParameters(
             command=sys.executable,
-            args=["-m", "wa_mcp_server", "--config", str(config)],
+            args=["-m", "wa_mcp_server", "--config", str(config), "--toolsets", "all"],
             env=env,
             cwd=tmp,
         )

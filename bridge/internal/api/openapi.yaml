@@ -264,6 +264,130 @@ paths:
               schema: { $ref: "#/components/schemas/Error" }
         "502": { $ref: "#/components/responses/Upstream" }
         "503": { $ref: "#/components/responses/NotConnected" }
+  /messages/react:
+    post:
+      tags: [act]
+      operationId: reactToMessage
+      summary: Set or remove your reaction
+      description: Requires sending.enabled and uses the send limits, deduplication, quiet hours and pacing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chat, message_id, emoji]
+              properties:
+                chat: { type: string, description: Source chat JID or international number. }
+                message_id: { type: string, minLength: 1, description: WhatsApp message ID in the source chat. }
+                emoji: { type: string, description: Reaction of up to 32 UTF-8 bytes. An empty string removes it. }
+      responses:
+        "200": { $ref: "#/paths/~1send/post/responses/200" }
+        "202": { $ref: "#/paths/~1send/post/responses/202" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/ActionForbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/ActionConflict" }
+        "413": { $ref: "#/components/responses/TooLarge" }
+        "429": { $ref: "#/paths/~1send/post/responses/429" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "502": { $ref: "#/components/responses/Upstream" }
+        "503": { $ref: "#/components/responses/NotConnected" }
+        "504": { $ref: "#/paths/~1send/post/responses/504" }
+  /messages/edit:
+    post:
+      tags: [act]
+      operationId: editMessage
+      summary: Replace the text of your own synced message
+      description: Requires sending.enabled and uses the send limits, deduplication, quiet hours and pacing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chat, message_id, text]
+              properties:
+                chat: { type: string, description: Source chat JID or international number. }
+                message_id: { type: string, minLength: 1, description: WhatsApp message ID in the source chat. }
+                text: { type: string, minLength: 1, maxLength: 4096, description: Full replacement text within the edit window. }
+      responses:
+        "200": { $ref: "#/paths/~1send/post/responses/200" }
+        "202": { $ref: "#/paths/~1send/post/responses/202" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/ActionForbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/ActionConflict" }
+        "413": { $ref: "#/components/responses/TooLarge" }
+        "429": { $ref: "#/paths/~1send/post/responses/429" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "502": { $ref: "#/components/responses/Upstream" }
+        "503": { $ref: "#/components/responses/NotConnected" }
+        "504": { $ref: "#/paths/~1send/post/responses/504" }
+  /messages/delete:
+    post:
+      tags: [act]
+      operationId: deleteMessage
+      summary: Revoke your own synced message for everyone
+      description: Requires sending.enabled and uses the send limits, deduplication, quiet hours and pacing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chat, message_id]
+              properties:
+                chat: { type: string, description: Source chat JID or international number. }
+                message_id: { type: string, minLength: 1, description: WhatsApp message ID in the source chat. }
+      responses:
+        "200": { $ref: "#/paths/~1send/post/responses/200" }
+        "202": { $ref: "#/paths/~1send/post/responses/202" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/ActionForbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/ActionConflict" }
+        "413": { $ref: "#/components/responses/TooLarge" }
+        "429": { $ref: "#/paths/~1send/post/responses/429" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "502": { $ref: "#/components/responses/Upstream" }
+        "503": { $ref: "#/components/responses/NotConnected" }
+        "504": { $ref: "#/paths/~1send/post/responses/504" }
+  /messages/forward:
+    post:
+      tags: [act]
+      operationId: forwardMessage
+      summary: Forward a synced text message with the forwarded marker
+      description: Requires sending.enabled and uses the send limits, deduplication, quiet hours and pacing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chat, message_id, to]
+              properties:
+                chat: { type: string, description: Source chat JID or international number. }
+                message_id: { type: string, minLength: 1, description: WhatsApp message ID in the source chat. }
+                to: { type: string, description: Destination chat JID or international number. }
+                expected_text: { type: string, maxLength: 4096, description: Optional approved source text. A mismatch returns 409. }
+      responses:
+        "200": { $ref: "#/paths/~1send/post/responses/200" }
+        "202": { $ref: "#/paths/~1send/post/responses/202" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/ActionForbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/ActionConflict" }
+        "413": { $ref: "#/components/responses/TooLarge" }
+        "429": { $ref: "#/paths/~1send/post/responses/429" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "502": { $ref: "#/components/responses/Upstream" }
+        "503": { $ref: "#/components/responses/NotConnected" }
+        "504": { $ref: "#/paths/~1send/post/responses/504" }
   /read:
     post:
       tags: [act]
@@ -762,6 +886,16 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/Error" }
+    ActionForbidden:
+      description: Sending is disabled, quiet hours refuse sends, the Host is invalid, or the message belongs to another sender.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ActionConflict:
+      description: Duplicate action or source text changed after preview.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
     Forbidden:
       description: Host header does not match the listen address.
       content:
@@ -995,7 +1129,9 @@ components:
         target: { type: string }
         body: { type: string }
         media_path: { type: string }
-        kind: { type: string, enum: [text, image, video, audio, voice, document, sticker], description: How media_path is sent. }
+        kind: { type: string, enum: [text, image, video, audio, voice, document, sticker, react, edit, delete, forward], description: Outgoing content or queued action type. }
+        source_chat: { type: string, description: Original chat of a queued message action. }
+        source_message_id: { type: string, description: Original message ID of a queued action. }
         human: { type: boolean, description: Stored pacing flag; absent means the config default. }
         reply_to_id: { type: string }
         mentions:

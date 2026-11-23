@@ -27,6 +27,8 @@ Data = dict[str, Any]
 
 def current() -> config.Config:
     cfg = db.store().cfg
+    if cfg.demo:
+        return cfg
     fresh = config.load(cfg.file, account=cfg.account)
     if (fresh.store_dir, fresh.session_db, fresh.api) != (cfg.store_dir, cfg.session_db, cfg.api):
         raise config.ConfigError("account connection changed. Restart the worker or MCP server")

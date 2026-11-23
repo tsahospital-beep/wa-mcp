@@ -13,7 +13,7 @@
   <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-4f7c9a?style=flat">
   <img alt="MCP के साथ संगत" src="https://img.shields.io/badge/MCP-compatible-5f8a7a?style=flat">
   <img alt="प्लैटफ़ॉर्म: Windows, macOS, Linux" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-5f8a7a?style=flat">
-  <a href="../../CHANGELOG.md"><img alt="वर्शन 0.1.1" src="https://img.shields.io/badge/version-0.1.1-6c7a89?style=flat"></a>
+  <a href="../../CHANGELOG.md"><img alt="वर्शन 0.2.0" src="https://img.shields.io/badge/version-0.2.0-6c7a89?style=flat"></a>
 </p>
 
 <p align="center">
@@ -29,6 +29,41 @@
   <a href="../security.md">सुरक्षा</a> |
   <a href="../faq.md">आम सवाल</a>
 </p>
+
+## फ़ोन के बिना आज़माएँ
+
+अगर uv इंस्टॉल है, तो `uvx wa-mcp-server --demo` से आठ काल्पनिक चैट खुल जाती हैं। इसके लिए WA MCP का संस्करण 0.2.0 या बाद का संस्करण चाहिए। इंस्टॉल करने के बाद डेमो बिना इंटरनेट और बिना Go ब्रिज के चलता है।
+
+[![Cursor में आज़माएँ](https://img.shields.io/badge/Cursor%20%E0%A4%AE%E0%A5%87%E0%A4%82%20%E0%A4%86%E0%A4%9C%E0%A4%BC%E0%A4%AE%E0%A4%BE%E0%A4%8F%E0%A4%81-4f7c9a?style=flat)](https://cursor.com/install-mcp?name=wa-mcp-demo&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJ3YS1tY3Atc2VydmVyIiwiLS1kZW1vIl19)
+[![VS Code में आज़माएँ](https://img.shields.io/badge/VS%20Code%20%E0%A4%AE%E0%A5%87%E0%A4%82%20%E0%A4%86%E0%A4%9C%E0%A4%BC%E0%A4%AE%E0%A4%BE%E0%A4%8F%E0%A4%81-4f7c9a?style=flat)](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp-demo%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522wa-mcp-server%2522%252C%2522--demo%2522%255D%257D)
+
+**Claude Code**
+
+```sh
+claude mcp add wa-mcp-demo -- uvx wa-mcp-server --demo
+```
+
+**Claude Desktop (`claude_desktop_config.json`) और Cursor (`.cursor/mcp.json`)**
+
+```json
+{
+  "mcpServers": {
+    "wa-mcp-demo": { "command": "uvx", "args": ["wa-mcp-server", "--demo"] }
+  }
+}
+```
+
+**VS Code (`.vscode/mcp.json`)**
+
+```json
+{
+  "servers": {
+    "wa-mcp-demo": { "type": "stdio", "command": "uvx", "args": ["wa-mcp-server", "--demo"] }
+  }
+}
+```
+
+पूछें “आज मुझे कौन से काम करने हैं?” फिर “blue umbrella” खोजें और मिले हुए वॉइस नोट का ट्रांसक्रिप्ट पढ़ें। [दो मिनट का ट्यूटोरियल](../tutorials/00-demo.md)
 
 ## सुविधाएँ
 

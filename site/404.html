@@ -5,23 +5,34 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>Page not found | WA MCP</title>
-    <meta name="description" content="Find the WA MCP home page and setup guides." />
+    <meta name="description" content="Find the WA MCP home page, client setup instructions, chat search and Docker guides when a bookmarked WhatsApp MCP documentation address has moved." />
     <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/404.html" />
     <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
-    <link rel="icon" href="/wa-mcp/assets/brand/logo.svg" type="image/svg+xml" />
-    <meta property="og:type" content="article" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
+    <meta property="og:type" content="website" />
     <meta property="og:site_name" content="WA MCP" />
     <meta property="og:title" content="Page not found | WA MCP" />
-    <meta property="og:description" content="Find the WA MCP home page and setup guides." />
+    <meta property="og:description" content="Find the WA MCP home page, client setup instructions, chat search and Docker guides when a bookmarked WhatsApp MCP documentation address has moved." />
     <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/404.html" />
     <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
-    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Page not found | WA MCP" />
-    <meta name="twitter:description" content="Find the WA MCP home page and setup guides." />
+    <meta name="twitter:description" content="Find the WA MCP home page, client setup instructions, chat search and Docker guides when a bookmarked WhatsApp MCP documentation address has moved." />
     <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
     <meta name="robots" content="noindex" />
     <script>
+      document.documentElement.classList.add("js");
       try {
         const t = localStorage.getItem("wa-theme");
         if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
@@ -29,24 +40,6 @@
     </script>
     <link rel="stylesheet" href="/wa-mcp/style.css" />
     <script defer src="/wa-mcp/site.js"></script>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@graph": [
-          {
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "WA MCP",
-                "item": "https://tsahospital-beep.github.io/wa-mcp/"
-              }
-            ]
-          }
-        ]
-      }
-    </script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -90,9 +83,8 @@
                 stroke-linecap="round"
               >
                 <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
-              >Star on GitHub <span class="star-count" hidden></span></a
-            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
-              >GitHub
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
               <svg
                 class="ui out"
                 aria-hidden="true"
@@ -139,7 +131,7 @@
     <main class="container missing" id="main">
       <div class="kicker">404</div>
       <h1>Page not found.</h1>
-      <p>This address does not match a WA MCP page.</p>
+      <p>This link may have moved. Return to the home page or choose the guide you were looking for.</p>
       <a class="button green" href="/wa-mcp/"
         >Back to WA MCP
         <svg
@@ -154,6 +146,11 @@
         >
           <path d="M5 12h14m-6-6 6 6-6 6" /></svg
       ></a>
+    <nav aria-label="Find a guide" class="recovery-links">
+        <a class="row-link" href="/wa-mcp/connect-whatsapp-to-claude/"><span>Connect WhatsApp to Claude Desktop</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+        <a class="row-link" href="/wa-mcp/search-whatsapp-messages-with-ai/"><span>Search WhatsApp chat history with AI</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+        <a class="row-link" href="/wa-mcp/whatsapp-mcp-docker/"><span>Run WhatsApp MCP with Docker Compose</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+      </nav>
     </main>
     <footer>
       <div class="container">
@@ -163,8 +160,8 @@
           >
           <nav aria-label="Footer">
             <a href="/wa-mcp/#guides">Guides</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
             ><a href="https://github.com/tsahospital-beep/wa-mcp"
               >GitHub
               <svg

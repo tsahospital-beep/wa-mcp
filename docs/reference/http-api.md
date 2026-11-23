@@ -236,6 +236,24 @@ During quiet hours with action `queue` the answer is 202:
 A send can take longer than a few seconds because of the waits. Use a client timeout of at least three
 minutes.
 
+## Message actions
+
+These authenticated POST endpoints accept JSON with `chat` and `message_id` from the selected account's
+synced archive. Each uses the `/send` pipeline and returns its sent (200) or quiet-hours queued (202)
+response. The returned `id` identifies the action sent to WhatsApp. HTTP and SDK callers handle their
+own approvals. MCP clients use the configured send confirmation flow.
+
+| Endpoint | Additional JSON fields | Python SDK |
+| --- | --- | --- |
+| `/messages/react` | `emoji` is required. An empty string clears your reaction. | `bridge.react_to_message(chat, message_id, emoji)` |
+| `/messages/edit` | `text` is the full replacement, up to 4096 characters. Requires your own text message within the edit window. | `bridge.edit_message(chat, message_id, text)` |
+| `/messages/delete` | Requires your own message. Requests deletion for everyone. | `bridge.delete_message(chat, message_id)` |
+| `/messages/forward` | `to` is the destination. Supply optional `expected_text` to require an exact match with a reviewed preview. Supports text up to 4096 characters. | `bridge.forward_message(chat, message_id, to, expected_text=preview)` |
+
+An unknown source returns 404. Imported or deleted messages and unsupported content return 400.
+Trying to edit or revoke someone else's message returns 403. A duplicate action or changed forward
+preview returns 409. Rate limits return 429.
+
 ## Read receipts
 
 `POST /read` marks messages as read on the account (all linked devices).

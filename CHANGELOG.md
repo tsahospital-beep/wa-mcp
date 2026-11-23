@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - Unreleased
+
+- Add an offline demo with eight fictional chats, searchable voice transcripts and a daily task briefing.
+  Start it with `uvx wa-mcp-server --demo` or set `WA_MCP_DEMO=1`.
+- Expose 11 core MCP tools by default. Select additional toolsets with `mcp.toolsets`,
+  `WA_MCP_TOOLSETS` or `--toolsets`. Use `all` to keep the full catalog after upgrading.
+- Add reactions, edits to own text, deletion of own messages for everyone and text forwarding
+  to the bridge HTTP API, Python SDK and opt-in MCP `actions` toolset. Actions follow the sending policy.
+
 ## [0.1.1] - 2026-11-23
 
 Clearer tool descriptions and annotations, glama.json.
@@ -219,5 +228,6 @@ Initial release.
   than 2 MiB are refused. The untrusted-content note also names transcripts, image text, image descriptions
   and AI summaries.
 
+[0.2.0]: https://github.com/tsahospital-beep/wa-mcp/compare/v0.1.1...main
 [0.1.1]: https://github.com/tsahospital-beep/wa-mcp/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/tsahospital-beep/wa-mcp/releases/tag/v0.1.0

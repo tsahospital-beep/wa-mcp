@@ -28,6 +28,7 @@ from typing import Any
 from wa_mcp import config, db
 from wa_mcp.console import configure_console
 from wa_mcp.insight import base
+from wa_mcp_server.toolsets import parse as parse_toolsets
 
 ROOT = Path(__file__).resolve().parent.parent
 BRIDGE = ROOT / "bridge"
@@ -165,7 +166,7 @@ def main() -> int:
             problems.append(f"{key}: example has {example[key]!r}, default is {value!r} (from {owner[key]})")
     if not args.skip_go:
         problems += [f"unknown key in the example: {key}" for key in example if key not in expected]
-    config.load(EXAMPLE)
+    parse_toolsets(config.load(EXAMPLE).section("mcp").get("toolsets"))
     if problems:
         sys.stderr.write("config.example.json does not match the defaults:\n")
         sys.stderr.writelines(f"  {p}\n" for p in problems)

@@ -55,7 +55,7 @@ def register(mcp: FastMCP) -> None:
     ) -> Result:
         """Browse stored conversations by most recent activity. Returns chats with jid, jids, name, is_group
         and last_activity. Linked phone and LID identities are merged within the page. Page with
-        next_offset. Use get_chat for recent messages in one result.
+        next_offset. Use search_contacts for a person by alias or phone and get_chat to inspect one conversation.
         """
         offset = max(offset, 0)
         rows = db.conversations(query=query, limit=clamp(limit), offset=offset)

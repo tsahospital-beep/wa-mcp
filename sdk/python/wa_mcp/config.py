@@ -20,6 +20,7 @@ from wa_mcp import secretfile
 from wa_mcp.agent import settings as agent_settings
 
 DEFAULTS: dict[str, Any] = {
+    "mcp": {"toolsets": ["core"]},
     "store_dir": "store",
     "downloads_dir": "downloads",
     "exports_dir": "exports",
@@ -302,6 +303,7 @@ class Config:
     top_raw: dict[str, Any] = field(default_factory=dict, repr=False, compare=False)
 
     agent: agent_settings.Settings = field(default_factory=agent_settings.Settings)
+    demo: bool = False  # In-memory only. A bridge configuration cannot select the demo store.
 
     def for_account(self, name: str | None) -> Config:
         """The settings of another account of the same config file (None or "" = "default")."""
@@ -393,6 +395,13 @@ def _merge(base: dict[str, Any], over: dict[str, Any]) -> None:
             _merge(base[key], value)
         else:
             base[key] = value
+
+
+def isolated_defaults(directory: Path, overrides: dict[str, Any]) -> Config:
+    """Build a configuration without reading host files, secrets or environment overrides."""
+    data = copy.deepcopy(DEFAULTS)
+    _merge(data, overrides)
+    return _account_config(directory.resolve() / "config.json", data, None)
 
 
 def _apply_env(data: dict[str, Any]) -> None:

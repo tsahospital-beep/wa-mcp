@@ -118,7 +118,13 @@ func sendStatus(err error) int {
 		return http.StatusForbidden
 	case errors.As(err, &le):
 		return http.StatusTooManyRequests
-	case errors.Is(err, sender.ErrDuplicate):
+	case errors.Is(err, store.ErrNotFound):
+		return http.StatusNotFound
+	case errors.Is(err, sender.ErrNotOwn):
+		return http.StatusForbidden
+	case errors.Is(err, sender.ErrAction):
+		return http.StatusBadRequest
+	case errors.Is(err, sender.ErrSourceChanged), errors.Is(err, sender.ErrDuplicate):
 		return http.StatusConflict
 	case errors.As(err, &pe):
 		if pe.Forbidden() {
@@ -169,6 +175,10 @@ func (s *Server) send(w http.ResponseWriter, r *http.Request) {
 	if !decode(w, r, &req) {
 		return
 	}
+	s.dispatchSend(w, r, req)
+}
+
+func (s *Server) dispatchSend(w http.ResponseWriter, r *http.Request, req sender.Request) {
 	if !s.WA.LoggedIn() {
 		fail(w, http.StatusServiceUnavailable, wa.ErrNotLoggedIn.Error())
 		return
@@ -177,7 +187,7 @@ func (s *Server) send(w http.ResponseWriter, r *http.Request) {
 		fail(w, http.StatusServiceUnavailable, wa.ErrNotConnected.Error())
 		return
 	}
-	req.Scheduled = false
+
 	// A send is not cut off when the client goes away: it would leave a
 	// multi-part message half sent. It is bounded instead.
 	ctx, cancel := context.WithTimeout(context.WithoutCancel(r.Context()), HandlerTimeout-30*time.Second)

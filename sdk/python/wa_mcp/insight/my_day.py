@@ -180,7 +180,12 @@ def _scheduled(day: date, only: Target | None) -> list[tuple[Target, dict[str, A
                     "message_id": None,
                     "time": db.iso_local(int(r["next_run"])),
                     "recurrence": r["recurrence"],
-                    "context": base.clip(str(r["body"] or "[media]"), 160),
+                    "context": base.clip(
+                        f"{r['kind']} {r['source_message_id']}: {r['body']}"
+                        if r.get("source_chat")
+                        else str(r["body"] or "[media]"),
+                        160,
+                    ),
                 },
             )
         )

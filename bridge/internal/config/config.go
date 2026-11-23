@@ -134,7 +134,7 @@ type Webhook struct {
 var WebhookEvents = []string{"message", "receipt", "call", "connection", "scheduled", "security", "agent.reply"}
 
 // pythonSections are read by the Python package only; their content is not checked here.
-var pythonSections = map[string]bool{"transcription": true, "people": true, "tasks": true, "mentions": true, "insight": true, "ai": true, "agent": true, "vision": true, "server": true}
+var pythonSections = map[string]bool{"mcp": true, "transcription": true, "people": true, "tasks": true, "mentions": true, "insight": true, "ai": true, "agent": true, "vision": true, "server": true}
 
 // pythonKeys are single keys inside bridge sections that only the Python package
 // reads; the bridge accepts and ignores them.

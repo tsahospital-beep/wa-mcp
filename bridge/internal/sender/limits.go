@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -33,6 +34,17 @@ func (s *Sender) bodyHash(ctx context.Context, req Request) (string, error) {
 	key, err := s.DB.OutboxKey(ctx)
 	if err != nil {
 		return "", err
+	}
+	if req.Action != nil {
+		if req.Action.Kind == "forward" {
+			// Identical text shares the same limits across ordinary sends and forwards.
+			return BodyHash(key, req.Action.Value, "", "", false), nil
+		}
+		data, err := json.Marshal(req.Action)
+		if err != nil {
+			return "", err
+		}
+		return "action:" + BodyHash(key, string(data), "", "", false), nil
 	}
 	media := req.MediaPath
 	if req.AsDocument {

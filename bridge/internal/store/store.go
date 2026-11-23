@@ -202,6 +202,9 @@ CREATE INDEX call_log_time ON call_log(started_at DESC, call_id);
 CREATE INDEX scheduled_messages_next ON scheduled_messages(next_run, id);
 CREATE INDEX outbox_log_time ON outbox_log(sent_at);
 CREATE INDEX outbox_log_body_time ON outbox_log(body_hash, sent_at, target);`,
+	// Store quiet-hours actions by source so replay can recheck ownership and content.
+	`ALTER TABLE scheduled_messages ADD COLUMN source_chat TEXT NOT NULL DEFAULT '';
+ALTER TABLE scheduled_messages ADD COLUMN source_message_id TEXT NOT NULL DEFAULT '';`,
 }
 
 // MinReaderSchema is written to meta.min_reader_schema after the migrations

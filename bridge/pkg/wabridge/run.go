@@ -251,7 +251,7 @@ func serve(ctx context.Context, cfg *config.Config, logger *log.Logger, opts Opt
 	}
 	restrictSession(cfg, logger) // protect.go
 
-	snd := &sender.Sender{AgentCurrent: cfg.AgentCurrent, Cfg: cfg.Sending, DB: db, Transport: client, Log: logger, NoMarkRead: !cfg.ReadReceipts.AllowMarkRead}
+	snd := &sender.Sender{BuildAction: client.BuildAction, AgentCurrent: cfg.AgentCurrent, Cfg: cfg.Sending, DB: db, Transport: client, Log: logger, NoMarkRead: !cfg.ReadReceipts.AllowMarkRead}
 	fetcher := &media.Fetcher{DB: db, Src: client, Dir: cfg.DownloadsDir, MaxBytes: cfg.MaxDownloadBytes(), Private: db.Encrypted()}
 	runner := &schedule.Runner{
 		DB: db, Send: snd.Send, Emit: hooks.Emit, Log: logger,

@@ -4,39 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
-    <title>WhatsApp MCP for VS Code | WA MCP</title>
-    <meta
-      name="description"
-      content="Set up WhatsApp tools in VS Code agent mode with a workspace or user configuration, or connect to a remote MCP endpoint."
-    />
+    <title>Use WhatsApp MCP in VS Code agent mode | WA MCP</title>
+    <meta name="description" content="Set up WhatsApp tools in VS Code agent mode with a workspace or user configuration, check the linked account and connect to a remote MCP endpoint." />
     <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/" />
-    <link rel="describedby" href="../llms.txt" type="text/plain" />
-    <link rel="icon" href="../assets/brand/logo.svg" type="image/svg+xml" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="WA MCP" />
-    <meta property="og:title" content="WhatsApp MCP for VS Code | WA MCP" />
-    <meta
-      property="og:description"
-      content="Set up WhatsApp tools in VS Code agent mode with a workspace or user configuration, or connect to a remote MCP endpoint."
-    />
+    <meta property="og:title" content="Use WhatsApp MCP in VS Code agent mode | WA MCP" />
+    <meta property="og:description" content="Set up WhatsApp tools in VS Code agent mode with a workspace or user configuration, check the linked account and connect to a remote MCP endpoint." />
     <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/" />
     <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
-    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="WhatsApp MCP for VS Code | WA MCP" />
-    <meta
-      name="twitter:description"
-      content="Set up WhatsApp tools in VS Code agent mode with a workspace or user configuration, or connect to a remote MCP endpoint."
-    />
+    <meta name="twitter:title" content="Use WhatsApp MCP in VS Code agent mode | WA MCP" />
+    <meta name="twitter:description" content="Set up WhatsApp tools in VS Code agent mode with a workspace or user configuration, check the linked account and connect to a remote MCP endpoint." />
     <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
     <script>
+      document.documentElement.classList.add("js");
       try {
         const t = localStorage.getItem("wa-theme");
         if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
       } catch {}
     </script>
-    <link rel="stylesheet" href="../style.css" />
-    <script defer src="../site.js"></script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -53,14 +55,29 @@
               {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "WhatsApp MCP for VS Code",
+                "name": "Guides",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/#guides"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "VS Code",
                 "item": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/"
               }
             ]
           },
           {
             "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/#faq",
             "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Can VS Code use WhatsApp MCP across workspaces?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Use the MCP: Open User Configuration command for a user-wide entry. A .vscode/mcp.json file scopes the entry to one workspace."
+                }
+              },
               {
                 "@type": "Question",
                 "name": "Where do I look if a tool is missing?",
@@ -81,31 +98,32 @@
           },
           {
             "@type": "HowTo",
-            "name": "WhatsApp MCP for VS Code",
-            "description": "To use WhatsApp in VS Code agent mode, install the WA MCP server and point it to the configuration of a running, linked bridge. VS Code starts the local server over stdio and displays its tools in chat. You can install it for one workspace or use your user configuration.",
+            "name": "Use WhatsApp MCP in VS Code agent mode",
+            "description": "Set up WhatsApp tools in VS Code agent mode with a workspace or user configuration, check the linked account and connect to a remote MCP endpoint.",
+            "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/",
             "step": [
               {
                 "@type": "HowToStep",
                 "name": "Add the VS Code server entry",
-                "text": "Install uv so VS Code can launch uvx, then open the VS Code install link. The link provides the stdio transport, executable and arguments for the Python server. Set WA_MCP_CONFIG to the absolute path of the bridge configuration in the environment inherited by VS Code. Restart the editor so the server starts with that setting. Install in VS Code To configure a workspace manually, create .vscode/mcp.json in that workspace. For an entry that applies across workspaces, run the command named MCP: Open User Configuration. VS Code expects a servers object and a transport type in the local entry. Preserve any servers that are already in the file when you add the example below. {\n  \"servers\": {\n    \"wa-mcp\": {\n      \"type\": \"stdio\",\n      \"command\": \"uvx\",\n      \"args\": [\n        \"--from\",\n        \"wa-mcp-server==0.1.0\",\n        \"--with\",\n        \"wa-mcp-sdk[encryption,files]\",\n        \"wa-mcp\",\n        \"--config\",\n        \"CONFIG_FILE\"\n      ]\n    }\n  }\n}",
+                "text": "Install uv so VS Code can launch uvx, then open the VS Code install link. The link provides the stdio transport, executable and arguments for the Python server. Set WA_MCP_CONFIG to the absolute path of the bridge configuration in the environment inherited by VS Code. Restart the editor so the server starts with that setting.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/#section-1"
               },
               {
                 "@type": "HowToStep",
                 "name": "Check the path from agent mode",
-                "text": "Replace CONFIG_FILE in the example with the file your bridge uses, including its full directory. A config inside the current project is unnecessary when the bridge lives elsewhere. The file tells the Python server where to read stored messages, which encryption settings to use and where it can reach the bridge API for live actions. Open chat in agent mode and ask the assistant to run bridge_status. Check the database result and the bridge's connected and logged_in flags. A missing database can indicate the wrong directory or a bridge that has never started there. A missing API token can indicate that the editor is running as a different operating system user from the bridge.",
+                "text": "Replace CONFIG_FILE in the example with the file your bridge uses, including its full directory. A config inside the current project is unnecessary when the bridge lives elsewhere. The file tells the Python server where to read stored messages, which encryption settings to use and where it can reach the bridge API for live actions.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/#section-2"
               },
               {
                 "@type": "HowToStep",
                 "name": "Read a thread while working",
-                "text": "Ask for a particular term in one conversation and include the date you care about. For example, find messages containing \u201cinvoice\u201d in the last week, then show the surrounding messages for the latest match. This gives the assistant a bounded question and gives you a way to check its answer against the conversation. Sending can remain disabled throughout. Search can include more than the message body. For a screenshot, first ask for text recognition on images in the relevant chat. For a voice note, transcribe the audio. Both operations attach derived text to the message, so a later lookup can retrieve it through the same conversation and time filters. Your MCP client receives the tool output it requests.",
+                "text": "Ask for a particular term in one conversation and include the date you care about. For example, find messages containing “invoice” in the last week, then show the surrounding messages for the latest match. This gives the assistant a bounded question and gives you a way to check its answer against the conversation. Sending can remain disabled throughout.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/#section-3"
               },
               {
                 "@type": "HowToStep",
                 "name": "Keep remote credentials in secret storage",
-                "text": "If the bridge runs on a server, configure VS Code with the HTTP transport and the HTTPS /mcp URL. Create a separate token for the editor. The documented remote configuration uses a password promptString input, then refers to that input from the Authorization header. VS Code asks for the value once and keeps it in its secret storage. In the remote example below, replace the example domain with the host where you run the MCP service. Keep the input identifier consistent in both places. When VS Code prompts for the secret, give it the token created for this client by the MCP server. The bridge API token belongs to the local service on the host. {\n  \"inputs\": [\n    {\n      \"type\": \"promptString\",\n      \"id\": \"wa-mcp-token\",\n      \"description\": \"WA MCP token\",\n      \"password\": true\n    }\n  ],\n  \"servers\": {\n    \"wa-mcp\": {\n      \"type\": \"http\",\n      \"url\": \"https://wa.example.com/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer ${input:wa-mcp-token}\"\n      }\n    }\n  }\n} The local and hosted configurations solve different deployment problems. The local process needs access to the bridge's configuration, database and encryption key as the same user. A VS Code client calling the hosted endpoint needs the endpoint address and a credential. The hosted Python process handles access to the message database on that machine.",
+                "text": "If the bridge runs on a server, configure VS Code with the HTTP transport and the HTTPS /mcp URL. Create a separate token for the editor. The documented remote configuration uses a password promptString input, then refers to that input from the Authorization header. VS Code asks for the value once and keeps it in its secret storage.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/#section-4"
               }
             ]
@@ -154,9 +172,8 @@
                 stroke-linecap="round"
               >
                 <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
-              >Star on GitHub <span class="star-count" hidden></span></a
-            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
-              >GitHub
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
               <svg
                 class="ui out"
                 aria-hidden="true"
@@ -202,19 +219,13 @@
     </header>
     <main id="main">
       <div class="container">
-        <nav aria-label="Breadcrumb" class="crumbs">
-          <a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / Client setup
-        </nav>
+        <nav aria-label="Breadcrumb" class="crumbs"><a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / <span aria-current="page">VS Code</span></nav>
         <div class="guide-hero">
           <div>
             <div class="kicker">Client setup guide</div>
-            <h1>WhatsApp MCP for VS Code</h1>
-            <p class="lead">
-              To use WhatsApp in VS Code agent mode, install the WA MCP server and point it to the configuration of a
-              running, linked bridge. VS Code starts the local server over stdio and displays its tools in chat. You can
-              install it for one workspace or use your user configuration.
-            </p>
-            <div class="byline">v0.1.0 <span>·</span> Updated <time datetime="2026-11-23">23 November 2026</time></div>
+            <h1>Use WhatsApp MCP in VS Code agent mode</h1>
+            <p class="lead">Use WhatsApp MCP in VS Code agent mode to read a thread from your editor. Choose workspace or user configuration, point the server at the linked bridge and ask for its connection status.</p>
+            <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
           </div>
           <div class="plate guide-plate" aria-hidden="true">
             <div class="plate-inner">
@@ -242,8 +253,9 @@
         </div>
         <div class="reading">
           <aside>
-            <strong>On this page</strong>
-            <nav aria-label="On this page">
+            <strong class="toc-title">On this page</strong>
+            <button class="toc-toggle" type="button" aria-controls="contents" aria-expanded="false">On this page <span aria-hidden="true">+</span></button>
+            <nav id="contents" aria-label="On this page">
               <a href="#section-1">Add the VS Code server entry</a
               ><a href="#section-2">Check the path from agent mode</a
               ><a href="#section-3">Read a thread while working</a
@@ -261,7 +273,7 @@
               </p>
               <a
                 class="button green"
-                href="https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522--from%2522%252C%2522wa-mcp-server%253D%253D0.1.0%2522%252C%2522--with%2522%252C%2522wa-mcp-sdk%255Bencryption%252Cfiles%255D%2522%252C%2522wa-mcp%2522%255D%257D"
+                href="https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522--from%2522%252C%2522wa-mcp-server%253D%253D0.1.1%2522%252C%2522--with%2522%252C%2522wa-mcp-sdk%255Bencryption%252Cfiles%255D%2522%252C%2522wa-mcp%2522%255D%257D"
                 >Install in VS Code
                 <svg
                   class="ui out"
@@ -281,6 +293,8 @@
                 and a transport type in the local entry. Preserve any servers that are already in the file when you add
                 the example below.
               </p>
+              <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
               <pre><code>{
   &quot;servers&quot;: {
     &quot;wa-mcp&quot;: {
@@ -288,7 +302,7 @@
       &quot;command&quot;: &quot;uvx&quot;,
       &quot;args&quot;: [
         &quot;--from&quot;,
-        &quot;wa-mcp-server==0.1.0&quot;,
+        &quot;wa-mcp-server==0.1.1&quot;,
         &quot;--with&quot;,
         &quot;wa-mcp-sdk[encryption,files]&quot;,
         &quot;wa-mcp&quot;,
@@ -298,6 +312,7 @@
     }
   }
 }</code></pre>
+            </div>
             </section>
             <section id="section-2">
               <h2>Check the path from agent mode</h2>
@@ -343,6 +358,8 @@
                 token created for this client by the MCP server. The bridge API token belongs to the local service on
                 the host.
               </p>
+              <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
               <pre><code>{
   &quot;inputs&quot;: [
     {
@@ -362,6 +379,7 @@
     }
   }
 }</code></pre>
+            </div>
               <p>
                 The local and hosted configurations solve different deployment problems. The local process needs access
                 to the bridge&#x27;s configuration, database and encryption key as the same user. A VS Code client
@@ -371,7 +389,8 @@
             </section>
             <section id="faq">
               <h2>Questions</h2>
-              <details>
+              <details><summary>Can VS Code use WhatsApp MCP across workspaces?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Yes. Use the MCP: Open User Configuration command for a user-wide entry. A .vscode/mcp.json file scopes the entry to one workspace.</p></details>
+          <details>
                 <summary>
                   Where do I look if a tool is missing?<svg
                     class="ui down"
@@ -415,7 +434,7 @@
             </section>
             <p class="source">
               Project documentation ·
-              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/guides/mcp-clients.md"
+              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/guides/mcp-clients.md"
                 >mcp-clients.md
                 <svg
                   class="ui out"
@@ -487,8 +506,8 @@
           <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
           <nav aria-label="Footer">
             <a href="../#guides">Guides</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
             ><a href="https://github.com/tsahospital-beep/wa-mcp"
               >GitHub
               <svg

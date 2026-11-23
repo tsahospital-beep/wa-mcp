@@ -4,39 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
-    <title>A WhatsApp assistant for your day | WA MCP</title>
-    <meta
-      name="description"
-      content="Use my_day to find open requests, promises, unanswered chats, missed calls and scheduled messages across your linked WhatsApp accounts."
-    />
+    <title>An open source WhatsApp AI assistant | WA MCP</title>
+    <meta name="description" content="Use an open source WhatsApp AI assistant to find unanswered chats, promises and scheduled messages. See the original conversation behind each daily task." />
     <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/whatsapp-ai-assistant/" />
-    <link rel="describedby" href="../llms.txt" type="text/plain" />
-    <link rel="icon" href="../assets/brand/logo.svg" type="image/svg+xml" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="WA MCP" />
-    <meta property="og:title" content="A WhatsApp assistant for your day | WA MCP" />
-    <meta
-      property="og:description"
-      content="Use my_day to find open requests, promises, unanswered chats, missed calls and scheduled messages across your linked WhatsApp accounts."
-    />
+    <meta property="og:title" content="An open source WhatsApp AI assistant | WA MCP" />
+    <meta property="og:description" content="Use an open source WhatsApp AI assistant to find unanswered chats, promises and scheduled messages. See the original conversation behind each daily task." />
     <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/whatsapp-ai-assistant/" />
     <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
-    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="A WhatsApp assistant for your day | WA MCP" />
-    <meta
-      name="twitter:description"
-      content="Use my_day to find open requests, promises, unanswered chats, missed calls and scheduled messages across your linked WhatsApp accounts."
-    />
+    <meta name="twitter:title" content="An open source WhatsApp AI assistant | WA MCP" />
+    <meta name="twitter:description" content="Use an open source WhatsApp AI assistant to find unanswered chats, promises and scheduled messages. See the original conversation behind each daily task." />
     <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
     <script>
+      document.documentElement.classList.add("js");
       try {
         const t = localStorage.getItem("wa-theme");
         if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
       } catch {}
     </script>
-    <link rel="stylesheet" href="../style.css" />
-    <script defer src="../site.js"></script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -53,14 +55,29 @@
               {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "A WhatsApp assistant for your day",
+                "name": "Guides",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/#guides"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Daily tasks",
                 "item": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-ai-assistant/"
               }
             ]
           },
           {
             "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-ai-assistant/#faq",
             "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Does this open source WhatsApp AI assistant need an API key?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The local daily report uses rules and works without a separate model key. Your chosen assistant has its own requirements. A background provider is optional for an additional summary."
+                }
+              },
               {
                 "@type": "Question",
                 "name": "Does a daily briefing send replies?",
@@ -123,9 +140,8 @@
                 stroke-linecap="round"
               >
                 <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
-              >Star on GitHub <span class="star-count" hidden></span></a
-            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
-              >GitHub
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
               <svg
                 class="ui out"
                 aria-hidden="true"
@@ -171,19 +187,13 @@
     </header>
     <main id="main">
       <div class="container">
-        <nav aria-label="Breadcrumb" class="crumbs">
-          <a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / Daily activity
-        </nav>
+        <nav aria-label="Breadcrumb" class="crumbs"><a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / <span aria-current="page">Daily tasks</span></nav>
         <div class="guide-hero">
           <div>
             <div class="kicker">Daily activity guide</div>
-            <h1>A WhatsApp assistant for your day</h1>
-            <p class="lead">
-              A WhatsApp AI assistant connected to WA MCP can tell you who needs a reply, what you promised and which
-              messages are scheduled today. Ask “What are my tasks today?” and the assistant can call
-              <code>my_day</code>, a local tool that organizes requests from your chats using plain rules.
-            </p>
-            <div class="byline">v0.1.0 <span>·</span> Updated <time datetime="2026-11-23">23 November 2026</time></div>
+            <h1>An open source WhatsApp AI assistant</h1>
+            <p class="lead">An open source WhatsApp AI assistant can start with one question: who is waiting for a reply? WA MCP uses local rules to build a daily list from linked chats. Your MCP client can follow each item back to the conversation.</p>
+            <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
           </div>
           <div class="plate guide-plate" aria-hidden="true">
             <div class="plate-inner">
@@ -211,8 +221,9 @@
         </div>
         <div class="reading">
           <aside>
-            <strong>On this page</strong>
-            <nav aria-label="On this page">
+            <strong class="toc-title">On this page</strong>
+            <button class="toc-toggle" type="button" aria-controls="contents" aria-expanded="false">On this page <span aria-hidden="true">+</span></button>
+            <nav id="contents" aria-label="On this page">
               <a href="#section-1">Start with the message behind a task</a
               ><a href="#section-2">Set the date and scope</a><a href="#section-3">Understand the task tracker</a
               ><a href="#section-4">Teach the rules your working vocabulary</a
@@ -289,7 +300,8 @@
             </section>
             <section id="faq">
               <h2>Questions</h2>
-              <details>
+              <details><summary>Does this open source WhatsApp AI assistant need an API key?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>The local daily report uses rules and works without a separate model key. Your chosen assistant has its own requirements. A background provider is optional for an additional summary.</p></details>
+          <details>
                 <summary>
                   Does a daily briefing send replies?<svg
                     class="ui down"
@@ -332,7 +344,7 @@
             </section>
             <p class="source">
               Project documentation ·
-              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/tutorials/04-my-day-and-tasks.md"
+              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/tutorials/04-my-day-and-tasks.md"
                 >04-my-day-and-tasks.md
                 <svg
                   class="ui out"
@@ -354,6 +366,7 @@
         <div class="container">
           <h2>Related guides</h2>
           <div class="related-grid">
+            <a class="row-link" href="/wa-mcp/whatsapp-bot-without-business-api/"><span>A WhatsApp bot without the Business API: OpenAI or ChatGPT?</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
             <a class="row-link" href="../search-whatsapp-messages-with-ai/"
               ><span>Search WhatsApp messages with AI</span
               ><svg
@@ -404,8 +417,8 @@
           <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
           <nav aria-label="Footer">
             <a href="../#guides">Guides</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
             ><a href="https://github.com/tsahospital-beep/wa-mcp"
               >GitHub
               <svg

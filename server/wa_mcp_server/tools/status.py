@@ -4,7 +4,7 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
-from wa_mcp import transcribe, vision
+from wa_mcp import db, transcribe, vision
 from wa_mcp.client import BridgeError, load_token
 from wa_mcp_server.common import Result, bridge, cfg, hints, load_errors, ok, safe
 
@@ -15,10 +15,20 @@ def register(mcp: FastMCP) -> None:
     def bridge_status() -> Result:
         """Check whether one account's bridge is reachable and logged in before requesting history or
         sending. Returns bridge, database, sending_enabled, require_confirm, backend readiness and
-        security_events. Report security warnings to the user. Use list_accounts to discover other
-        accounts.
+        security_events. Report security warnings to the user. Use list_chats to browse stored conversations or list_accounts in the accounts toolset to check other bridges.
         """
         c = cfg()
+        if c.demo:
+            return ok(
+                demo=True,
+                database=True,
+                encryption=False,
+                encryption_mode="off",
+                sending_enabled=False,
+                bridge={"reachable": False, "connected": False, "logged_in": False},
+                counts={"chats": len(db.conversations(limit=None)), "messages": len(db.messages(limit=None))},
+                tool_modules_failed=dict(load_errors),
+            )
         info: dict[str, Any] = {
             "database": c.wa_db.is_file(),
             "sending_enabled": c.sending.enabled,

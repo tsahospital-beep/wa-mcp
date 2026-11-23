@@ -84,7 +84,7 @@ async def _session(
     environ.pop("WA_MCP_SENDING_ENABLED", None)
     if path_first is not None:
         environ["PATH"] = f"{path_first}{os.pathsep}{environ.get('PATH', '')}"
-    params = StdioServerParameters(command=command, args=args, env=environ)
+    params = StdioServerParameters(command=command, args=[*args, "--toolsets", "all"], env=environ)
     results: list[dict[str, Any]] = []
     async with stdio_client(params) as (read, write), ClientSession(read, write) as session:
         await session.initialize()

@@ -34,6 +34,7 @@ def _parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="command", required=True)
 
     serve = sub.add_parser("serve", parents=[common], help="run the MCP server (stdio, or HTTP with --http)")
+    serve.add_argument("--toolsets", help="comma-separated MCP toolsets, or all")
     serve.add_argument("--http", action="store_true", help="serve MCP over Streamable HTTP instead of stdio")
     serve.add_argument("--listen", help="host:port for --http (default: server.listen, 127.0.0.1:8765)")
     serve.add_argument(
@@ -89,7 +90,7 @@ def _serve(cfg: config_mod.Config, args: argparse.Namespace) -> int:
     level = (args.log_level or ("INFO" if args.http else "WARNING")).upper()
     app.setup_logging(level, "%(asctime)s %(levelname)s %(name)s: %(message)s")
     if not args.http:
-        app.create_app(cfg).run("stdio")
+        app.create_app(cfg, args.toolsets).run("stdio")
         return 0
     from wa_mcp_server.remote import http
 
@@ -104,7 +105,12 @@ def _serve(cfg: config_mod.Config, args: argparse.Namespace) -> int:
             f"(or {remote.oauth.admin_password_env}_FILE) is empty"
         )
     store = ServerStore.open(cfg.store_dir)
-    http.serve(app.create_app(cfg), remote, store, settings_mod.restrict_peers(remote, args.insecure_lan))
+    http.serve(
+        app.create_app(cfg, args.toolsets),
+        remote,
+        store,
+        settings_mod.restrict_peers(remote, args.insecure_lan),
+    )
     return 0
 
 

@@ -126,15 +126,17 @@ func (s *Sender) markChatRead(ctx context.Context, chat types.JID) {
 	}
 }
 
-// record stores our own message and remembers the send time for pacing.
+func (s *Sender) noteSent(target string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.chats[target].lastSent = s.now()
+}
+
+// record stores our own message.
 // With an encrypted store the original file path is not kept, since it can
 // reveal the attachment name.
 func (s *Sender) record(ctx context.Context, target, id string, ts time.Time, row store.Message,
 	withCtx bool, reply *Reply, mentions []types.JID) {
-	s.mu.Lock()
-	s.chats[target].lastSent = s.now()
-	s.mu.Unlock()
-
 	ctx = store.WithOrigin(ctx, store.OriginSent)
 	row.Conv, row.ID, row.Outgoing, row.SentAt = target, id, true, ts.Unix()
 	row.Author = s.Transport.OwnJID().String()

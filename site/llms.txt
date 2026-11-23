@@ -1,27 +1,34 @@
 # WA MCP
 
-> WA MCP v0.1.0 is an MIT-licensed WhatsApp MCP server with 49 MCP tools. The Go bridge links a phone and stores messages locally. The Python server exposes tools to a connected assistant.
+> A self-hosted WhatsApp MCP server for Claude, Cursor and VS Code. The Go bridge links a phone and stores messages locally. A Python server exposes the store to MCP clients.
 
-Field encryption is on by default. Sending and optional background AI providers start disabled. The assistant receives requested tool results. The unofficial WhatsApp Web protocol carries a risk of account restrictions or a ban.
+The v0.2.0 source checkout has 11 default tools and 53 across all toolsets. The published v0.1.1 release includes the Claude Desktop extension. Field encryption is on by default. Sending starts disabled. A hosted assistant processes the tool results it requests.
+
+WA MCP uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or ban the linked account even with sending limits.
 
 ## Project
 
-- [Home](https://tsahospital-beep.github.io/wa-mcp/): Features, install links and comparison.
+- [Home and installation](https://tsahospital-beep.github.io/wa-mcp/)
+- [Release assets](https://github.com/tsahospital-beep/wa-mcp/releases/latest)
 
 ## Guides
 
-- [WhatsApp MCP server](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-server/): Read how the Go bridge and Python server give MCP clients 49 tools for working with a linked WhatsApp account.
-- [Connect WhatsApp to Claude](https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/): Configure Claude Desktop for a linked WhatsApp account, including the v0.1.0 manual setup, config example and connection checks.
-- [WhatsApp MCP for Cursor](https://tsahospital-beep.github.io/wa-mcp/whatsapp-cursor-mcp/): Install WA MCP in Cursor, choose a project or user configuration and verify that the editor can read the right WhatsApp store.
-- [WhatsApp MCP for VS Code](https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/): Set up WhatsApp tools in VS Code agent mode with a workspace or user configuration, or connect to a remote MCP endpoint.
-- [A WhatsApp assistant for your day](https://tsahospital-beep.github.io/wa-mcp/whatsapp-ai-assistant/): Use my_day to find open requests, promises, unanswered chats, missed calls and scheduled messages across your linked WhatsApp accounts.
-- [Search WhatsApp messages with AI](https://tsahospital-beep.github.io/wa-mcp/search-whatsapp-messages-with-ai/): Find phrases in messages, transcripts, screenshots and documents, then recover the surrounding conversation and check the date.
-- [Transcribe WhatsApp voice notes](https://tsahospital-beep.github.io/wa-mcp/whatsapp-voice-note-transcription/): Choose a local speech backend or HTTP endpoint, transcribe a WhatsApp chat and find spoken words in the message store.
-- [Import a WhatsApp chat export](https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/): Preview a WhatsApp TXT or ZIP export, check the senders and time zone, and import older messages into the correct local chat.
-- [A self-hosted WhatsApp API](https://tsahospital-beep.github.io/wa-mcp/self-hosted-whatsapp-api/): Read WhatsApp through a token-authenticated local REST API, handle status responses and receive signed webhook events.
-- [WhatsApp MCP security and privacy](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-security/): See what WA MCP encrypts, what a connected assistant receives, how sending approval works and where to review linked-device alerts.
-- [Run WhatsApp MCP in Docker](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/): Run the bridge, MCP server and HTTPS proxy with Docker Compose, pair the phone and plan backups for the data, key and session.
+- [How the WhatsApp MCP server works](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-server/) - Follow a message from a linked phone through the Go bridge and local store to a WhatsApp MCP server. Compare desktop and remote client connections.
+- [Embed the whatsmeow Go bridge for WhatsApp MCP](https://tsahospital-beep.github.io/wa-mcp/whatsmeow-go-bridge/) - Use the WA MCP Go package around whatsmeow to observe stored WhatsApp messages, add a token-protected route and test it before linking a phone.
+- [Connect WhatsApp to Claude Desktop](https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/) - Connect WhatsApp to Claude Desktop with the WA MCP extension or a manual config. Link your phone, select the right store and test your first chat search.
+- [Connect WhatsApp to Cursor with MCP](https://tsahospital-beep.github.io/wa-mcp/whatsapp-cursor-mcp/) - Set up WhatsApp in Cursor for one project or across your editor. Configure the linked bridge, check its status and search a conversation from a chat.
+- [Use WhatsApp MCP in VS Code agent mode](https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/) - Set up WhatsApp tools in VS Code agent mode with a workspace or user configuration, check the linked account and connect to a remote MCP endpoint.
+- [An open source WhatsApp AI assistant](https://tsahospital-beep.github.io/wa-mcp/whatsapp-ai-assistant/) - Use an open source WhatsApp AI assistant to find unanswered chats, promises and scheduled messages. See the original conversation behind each daily task.
+- [A WhatsApp bot without the Business API: OpenAI or ChatGPT?](https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/) - Build a draft-only WhatsApp bot without the Business API. Test the OpenAI provider, limit incoming chats and review a reply before enabling any sends.
+- [Search WhatsApp chat history with AI](https://tsahospital-beep.github.io/wa-mcp/search-whatsapp-messages-with-ai/) - Search WhatsApp chat history across messages, transcripts and extracted file text. Narrow a query by chat or date and open the conversation around a match.
+- [Transcribe WhatsApp voice messages](https://tsahospital-beep.github.io/wa-mcp/whatsapp-voice-note-transcription/) - Transcribe WhatsApp voice messages with a local engine or an HTTP endpoint. Save transcripts beside the original messages and search for a spoken phrase.
+- [Export a WhatsApp chat for AI search](https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/) - Export a WhatsApp chat for AI search with a TXT or ZIP file. Preview the conversation, confirm senders and dates, then import older history into WA MCP.
+- [A free, self-hosted WhatsApp API](https://tsahospital-beep.github.io/wa-mcp/self-hosted-whatsapp-api/) - Run a free, self-hosted WhatsApp API for a linked personal account. Read messages through authenticated local endpoints and inspect the OpenAPI description.
+- [Read chats with the WhatsApp MCP Python SDK](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-python/) - Use the WhatsApp MCP Python SDK to read a linked chat, inspect connection status, query encrypted history and download one attachment with the local bridge.
+- [WhatsApp MCP security and account risk](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-security/) - See what WA MCP encrypts, what a connected assistant receives, how sending approval works and where to review alerts about a linked WhatsApp device.
+- [Run WhatsApp MCP with Docker Compose](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/) - Run WhatsApp MCP with Docker Compose and Caddy. Check the services, link a phone and back up the message volume, session and encryption key separately.
+- [WhatsApp webhooks or an n8n AI workflow?](https://tsahospital-beep.github.io/wa-mcp/whatsapp-webhook-workflows/) - Compare WA MCP signed WhatsApp webhooks with the n8n Business Cloud node. Receive a live event, verify its signature and handle retries in your workflow.
 
-## Optional
+## Full text
 
-- [Full guide text](https://tsahospital-beep.github.io/wa-mcp/llms-full.txt): Read the guides together.
+- [Read all guides together](https://tsahospital-beep.github.io/wa-mcp/llms-full.txt)

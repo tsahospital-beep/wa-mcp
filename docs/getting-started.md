@@ -1,9 +1,19 @@
 # Getting started
 
-Your MCP client starts the Python server. A separate bridge links your phone, syncs messages and
-serves live requests. Sending stays off by default.
+Your MCP client starts the Python server. Choose the offline demo to explore a fictional archive, or
+link a phone to read your own messages. Sending stays off by default.
 
-## What you need
+## Try it without a phone
+
+With [uv](https://docs.astral.sh/uv/getting-started/installation/) installed, configure your client to
+run `uvx wa-mcp-server --demo`. Claude Desktop bundle users can select **Demo mode** and leave the
+bridge configuration blank. Ask “What are my tasks today?” to read the fictional daily briefing.
+The demo requires version 0.2.0 or newer. For a checkout of the unreleased version, use
+`uv run --directory /absolute/path/to/wa-mcp wa-mcp-server --demo` as the client command.
+See the [client configurations](../README.md#try-it-without-a-phone) and the
+[two-minute demo](tutorials/00-demo.md).
+
+## What you need for a linked account
 
 - A phone with the WhatsApp account you want to link.
 - [Go](https://go.dev/dl/) 1.26 or newer for the native bridge, or Docker Engine for the bridge image.

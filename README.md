@@ -11,7 +11,7 @@
   <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-4f7c9a?style=flat">
   <img alt="MCP compatible" src="https://img.shields.io/badge/MCP-compatible-5f8a7a?style=flat">
   <img alt="Platform: Windows, macOS, Linux" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-5f8a7a?style=flat">
-  <a href="CHANGELOG.md"><img alt="Version 0.1.1" src="https://img.shields.io/badge/version-0.1.1-6c7a89?style=flat"></a>
+  <a href="CHANGELOG.md"><img alt="Version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-6c7a89?style=flat"></a>
 </p>
 
 <p align="center">
@@ -28,6 +28,38 @@
   <a href="docs/faq.md">FAQ</a>
   <br>English | <a href="docs/i18n/README.pt-BR.md">Português</a> | <a href="docs/i18n/README.es.md">Español</a> | <a href="docs/i18n/README.hi.md">हिन्दी</a>
 </p>
+
+## Try it without a phone
+
+With uv installed, `uvx wa-mcp-server --demo` starts a fictional archive of eight chats. The demo needs WA MCP 0.2.0 or later and runs offline after installation. Use the [install buttons](#quick-start) or copy the config for your client.
+
+**Claude Code**
+
+```sh
+claude mcp add wa-mcp-demo -- uvx wa-mcp-server --demo
+```
+
+**Claude Desktop (`claude_desktop_config.json`) and Cursor (`.cursor/mcp.json`)**
+
+```json
+{
+  "mcpServers": {
+    "wa-mcp-demo": { "command": "uvx", "args": ["wa-mcp-server", "--demo"] }
+  }
+}
+```
+
+**VS Code (`.vscode/mcp.json`)**
+
+```json
+{
+  "servers": {
+    "wa-mcp-demo": { "type": "stdio", "command": "uvx", "args": ["wa-mcp-server", "--demo"] }
+  }
+}
+```
+
+Ask “What are my tasks today?”, then search for “blue umbrella” and read the voice note transcript. [Two-minute tutorial](docs/tutorials/00-demo.md)
 
 ## Features
 
@@ -108,6 +140,8 @@ Checked in November 2026 from each project's public repository. Corrections are 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/) so your MCP client can run `uvx`.
 The buttons install the Python server. Keep a linked bridge running for live messages and bridge tools.
 
+[![Demo in Cursor](https://img.shields.io/badge/Demo%20in%20Cursor-4f7c9a?style=flat)](https://cursor.com/install-mcp?name=wa-mcp-demo&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJ3YS1tY3Atc2VydmVyIiwiLS1kZW1vIl19)
+[![Demo in VS Code](https://img.shields.io/badge/Demo%20in%20VS%20Code-4f7c9a?style=flat)](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp-demo%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522wa-mcp-server%2522%252C%2522--demo%2522%255D%257D)
 [![Add to Cursor](https://img.shields.io/badge/Add%20to%20Cursor-4f7c9a?style=flat)](https://cursor.com/install-mcp?name=wa-mcp&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLWZyb20iLCJ3YS1tY3Atc2VydmVyPT0wLjEuMCIsIi0td2l0aCIsIndhLW1jcC1zZGtbZW5jcnlwdGlvbixmaWxlc10iLCJ3YS1tY3AiXX0%3D)
 [![Install in VS Code](https://img.shields.io/badge/Install%20in%20VS%20Code-4f7c9a?style=flat)](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522--from%2522%252C%2522wa-mcp-server%253D%253D0.1.0%2522%252C%2522--with%2522%252C%2522wa-mcp-sdk%255Bencryption%252Cfiles%255D%2522%252C%2522wa-mcp%2522%255D%257D)
 [![Install in VS Code Insiders](https://img.shields.io/badge/Install%20in%20VS%20Code%20Insiders-4f7c9a?style=flat)](https://vscode.dev/redirect?url=vscode-insiders%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522--from%2522%252C%2522wa-mcp-server%253D%253D0.1.0%2522%252C%2522--with%2522%252C%2522wa-mcp-sdk%255Bencryption%252Cfiles%255D%2522%252C%2522wa-mcp%2522%255D%257D)
@@ -188,6 +222,18 @@ Assistant:  (calls my_day for 2026-11-23)
 ```
 
 `my_day` runs on your machine and uses plain rules. The assistant only phrases the result.
+
+## Toolsets
+
+The default `core` toolset exposes 11 tools for checking bridge status, finding contacts and chats,
+reading or searching messages, reviewing your day, sending text and files, downloading media and
+transcribing voice notes. Sending requires `sending.enabled` and follows the configured approval policy.
+
+Enable additional sets with `{"mcp": {"toolsets": ["core", "actions"]}}` in `config.json`.
+Choose from `history`, `media`, `insight`, `tasks`, `schedule`, `agent`, `accounts` and `actions`.
+To expose every tool after upgrading from 0.1.1, use `["all"]`. The `--toolsets` flag takes precedence
+over `WA_MCP_TOOLSETS` and the file. For example, `wa-mcp --toolsets core,actions` enables message
+reactions, edits, revocations and text forwards. [Tool reference](docs/reference/tools.md).
 
 ## Configuration
 

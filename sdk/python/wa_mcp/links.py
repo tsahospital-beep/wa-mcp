@@ -252,6 +252,8 @@ def fetch_shared_docs(
             if len(fetched) + len(failed) >= limit:
                 break
             try:
+                if db.store().cfg.demo:
+                    raise LinkError("Demo mode: external documents are offline.")
                 text = fetch_doc(link, transport=transport, resolve=resolve)
             except LinkError as exc:
                 failed.append({"msg_id": row["msg_id"], "url": link.url, "error": str(exc)})
@@ -289,7 +291,12 @@ def check_chat_links(
         for url in find_urls(str(row["body"])):
             if url not in seen and len(seen) < limit:
                 seen[url] = str(row["msg_id"])
-    checked = [
-        {**link_status(url, transport=transport, resolve=resolve), "msg_id": mid} for url, mid in seen.items()
-    ]
+    checked = []
+    for url, mid in seen.items():
+        status = (
+            {"url": url, "ok": False, "error": "Demo mode: external links are offline."}
+            if db.store().cfg.demo
+            else link_status(url, transport=transport, resolve=resolve)
+        )
+        checked.append({**status, "msg_id": mid})
     return {"links": checked, "count": len(checked)}

@@ -23,6 +23,7 @@ from wa_mcp import config as config_mod
 from wa_mcp.client import Bridge, BridgeError
 from wa_mcp.crypt import CryptError
 from wa_mcp.db import Row, StoreError
+from wa_mcp_server.demo import LINK_NOTICE, OFFLINE_TOOLS
 
 log = logging.getLogger("wa_mcp_server")
 
@@ -75,7 +76,7 @@ ACCOUNT_PARAM = inspect.Parameter(
 
 def setup(cfg: config_mod.Config) -> None:
     # NumPy's Windows DLL can block on first import after the stdio reader takes stdin.
-    if sys.platform == "win32":
+    if sys.platform == "win32" and not cfg.demo:
         with contextlib.suppress(ImportError):
             importlib.import_module("numpy")
     _state.clear()
@@ -143,26 +144,14 @@ def safe(fn: Callable[P, Any]) -> Callable[P, Coroutine[Any, Any, Result]]:
     it declares `account` itself and handles it.
     """
     own = "account" in inspect.signature(fn).parameters
+    asynchronous = inspect.iscoroutinefunction(fn)
+    needs_link = fn.__name__ not in OFFLINE_TOOLS
 
     def on(account: str | None) -> contextlib.AbstractContextManager[Any]:
         return contextlib.nullcontext() if own else db.use_account(account)
 
-    if inspect.iscoroutinefunction(fn):
-
-        @functools.wraps(fn)
-        async def run_async(*args: Any, **kwargs: Any) -> Result:
-            name = None if own else kwargs.pop("account", None)
-            try:
-                with on(name):
-                    result: Result = await fn(*args, **kwargs)
-                return result
-            except Exception as exc:
-                return _error(fn.__name__, exc)
-
-        return _with_account(fn, run_async, own)
-
     @functools.wraps(fn)
-    async def run_in_thread(*args: Any, **kwargs: Any) -> Result:
+    async def run(*args: Any, **kwargs: Any) -> Result:
         name = None if own else kwargs.pop("account", None)
 
         def call() -> Result:
@@ -171,11 +160,17 @@ def safe(fn: Callable[P, Any]) -> Callable[P, Coroutine[Any, Any, Result]]:
                 return result
 
         try:
+            if needs_link and cfg().demo:
+                return fail(LINK_NOTICE, demo=True)
+            if asynchronous:
+                with on(name):
+                    result: Result = await fn(*args, **kwargs)
+                return result
             return await anyio.to_thread.run_sync(call)
         except Exception as exc:
             return _error(fn.__name__, exc)
 
-    return _with_account(fn, run_in_thread, own)
+    return _with_account(fn, run, own)
 
 
 def _with_account(fn: Callable[..., Any], wrapper: Callable[..., T], own: bool) -> Callable[..., T]:

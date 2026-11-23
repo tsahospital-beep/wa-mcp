@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Read chats with the WhatsApp MCP Python SDK | WA MCP</title>
+    <meta name="description" content="Use the WhatsApp MCP Python SDK to read a linked chat, inspect connection status, query encrypted history and download one attachment with the local bridge." />
+    <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-python/" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="WA MCP" />
+    <meta property="og:title" content="Read chats with the WhatsApp MCP Python SDK | WA MCP" />
+    <meta property="og:description" content="Use the WhatsApp MCP Python SDK to read a linked chat, inspect connection status, query encrypted history and download one attachment with the local bridge." />
+    <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-python/" />
+    <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Read chats with the WhatsApp MCP Python SDK | WA MCP" />
+    <meta name="twitter:description" content="Use the WhatsApp MCP Python SDK to read a linked chat, inspect connection status, query encrypted history and download one attachment with the local bridge." />
+    <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <script>
+      document.documentElement.classList.add("js");
+      try {
+        const t = localStorage.getItem("wa-theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "WA MCP",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Guides",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/#guides"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Python SDK",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-python/"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-python/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Does the WhatsApp MCP Python SDK require a running assistant?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. The Bridge client reads through the authenticated Go bridge. A direct database reader uses the local store and needs access to its configured encryption key."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can the reader run against an encrypted WhatsApp store?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. The example reads through the authenticated bridge API. For direct database access the script also needs the configured storage key."
+                }
+              }
+            ]
+          },
+          {
+            "@type": "HowTo",
+            "name": "Read chats with the WhatsApp MCP Python SDK",
+            "description": "Use the WhatsApp MCP Python SDK to read a linked chat, inspect connection status, query encrypted history and download one attachment with the local bridge.",
+            "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-python/",
+            "step": [
+              {
+                "@type": "HowToStep",
+                "name": "Read one conversation from the bridge",
+                "text": "Suppose a book club wants a weekly list of books people have suggested. You can build the list from one conversation with the Python SDK. Start by finding the group and reading five messages. This gives you a short list that you can compare with the chat on your phone before writing a filter or saving any output.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-python/#section-1"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Keep the account and chat explicit",
+                "text": "Once you have the intended chat identifier, use it for subsequent reads. A title is convenient for a human, but two groups can share a title. The SDK returns the identifier with each chat. Print it locally when selecting a group, then pass that value to the message query. The response comes newest first. Reverse the selected rows when a reader needs the discussion in chronological order.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-python/#section-2"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Choose where to read encrypted fields",
+                "text": "The reader above talks to the authenticated bridge API. The bridge handles its storage key, so the reader can obtain the requested fields without opening the encrypted database itself. A local script with the right configuration can also read stored history through the SDK's database module. This is useful for a report that reads many matching rows without needing new messages from the phone.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-python/#section-3"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Handle gaps and attachments",
+                "text": "A new link receives the history the phone supplies. An empty result can mean that the conversation is outside that window. First read recent messages from the chosen chat without the search term. Then request older history for that chat or preview an existing chat export. Record the period covered by your report before interpreting a count as a full archive.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-python/#section-4"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Keep a reporting job read-only",
+                "text": "A script can finish after the last read. It needs no model credentials or running desktop assistant. Leave sending disabled in the bridge while developing a report. The SDK also exposes a send method for other applications. Calling it from a script puts the decision to send in that application, outside an MCP client's interactive confirmation.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-python/#section-5"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="container bar">
+        <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+        <button class="menu-button tool" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">
+          <svg
+            class="ui menu"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M3 7h18M3 16h18" />
+          </svg>
+        </button>
+        <div id="navigation" class="navigation">
+          <nav aria-label="Primary">
+            <a href="../#features">Features</a><a href="../#install">Install</a><a href="../#guides">Guides</a
+            ><a href="../whatsapp-mcp-security/">Security</a>
+          </nav>
+          <div class="actions">
+            <a
+              class="button star-button"
+              href="https://github.com/tsahospital-beep/wa-mcp"
+              title="Open the repository to star WA MCP"
+              ><svg
+                class="ui star"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg
+            ></a>
+          </div>
+        </div>
+        <button class="theme tool" aria-label="Switch color mode">
+          <svg
+            class="ui sun"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path
+              d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2 M16 12a4 4 0 1 0-8 0 4 4 0 1 0 8 0"
+            /></svg
+          ><svg
+            class="ui moon"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+    <main id="main">
+      <div class="container">
+        <nav aria-label="Breadcrumb" class="crumbs"><a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / <span aria-current="page">Python SDK</span></nav>
+        <div class="guide-hero">
+          <div>
+            <div class="kicker">Development guide</div>
+            <h1>Read chats with the WhatsApp MCP Python SDK</h1>
+            <p class="lead">The WhatsApp MCP Python SDK gives a script access to the same store and bridge as your assistant. Use the included reader to identify a chat, inspect recent messages and build a small report without starting an MCP client.</p>
+            <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
+          </div>
+          <div class="plate guide-plate" aria-hidden="true">
+            <div class="plate-inner">
+              <svg class="dot-art" aria-hidden="true" viewBox="0 0 180 140">
+                <defs>
+                  <pattern id="p-webhooks-and-python-sdk" width="3.6" height="3.6" patternUnits="userSpaceOnUse">
+                    <circle cx="1.8" cy="1.8" r="1.35" fill="white" />
+                  </pattern>
+                  <mask id="m-webhooks-and-python-sdk">
+                    <path
+                      d="M7 8l-5 4 5 4 M17 8l5 4-5 4 M14 3.5v10q0 5.5-4.5 7"
+                      transform="translate(31 13) scale(4.9)"
+                      fill="none"
+                      stroke="white"
+                      stroke-width="2.35"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </mask>
+                </defs>
+                <g mask="url(#m-webhooks-and-python-sdk)">
+                  <rect width="180" height="140" fill="url(#p-webhooks-and-python-sdk)" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="reading">
+          <aside>
+            <strong class="toc-title">On this page</strong>
+            <button class="toc-toggle" type="button" aria-controls="contents" aria-expanded="false">On this page <span aria-hidden="true">+</span></button>
+            <nav id="contents" aria-label="On this page">
+              <a href="#section-1">Read one conversation from the bridge</a>
+              <a href="#section-2">Keep the account and chat explicit</a>
+              <a href="#section-3">Choose where to read encrypted fields</a>
+              <a href="#section-4">Handle gaps and attachments</a>
+              <a href="#section-5">Keep a reporting job read-only</a>
+              <a href="#faq">Questions</a>
+            </nav>
+          </aside>
+          <article>
+            <section id="section-1">
+            <h2>Read one conversation from the bridge</h2>
+            <p>Suppose a book club wants a weekly list of books people have suggested. You can build the list from one conversation with the Python SDK. Start by finding the group and reading five messages. This gives you a short list that you can compare with the chat on your phone before writing a filter or saving any output.</p>
+            <p>From a source checkout, install the workspace dependencies with <code>uv sync</code>. Build or start the Go bridge, link your phone and wait for recent chats to appear. Run the included reader from the repository directory. Give it the same configuration file as the bridge, especially if you keep the store outside the checkout.</p>
+            <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
+              <pre><code class="language-shell">uv run python examples/python_sdk_basic.py --config config.json --chats 5</code></pre>
+            </div>
+            <p>The first line reports the bridge version, connection state and login state. The script lists recent conversations and reads the newest one when you omit the chat argument. Look at the title and the group indicator before using that default for a report. A new message in another conversation can change which chat is first.</p>
+            </section>
+            <section id="section-2">
+            <h2>Keep the account and chat explicit</h2>
+            <p>Once you have the intended chat identifier, use it for subsequent reads. A title is convenient for a human, but two groups can share a title. The SDK returns the identifier with each chat. Print it locally when selecting a group, then pass that value to the message query. The response comes newest first. Reverse the selected rows when a reader needs the discussion in chronological order.</p>
+            <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
+              <pre><code class="language-python">from wa_mcp import config
+from wa_mcp.client import Bridge
+
+with Bridge(cfg=config.load(&quot;config.json&quot;)) as bridge:
+    for chat in bridge.chats(limit=5):
+        print(chat[&quot;jid&quot;], chat.get(&quot;title&quot;))</code></pre>
+            </div>
+            <p>The example reader also accepts <code>--chat</code> and <code>--messages</code>. Try the same chat twice with a limit of five. Check the sender direction and timestamp against your phone. A voice message may have a media kind and an empty body. Treat that as a media entry when counting messages, even if your book-title filter only handles text.</p>
+            </section>
+            <section id="section-3">
+            <h2>Choose where to read encrypted fields</h2>
+            <p>The reader above talks to the authenticated bridge API. The bridge handles its storage key, so the reader can obtain the requested fields without opening the encrypted database itself. A local script with the right configuration can also read stored history through the SDK's database module. This is useful for a report that reads many matching rows without needing new messages from the phone.</p>
+            <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
+              <pre><code class="language-python">from wa_mcp import config, db, people
+
+cfg = config.load(&quot;config.json&quot;)
+db.connect(cfg)
+people.connect(cfg)
+
+for row in db.messages(query=&quot;paperback&quot;, limit=5):
+    print(row[&quot;time&quot;], people.name_of(row[&quot;conv&quot;]))</code></pre>
+            </div>
+            <p>This report prints the time and conversation name. The message text can stay out of your shell history, logs and exported reports. Run direct reads as an operating-system user with access to the configured key. If the API example works and the direct read fails, compare the store directory and key configuration used by each process.</p>
+            </section>
+            <section id="section-4">
+            <h2>Handle gaps and attachments</h2>
+            <p>A new link receives the history the phone supplies. An empty result can mean that the conversation is outside that window. First read recent messages from the chosen chat without the search term. Then request older history for that chat or preview an existing chat export. Record the period covered by your report before interpreting a count as a full archive.</p>
+            <p>The example's optional <code>--download</code> switch saves an attachment and prints its local path. Leave it out for a text report. A saved file has its own storage and deletion requirements, even when the corresponding message fields are encrypted. A message ID paired with its chat ID is usually enough to return to the source later.</p>
+            </section>
+            <section id="section-5">
+            <h2>Keep a reporting job read-only</h2>
+            <p>A script can finish after the last read. It needs no model credentials or running desktop assistant. Leave sending disabled in the bridge while developing a report. The SDK also exposes a send method for other applications. Calling it from a script puts the decision to send in that application, outside an MCP client's interactive confirmation.</p>
+            <p>If the script reports that the bridge is unreachable, check the process and the API address in the selected config. If it reports a missing token, start the bridge as the intended user and check the token settings. A successful status response with an empty chat list points to a different issue: check the linked account and allow time for the initial sync.</p>
+            </section>
+            <section id="faq"><h2>Questions</h2><details><summary>Does the WhatsApp MCP Python SDK require a running assistant?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>No. The Bridge client reads through the authenticated Go bridge. A direct database reader uses the local store and needs access to its configured encryption key.</p></details>
+          <details><summary>Can the reader run against an encrypted WhatsApp store?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Yes. The example reads through the authenticated bridge API. For direct database access the script also needs the configured storage key.</p></details></section>
+            <p class="source"><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/tutorials/12-webhooks-and-python-sdk.md">Read the project Python SDK tutorial</a></p>
+          </article>
+        </div>
+      </div>
+      <section class="related">
+        <div class="container">
+          <h2>Related guides</h2>
+          <div class="related-grid">
+            <a class="row-link" href="/wa-mcp/self-hosted-whatsapp-api/"><span>A free, self-hosted WhatsApp API</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+            <a class="row-link" href="/wa-mcp/search-whatsapp-messages-with-ai/"><span>Search WhatsApp chat history with AI</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+            <a class="row-link" href="/wa-mcp/whatsmeow-go-bridge/"><span>Embed the whatsmeow Go bridge for WhatsApp MCP</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="container">
+        <div class="foot-top">
+          <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+          <nav aria-label="Footer">
+            <a href="../#guides">Guides</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg></a
+            ><a href="../llms.txt">llms.txt</a>
+          </nav>
+        </div>
+        <div class="foot-note">
+          <p>
+            <strong>Account risk.</strong> WA MCP uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or
+            ban a linked account, even with sending limits in place.
+          </p>
+          <span>Updated <time datetime="2026-11-23">23 Nov 2026</time></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

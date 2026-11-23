@@ -58,15 +58,16 @@ type Sleeper func(ctx context.Context, d time.Duration) error
 
 // Request is one send.
 type Request struct {
-	AgentRevision string   `json:"agent_revision,omitempty"`
-	To            string   `json:"to"`
-	Text          string   `json:"text"`
-	MediaPath     string   `json:"media_path"`
-	AsVoice       bool     `json:"as_voice"`
-	StickerPath   string   `json:"sticker_path"`
-	ReplyTo       *Reply   `json:"reply_to"`
-	Mentions      []string `json:"mentions"`
-	Human         *bool    `json:"human"`
+	Action        *wa.MessageAction `json:"-"`
+	AgentRevision string            `json:"agent_revision,omitempty"`
+	To            string            `json:"to"`
+	Text          string            `json:"text"`
+	MediaPath     string            `json:"media_path"`
+	AsVoice       bool              `json:"as_voice"`
+	StickerPath   string            `json:"sticker_path"`
+	ReplyTo       *Reply            `json:"reply_to"`
+	Mentions      []string          `json:"mentions"`
+	Human         *bool             `json:"human"`
 	// Scheduled marks sends from the scheduler: the time was chosen explicitly,
 	// so quiet hours do not apply.
 	Scheduled   bool `json:"-"`
@@ -97,6 +98,8 @@ func (r *Result) add(id string, at time.Time) {
 
 // Sender runs the pipeline. Fields other than Cfg, DB and Transport are optional.
 type Sender struct {
+	// BuildAction supplies the protocol builder for message actions.
+	BuildAction  func(wa.MessageAction, types.JID, types.JID) (*waE2E.Message, error)
 	AgentCurrent func(string) bool
 	Cfg          config.Sending
 	DB           *store.DB
@@ -144,9 +147,14 @@ func (s *Sender) Send(ctx context.Context, req Request) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
-	parts, err := planAs(WithMentionTags(req.Text, mentions), media, req.AsVoice, req.AsDocument, sticker)
-	if err != nil {
-		return Result{}, err
+	var parts []part
+	partCount := 1
+	if req.Action == nil {
+		parts, err = planAs(WithMentionTags(req.Text, mentions), media, req.AsVoice, req.AsDocument, sticker)
+		if err != nil {
+			return Result{}, err
+		}
+		partCount = len(parts)
 	}
 	target := to.String()
 	hash, err := s.bodyHash(ctx, req)
@@ -168,7 +176,15 @@ func (s *Sender) Send(ctx context.Context, req Request) (Result, error) {
 			return Result{}, &DeferUntil{End: until}
 		}
 	}
-	resv, err := s.reserve(ctx, target, hash, now, len(parts))
+	if req.Action != nil {
+		if s.BuildAction == nil {
+			return Result{}, errors.New("message action builder unavailable")
+		}
+		if _, err := s.actionAuthor(ctx, to, req.Action); err != nil {
+			return Result{}, err
+		}
+	}
+	resv, err := s.reserve(ctx, target, hash, now, partCount)
 	if err != nil {
 		return Result{}, err
 	}
@@ -185,6 +201,9 @@ func (s *Sender) Send(ctx context.Context, req Request) (Result, error) {
 	var waited time.Duration
 	if err := s.beforeFirstPart(ctx, to, target, human, &waited); err != nil {
 		return Result{}, err
+	}
+	if req.Action != nil {
+		return s.sendAction(ctx, to, req.Action, resv, human, waited)
 	}
 	res, err := s.sendParts(ctx, to, target, req.ReplyTo, mentions, parts, resv, human, &waited, req.AgentRevision)
 	res.Waited = waited
@@ -313,6 +332,7 @@ func (s *Sender) sendOne(ctx context.Context, to types.JID, msg *waE2E.Message, 
 		}
 		return "", time.Time{}, fmt.Errorf("send: %w", err)
 	}
+	s.noteSent(to.String())
 	if ts.IsZero() {
 		ts = s.now()
 	}

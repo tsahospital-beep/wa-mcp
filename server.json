@@ -1,16 +1,16 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.tsahospital-beep/wa-mcp",
-  "description": "Read, search and send WhatsApp messages through a linked WA MCP bridge.",
+  "description": "Try fictional WhatsApp chats offline with --demo, or read, search and send through a linked bridge.",
   "repository": {
     "url": "https://github.com/tsahospital-beep/wa-mcp",
     "source": "github"
   },
-  "version": "0.1.1",
+  "version": "0.2.0",
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/tsahospital-beep/wa-mcp-server:0.1.1",
+      "identifier": "ghcr.io/tsahospital-beep/wa-mcp-server:0.2.0",
       "transport": { "type": "stdio" },
       "runtimeHint": "docker",
       "runtimeArguments": [
@@ -60,6 +60,7 @@
         { "type": "named", "name": "--log-level", "value": "WARNING", "isRequired": true }
       ],
       "environmentVariables": [
+        { "name": "WA_MCP_TOOLSETS", "description": "Comma-separated MCP toolsets. Defaults to core. Use all for the full catalog." },
         { "name": "WA_MCP_CONFIG", "description": "Configuration file inside the container.", "default": "/config/config.json" },
         { "name": "WA_MCP_STORE_DIR", "description": "Message database directory inside the shared volume.", "default": "/data/store" },
         { "name": "WA_MCP_API_LISTEN", "description": "Bridge API host and port.", "default": "127.0.0.1:8080" },

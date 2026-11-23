@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Embed the whatsmeow Go bridge for WhatsApp MCP | WA MCP</title>
+    <meta name="description" content="Use the WA MCP Go package around whatsmeow to observe stored WhatsApp messages, add a token-protected route and test it before linking a phone." />
+    <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/whatsmeow-go-bridge/" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="WA MCP" />
+    <meta property="og:title" content="Embed the whatsmeow Go bridge for WhatsApp MCP | WA MCP" />
+    <meta property="og:description" content="Use the WA MCP Go package around whatsmeow to observe stored WhatsApp messages, add a token-protected route and test it before linking a phone." />
+    <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/whatsmeow-go-bridge/" />
+    <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Embed the whatsmeow Go bridge for WhatsApp MCP | WA MCP" />
+    <meta name="twitter:description" content="Use the WA MCP Go package around whatsmeow to observe stored WhatsApp messages, add a token-protected route and test it before linking a phone." />
+    <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <script>
+      document.documentElement.classList.add("js");
+      try {
+        const t = localStorage.getItem("wa-theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "WA MCP",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Guides",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/#guides"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Go bridge",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/whatsmeow-go-bridge/"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/whatsmeow-go-bridge/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Which WhatsApp Go library does the MCP bridge use?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The bridge uses whatsmeow for the WhatsApp connection. Import pkg/wabridge to extend WA MCP with stored-message hooks and HTTP routes. The Python MCP server handles client tool calls."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Will an import call my Go message hook?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Bulk chat export imports skip OnMessageStored. Read existing rows when building an initial index, then process the live, history and change origins your application needs."
+                }
+              }
+            ]
+          },
+          {
+            "@type": "HowTo",
+            "name": "Embed the whatsmeow Go bridge for WhatsApp MCP",
+            "description": "Use the WA MCP Go package around whatsmeow to observe stored WhatsApp messages, add a token-protected route and test it before linking a phone.",
+            "url": "https://tsahospital-beep.github.io/wa-mcp/whatsmeow-go-bridge/",
+            "step": [
+              {
+                "@type": "HowToStep",
+                "name": "Choose the extension point",
+                "text": "Consider a Go service that maintains a reading list for a group chat. It needs to know when a message has been saved and when someone edits a suggestion. WA MCP already owns the WhatsApp connection and the local message store. Its public Go package lets a service observe committed changes and use the bridge's existing configuration. A separate Python process can still expose the stored history to an MCP client.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsmeow-go-bridge/#section-1"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Start the bridge with your program",
+                "text": "Use wabridge.Main when the program should accept the same command-line arguments as the bridge. It returns an exit status for your main function. An application that already manages its own lifetime can use Run(ctx, opts) and cancel the context during shutdown. Use a single running owner for a linked-device session.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsmeow-go-bridge/#section-2"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Observe a message after it is stored",
+                "text": "Set OnMessageStored to a function that accepts a context and a stored message. Inspect the origin before deciding what to do. A live update can be an outgoing message sent on your phone. A history update can describe something said long before your application started. For a notification about a new suggestion, inspect both the origin and the outgoing flag and match the intended chat.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsmeow-go-bridge/#section-3"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Add a route and test it locally",
+                "text": "The routes callback receives a router and the running bridge's dependencies. Register an application-specific path with Handle to use the bridge's token checks. The bridge reserves its root, health endpoint and API namespace. A route that lists the most recent suggestion can ask the provided store for messages with a chat identifier and a small limit.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsmeow-go-bridge/#section-4"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Expose a result to an assistant",
+                "text": "The standard Python MCP server can read the configured WhatsApp store alongside your Go program. Keep the config and the relevant storage key available to that process. If you already run a Python FastMCP application, the project also provides wa_mcp_server.embed.register to add selected tools and rename them to avoid a collision. Choose only the tools the assistant needs for the reading list.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsmeow-go-bridge/#section-5"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="container bar">
+        <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+        <button class="menu-button tool" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">
+          <svg
+            class="ui menu"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M3 7h18M3 16h18" />
+          </svg>
+        </button>
+        <div id="navigation" class="navigation">
+          <nav aria-label="Primary">
+            <a href="../#features">Features</a><a href="../#install">Install</a><a href="../#guides">Guides</a
+            ><a href="../whatsapp-mcp-security/">Security</a>
+          </nav>
+          <div class="actions">
+            <a
+              class="button star-button"
+              href="https://github.com/tsahospital-beep/wa-mcp"
+              title="Open the repository to star WA MCP"
+              ><svg
+                class="ui star"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg
+            ></a>
+          </div>
+        </div>
+        <button class="theme tool" aria-label="Switch color mode">
+          <svg
+            class="ui sun"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path
+              d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2 M16 12a4 4 0 1 0-8 0 4 4 0 1 0 8 0"
+            /></svg
+          ><svg
+            class="ui moon"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+    <main id="main">
+      <div class="container">
+        <nav aria-label="Breadcrumb" class="crumbs"><a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / <span aria-current="page">Go bridge</span></nav>
+        <div class="guide-hero">
+          <div>
+            <div class="kicker">Architecture guide</div>
+            <h1>Embed the whatsmeow Go bridge for WhatsApp MCP</h1>
+            <p class="lead">WA MCP uses the whatsmeow Go library for WhatsApp and exposes a public bridge package for Go applications. Learn where to attach a message hook, how to test a custom route and where the Python MCP server fits.</p>
+            <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
+          </div>
+          <div class="plate guide-plate" aria-hidden="true">
+            <div class="plate-inner">
+              <svg class="dot-art" aria-hidden="true" viewBox="0 0 180 140">
+                <defs>
+                  <pattern id="p-remote-mcp" width="3.6" height="3.6" patternUnits="userSpaceOnUse">
+                    <circle cx="1.8" cy="1.8" r="1.35" fill="white" />
+                  </pattern>
+                  <mask id="m-remote-mcp">
+                    <path
+                      d="M8 15H6a4 4 0 0 1-.4-8A6.4 6.4 0 0 1 18 6.8a4.2 4.2 0 0 1 0 8.4h-2 M12 11.5v9 M7.5 20.5h9"
+                      transform="translate(31 13) scale(4.9)"
+                      fill="none"
+                      stroke="white"
+                      stroke-width="2.35"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </mask>
+                </defs>
+                <g mask="url(#m-remote-mcp)"><rect width="180" height="140" fill="url(#p-remote-mcp)" /></g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="reading">
+          <aside>
+            <strong class="toc-title">On this page</strong>
+            <button class="toc-toggle" type="button" aria-controls="contents" aria-expanded="false">On this page <span aria-hidden="true">+</span></button>
+            <nav id="contents" aria-label="On this page">
+              <a href="#section-1">Choose the extension point</a>
+              <a href="#section-2">Start the bridge with your program</a>
+              <a href="#section-3">Observe a message after it is stored</a>
+              <a href="#section-4">Add a route and test it locally</a>
+              <a href="#section-5">Expose a result to an assistant</a>
+              <a href="#faq">Questions</a>
+            </nav>
+          </aside>
+          <article>
+            <section id="section-1">
+            <h2>Choose the extension point</h2>
+            <p>Consider a Go service that maintains a reading list for a group chat. It needs to know when a message has been saved and when someone edits a suggestion. WA MCP already owns the WhatsApp connection and the local message store. Its public Go package lets a service observe committed changes and use the bridge's existing configuration. A separate Python process can still expose the stored history to an MCP client.</p>
+            <p>Import <code>github.com/tsahospital-beep/wa-mcp/bridge/pkg/wabridge</code>. The bridge command itself calls this package. The underlying WhatsApp Go library is whatsmeow. Working through the public package gives your program the bridge's storage, login and configuration behavior. Keep imports inside the published package boundary so changes to the bridge's internal packages do not become changes your application has to track.</p>
+            </section>
+            <section id="section-2">
+            <h2>Start the bridge with your program</h2>
+            <p>Use <code>wabridge.Main</code> when the program should accept the same command-line arguments as the bridge. It returns an exit status for your main function. An application that already manages its own lifetime can use <code>Run(ctx, opts)</code> and cancel the context during shutdown. Use a single running owner for a linked-device session.</p>
+            <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
+              <pre><code class="language-go">package main
+
+import (
+    &quot;os&quot;
+
+    &quot;github.com/tsahospital-beep/wa-mcp/bridge/pkg/wabridge&quot;
+)
+
+func main() {
+    opts := wabridge.Options{Version: &quot;reading-list-1&quot;}
+    os.Exit(wabridge.Main(os.Args[1:], opts))
+}</code></pre>
+            </div>
+            <p>During local development the embedding guide shows how to point a Go module's replace directive at the bridge checkout. This lets you build the application and bridge from the same source tree. Set the configuration path explicitly so launching from a service manager or another directory still finds the expected store. The version string also appears in the status response and helps identify which program owns the listener.</p>
+            </section>
+            <section id="section-3">
+            <h2>Observe a message after it is stored</h2>
+            <p>Set <code>OnMessageStored</code> to a function that accepts a context and a stored message. Inspect the origin before deciding what to do. A live update can be an outgoing message sent on your phone. A history update can describe something said long before your application started. For a notification about a new suggestion, inspect both the origin and the outgoing flag and match the intended chat.</p>
+            <p>For a reading list that tracks corrections, record the message and chat identifiers. An edit carries the revised body and an edit time. A recorded deletion can still carry the old body, so look at the deletion fields before displaying a suggestion. Bulk chat export imports skip the message hook. If the application needs to build an initial index, read the store as a separate step.</p>
+            <p>Hooks run on the goroutine that wrote the row. Keep the work there short. A hook sees plaintext even with field encryption active. Logging message bodies or copying them to another database creates another place where the content must be protected. A count grouped by message kind may be sufficient when testing the connection.</p>
+            </section>
+            <section id="section-4">
+            <h2>Add a route and test it locally</h2>
+            <p>The routes callback receives a router and the running bridge's dependencies. Register an application-specific path with <code>Handle</code> to use the bridge's token checks. The bridge reserves its root, health endpoint and API namespace. A route that lists the most recent suggestion can ask the provided store for messages with a chat identifier and a small limit.</p>
+            <p>Test the handler before using the live group. The package provides <code>RoutesHandler</code>, which builds an HTTP handler with the bridge's token, host and body checks. Supply fake dependencies and a test token. Exercise an empty chat and one with a single message so the HTTP response for each case is clear. No phone pairing is needed for that handler test.</p>
+            </section>
+            <section id="section-5">
+            <h2>Expose a result to an assistant</h2>
+            <p>The standard Python MCP server can read the configured WhatsApp store alongside your Go program. Keep the config and the relevant storage key available to that process. If you already run a Python FastMCP application, the project also provides <code>wa_mcp_server.embed.register</code> to add selected tools and rename them to avoid a collision. Choose only the tools the assistant needs for the reading list.</p>
+            <p>A local HTTP route you register in Go remains your application's route. To make a new reading-list operation available as an MCP tool, define that tool in the client-facing server and give it a clear input and result. Ordinary message lookup can use the existing tools. This distinction lets you test phone sync, the Go route and the assistant's tool list independently.</p>
+            </section>
+            <section id="faq"><h2>Questions</h2><details><summary>Which WhatsApp Go library does the MCP bridge use?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>The bridge uses whatsmeow for the WhatsApp connection. Import pkg/wabridge to extend WA MCP with stored-message hooks and HTTP routes. The Python MCP server handles client tool calls.</p></details>
+          <details><summary>Will an import call my Go message hook?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Bulk chat export imports skip OnMessageStored. Read existing rows when building an initial index, then process the live, history and change origins your application needs.</p></details></section>
+            <p class="source"><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/guides/embedding.md">Read the project Go embedding guide</a></p>
+          </article>
+        </div>
+      </div>
+      <section class="related">
+        <div class="container">
+          <h2>Related guides</h2>
+          <div class="related-grid">
+            <a class="row-link" href="/wa-mcp/whatsapp-mcp-server/"><span>How the WhatsApp MCP server works</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+            <a class="row-link" href="/wa-mcp/whatsapp-mcp-python/"><span>Read chats with the WhatsApp MCP Python SDK</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+            <a class="row-link" href="/wa-mcp/self-hosted-whatsapp-api/"><span>A free, self-hosted WhatsApp API</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="container">
+        <div class="foot-top">
+          <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+          <nav aria-label="Footer">
+            <a href="../#guides">Guides</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg></a
+            ><a href="../llms.txt">llms.txt</a>
+          </nav>
+        </div>
+        <div class="foot-note">
+          <p>
+            <strong>Account risk.</strong> WA MCP uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or
+            ban a linked account, even with sending limits in place.
+          </p>
+          <span>Updated <time datetime="2026-11-23">23 Nov 2026</time></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

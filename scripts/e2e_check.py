@@ -467,7 +467,7 @@ class McpStdio:
         self._stop = asyncio.Event()
         params = StdioServerParameters(
             command=sys.executable,
-            args=["-m", "wa_mcp_server", "--config", str(self.config_file)],
+            args=["-m", "wa_mcp_server", "--config", str(self.config_file), "--toolsets", "all"],
             env=dict(os.environ),
         )
         try:

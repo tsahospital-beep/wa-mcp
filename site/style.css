@@ -214,6 +214,26 @@ pre { margin: 18px 0; padding: 18px; color: #e4f5df; background: #123a2c; font-s
 .related-grid { margin-top: 20px }
 .missing { padding-block: 100px }
 .missing .button { margin-top: 20px }
+.recovery-links { max-width: 32rem; margin-top: 28px }
+.toc-toggle { display: none }
+.snippet { margin: 18px 0; border-radius: 8px; background: #123a2c; color: #e4f5df }
+.snippet pre { margin: 0; padding-top: 8px }
+.snippet-tools { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 5px 6px 0; font: 13px var(--mono) }
+.snippet-tools button { padding: 0 12px; border-radius: 5px; border: 1px solid #829f8d; background: transparent; color: #f0ffe9 }
+.snippet-tools button:focus-visible, .plate button:focus-visible, .security a:focus-visible { outline-color: #d6ffad }
+.star-count { min-width: 3ch; text-align: center; font-variant-numeric: tabular-nums }
+.brand, .button, .tool, .release, .text-link, .command button, .stage-bar button,
+.switcher button, .snippet-tools button, .row-link, summary { min-height: 44px }
+.tool, .command button { min-width: 44px }
+.navigation nav a, footer nav a, aside nav a, .crumbs a, .source a, .note a,
+article p a, .table-scroll a { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; min-width: 44px }
+.crumbs { flex-wrap: wrap; row-gap: 0 }
+.snippet-tools, #copy, .menu-button, .theme, #replay { visibility: hidden }
+.js :is(.snippet-tools, #copy, .menu-button, .theme, #replay) { visibility: visible }
+:root:not(.js) .switcher { display: none }
+.note a { white-space: normal }
+aside nav { gap: 0 }
+.related-grid { row-gap: 0 }
 @media (prefers-reduced-motion:no-preference) {
   .play .question { animation: enter-prompt .38s both }
   .play .result { animation: enter-prompt .45s .23s both }
@@ -266,7 +286,6 @@ pre { margin: 18px 0; padding: 18px; color: #e4f5df; background: #123a2c; font-s
   .conversation { width: 94%; gap: 12px }
   .question { padding: 11px 14px; font-size: 15px }
   .result { min-width: min(255px,100%); padding: 14px 16px }
-  .switcher button { min-height: 36px }
   .facts { grid-template-columns: repeat(2,1fr); gap: 19px 0; padding-block: 20px }
   .facts div { padding-left: 15px }
   .facts div:nth-child(odd) { padding-left: 0; border: none }
@@ -303,5 +322,27 @@ pre { margin: 18px 0; padding: 18px; color: #e4f5df; background: #123a2c; font-s
   article p { font-size: 16px }
   .related-grid { gap: 0 }
   .related { padding: 28px 0 }
+}
+@media (max-width: 800px) {
+  .navigation { max-height: calc(100dvh - 62px); overflow-y: auto }
+  :root:not(.js) .top { position: static }
+  :root:not(.js) .bar { flex-wrap: wrap; padding-block: 8px }
+  :root:not(.js) .navigation { display: grid; position: static; width: 100%; flex: auto }
+  :root:not(.js) :is(.menu-button, .theme) { display: none }
+}
+@media (max-width: 620px) {
+  .reading aside { padding: 3px 14px }
+  .js .toc-title { display: none }
+  .js .toc-toggle { display: flex; width: 100%; min-height: 44px; justify-content: space-between; align-items: center; border: 0; padding: 0; background: transparent; font-weight: 650 }
+  .js .toc-toggle[aria-expanded=false] + nav { display: none }
+  aside nav { margin: 0 0 8px; gap: 0 }
+  .crumbs { padding-top: 8px }
+  .guide-hero { padding-top: 12px }
+  .reading { padding-top: 16px }
+  .guide-hero h1 { font-size: clamp(38px,10.6vw,46px); line-height: 1.03 }
+  .facts dd { font-size: clamp(22px,5.8vw,26px) }
+  .missing { padding-block: 48px }
+  .table-scroll { overscroll-behavior-x: contain }
+  .flow-node:not(:last-child)::after { line-height: 21px }
 }
 

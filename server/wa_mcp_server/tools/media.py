@@ -10,6 +10,7 @@ from wa_mcp_server.common import (
     UNTRUSTED,
     Result,
     bridge,
+    cfg,
     chat_jids,
     clamp,
     fail,
@@ -28,7 +29,7 @@ def register(mcp: FastMCP) -> None:
     def download_media(chat: Chat, message_id: MessageId) -> Result:
         """Get the file for one stored message. Reuses a verified local copy or downloads through the bridge
         into downloads_dir. Expired media may need a new phone request and up to 40 seconds. Returns chat,
-        msg_id, kind and path. Use download_chat_media to process a batch.
+        msg_id, kind and path. Use transcribe_chat_audio for speech or download_chat_media in the media toolset for a batch.
         """
         row = find_message(chat, message_id)
         res = media.download_media(bridge(), str(row["conv"]), message_id)
@@ -110,7 +111,12 @@ def register(mcp: FastMCP) -> None:
         row = find_message(chat, message_id)
         if row["kind"] != "document":
             return fail(f"message {message_id} is a {row['kind']}, not a document")
-        path = media.ensure_local(bridge(), row)
+        if cfg().demo:
+            path = media.local_file(row)
+            if path is None:
+                return fail("The demo document is missing. Restart the demo to recreate it.")
+        else:
+            path = media.ensure_local(bridge(), row)
         try:
             res = files.extract_message(str(row["conv"]), message_id, path)
         except files.FileError as exc:

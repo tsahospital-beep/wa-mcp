@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>WhatsApp webhooks or an n8n AI workflow? | WA MCP</title>
+    <meta name="description" content="Compare WA MCP signed WhatsApp webhooks with the n8n Business Cloud node. Receive a live event, verify its signature and handle retries in your workflow." />
+    <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/whatsapp-webhook-workflows/" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="WA MCP" />
+    <meta property="og:title" content="WhatsApp webhooks or an n8n AI workflow? | WA MCP" />
+    <meta property="og:description" content="Compare WA MCP signed WhatsApp webhooks with the n8n Business Cloud node. Receive a live event, verify its signature and handle retries in your workflow." />
+    <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/whatsapp-webhook-workflows/" />
+    <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="WhatsApp webhooks or an n8n AI workflow? | WA MCP" />
+    <meta name="twitter:description" content="Compare WA MCP signed WhatsApp webhooks with the n8n Business Cloud node. Receive a live event, verify its signature and handle retries in your workflow." />
+    <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <script>
+      document.documentElement.classList.add("js");
+      try {
+        const t = localStorage.getItem("wa-theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "WA MCP",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Guides",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/#guides"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Webhook events",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-webhook-workflows/"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-webhook-workflows/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Does WA MCP include a WhatsApp n8n AI workflow?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "WA MCP documents signed webhooks and a sample Python receiver. A custom n8n workflow needs its own receiving and verification logic. The built-in n8n WhatsApp node uses Business Cloud credentials."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Why is there no event for an older message?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The bridge emits message webhooks for live messages. Use stored history to fill gaps after downtime or to retrieve messages received during history sync."
+                }
+              }
+            ]
+          },
+          {
+            "@type": "HowTo",
+            "name": "WhatsApp webhooks or an n8n AI workflow?",
+            "description": "Compare WA MCP signed WhatsApp webhooks with the n8n Business Cloud node. Receive a live event, verify its signature and handle retries in your workflow.",
+            "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-webhook-workflows/",
+            "step": [
+              {
+                "@type": "HowToStep",
+                "name": "Choose the right source of events",
+                "text": "Suppose you want a workflow to record when a message arrives in a personal WhatsApp chat. First identify which system owns the number. The n8n WhatsApp Business Cloud node uses the official Business platform and its credentials. WA MCP uses a phone linked as a companion device. Its documented integration point for another program is a signed HTTP webhook. The project supplies a receiver you can run and inspect locally.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-webhook-workflows/#section-1"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Subscribe to a live event",
+                "text": "Add a webhook entry to the configuration used by the bridge. The URL in this example belongs to the local sample receiver. Put the same randomly generated secret in the environment of the receiver and the bridge, then restart the bridge after editing its configuration. The JSON stores the environment variable name.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-webhook-workflows/#section-2"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Verify before handing data to a workflow",
+                "text": "The request includes the delivery identifier, a timestamp and a signature. Verification uses the original request bytes. Reformatting the JSON in a workflow before checking the signature changes those bytes. The example receiver verifies the signature and the age of the request and remembers accepted delivery identifiers. A request with a missing or incorrect signature should never trigger the downstream action.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-webhook-workflows/#section-3"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Handle repeated or missed deliveries",
+                "text": "The bridge can retry a failed delivery using the same delivery identifier. If a receiver completes the action but loses its response, the next request can describe work it has already done. Track which identifiers have been accepted. A repeated identifier should be acknowledged without increasing the counter again. For a durable counter, keep that decision with the record it protects.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-webhook-workflows/#section-4"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Diagnose a quiet receiver",
+                "text": "Start with the URL the bridge can reach. A loopback address in a container refers to that container's network environment. Confirm the intended listener, then read the bridge startup log for the configured webhook count. If requests arrive but fail verification, compare the secret available to each process and check their clocks. Changing the variable in a different shell leaves an already running process with its original environment.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-webhook-workflows/#section-5"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="container bar">
+        <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+        <button class="menu-button tool" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">
+          <svg
+            class="ui menu"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M3 7h18M3 16h18" />
+          </svg>
+        </button>
+        <div id="navigation" class="navigation">
+          <nav aria-label="Primary">
+            <a href="../#features">Features</a><a href="../#install">Install</a><a href="../#guides">Guides</a
+            ><a href="../whatsapp-mcp-security/">Security</a>
+          </nav>
+          <div class="actions">
+            <a
+              class="button star-button"
+              href="https://github.com/tsahospital-beep/wa-mcp"
+              title="Open the repository to star WA MCP"
+              ><svg
+                class="ui star"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg
+            ></a>
+          </div>
+        </div>
+        <button class="theme tool" aria-label="Switch color mode">
+          <svg
+            class="ui sun"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path
+              d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2 M16 12a4 4 0 1 0-8 0 4 4 0 1 0 8 0"
+            /></svg
+          ><svg
+            class="ui moon"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+    <main id="main">
+      <div class="container">
+        <nav aria-label="Breadcrumb" class="crumbs"><a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / <span aria-current="page">Webhook events</span></nav>
+        <div class="guide-hero">
+          <div>
+            <div class="kicker">Development guide</div>
+            <h1>WhatsApp webhooks or an n8n AI workflow?</h1>
+            <p class="lead">A WhatsApp n8n AI workflow built around Business Cloud uses a business integration. For a linked personal account, WA MCP documents signed webhook events. Follow a message through the sample receiver before designing your own workflow.</p>
+            <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
+          </div>
+          <div class="plate guide-plate" aria-hidden="true">
+            <div class="plate-inner">
+              <svg class="dot-art" aria-hidden="true" viewBox="0 0 180 140">
+                <defs>
+                  <pattern id="p-webhooks-and-python-sdk" width="3.6" height="3.6" patternUnits="userSpaceOnUse">
+                    <circle cx="1.8" cy="1.8" r="1.35" fill="white" />
+                  </pattern>
+                  <mask id="m-webhooks-and-python-sdk">
+                    <path
+                      d="M7 8l-5 4 5 4 M17 8l5 4-5 4 M14 3.5v10q0 5.5-4.5 7"
+                      transform="translate(31 13) scale(4.9)"
+                      fill="none"
+                      stroke="white"
+                      stroke-width="2.35"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </mask>
+                </defs>
+                <g mask="url(#m-webhooks-and-python-sdk)">
+                  <rect width="180" height="140" fill="url(#p-webhooks-and-python-sdk)" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="reading">
+          <aside>
+            <strong class="toc-title">On this page</strong>
+            <button class="toc-toggle" type="button" aria-controls="contents" aria-expanded="false">On this page <span aria-hidden="true">+</span></button>
+            <nav id="contents" aria-label="On this page">
+              <a href="#section-1">Choose the right source of events</a>
+              <a href="#section-2">Subscribe to a live event</a>
+              <a href="#section-3">Verify before handing data to a workflow</a>
+              <a href="#section-4">Handle repeated or missed deliveries</a>
+              <a href="#section-5">Diagnose a quiet receiver</a>
+              <a href="#faq">Questions</a>
+            </nav>
+          </aside>
+          <article>
+            <section id="section-1">
+            <h2>Choose the right source of events</h2>
+            <p>Suppose you want a workflow to record when a message arrives in a personal WhatsApp chat. First identify which system owns the number. The n8n WhatsApp Business Cloud node uses the official Business platform and its credentials. WA MCP uses a phone linked as a companion device. Its documented integration point for another program is a signed HTTP webhook. The project supplies a receiver you can run and inspect locally.</p>
+            <p>Choose a small first result, such as counting incoming text messages in one test chat. A count does not need a copy of the full conversation. You can confirm that delivery, verification and chat selection work before deciding whether any content should go to a workflow service or a model.</p>
+            </section>
+            <section id="section-2">
+            <h2>Subscribe to a live event</h2>
+            <p>Add a webhook entry to the configuration used by the bridge. The URL in this example belongs to the local sample receiver. Put the same randomly generated secret in the environment of the receiver and the bridge, then restart the bridge after editing its configuration. The JSON stores the environment variable name.</p>
+            <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
+              <pre><code class="language-json">{
+  &quot;webhooks&quot;: [{
+    &quot;url&quot;: &quot;http://127.0.0.1:9000/hook&quot;,
+    &quot;events&quot;: [&quot;message&quot;],
+    &quot;secret_env&quot;: &quot;WA_MCP_WEBHOOK_SECRET&quot;
+  }]
+}</code></pre>
+            </div>
+            <p>From the source checkout, run <code>uv run python examples/webhook_receiver.py --port 9000</code>. Look for the listening address and port. Ask the test contact to send a fresh message while both processes are running. The receiver normally prints a short event record without the message body. Compare the event kind and timestamp with the phone before adding more event types.</p>
+            <p>A message you send from the phone can also generate an event. Inspect the outgoing flag and chat identifier when counting incoming messages. Older messages that arrive during history sync do not generate these notifications. Edits, deletions and reactions can update the local database without producing message webhooks.</p>
+            </section>
+            <section id="section-3">
+            <h2>Verify before handing data to a workflow</h2>
+            <p>The request includes the delivery identifier, a timestamp and a signature. Verification uses the original request bytes. Reformatting the JSON in a workflow before checking the signature changes those bytes. The example receiver verifies the signature and the age of the request and remembers accepted delivery identifiers. A request with a missing or incorrect signature should never trigger the downstream action.</p>
+            <p>Use the receiver as the reference when adapting this to a workflow engine. Check which component can access the raw body and keep the shared secret private. If that component is a small local program, it can pass only the fields your workflow needs after verification. The WA MCP docs describe that HTTP contract. They do not supply an n8n node, an importable workflow or a tested n8n AI configuration.</p>
+            <p>For the counter example, select the expected chat and use the message identifier for the record. A workflow that merely needs the arrival time and message kind has no reason to store the body, author name or quoted reply. A voice event contains metadata. Downloading and transcribing audio is a separate operation with its own storage and provider choices.</p>
+            </section>
+            <section id="section-4">
+            <h2>Handle repeated or missed deliveries</h2>
+            <p>The bridge can retry a failed delivery using the same delivery identifier. If a receiver completes the action but loses its response, the next request can describe work it has already done. Track which identifiers have been accepted. A repeated identifier should be acknowledged without increasing the counter again. For a durable counter, keep that decision with the record it protects.</p>
+            <p>A webhook subscription is a live feed with limited retries. After sustained downtime the bridge can drop an event. For a daily report, use stored messages to check the missing interval. Keep the time and message identifier of the last processed record, and compare overlapping results before adding them. Receiving a fresh event proves the receiver is working now. It says little about a period when it was offline.</p>
+            </section>
+            <section id="section-5">
+            <h2>Diagnose a quiet receiver</h2>
+            <p>Start with the URL the bridge can reach. A loopback address in a container refers to that container's network environment. Confirm the intended listener, then read the bridge startup log for the configured webhook count. If requests arrive but fail verification, compare the secret available to each process and check their clocks. Changing the variable in a different shell leaves an already running process with its original environment.</p>
+            <p>Finally, test an ordinary direct text message while the bridge is connected. It has fewer moving parts than a voice note or a missed call. Once the receiver records the expected event exactly once, you have a concrete input against which to test your own workflow.</p>
+            </section>
+            <section id="faq"><h2>Questions</h2><details><summary>Does WA MCP include a WhatsApp n8n AI workflow?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>WA MCP documents signed webhooks and a sample Python receiver. A custom n8n workflow needs its own receiving and verification logic. The built-in n8n WhatsApp node uses Business Cloud credentials.</p></details>
+          <details><summary>Why is there no event for an older message?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>The bridge emits message webhooks for live messages. Use stored history to fill gaps after downtime or to retrieve messages received during history sync.</p></details></section>
+            <p class="source"><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/guides/webhooks.md">Read the project webhook reference</a></p>
+            <p class="source"><a href="https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.whatsapp">n8n WhatsApp Business Cloud node documentation</a></p>
+          </article>
+        </div>
+      </div>
+      <section class="related">
+        <div class="container">
+          <h2>Related guides</h2>
+          <div class="related-grid">
+            <a class="row-link" href="/wa-mcp/self-hosted-whatsapp-api/"><span>A free, self-hosted WhatsApp API</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+            <a class="row-link" href="/wa-mcp/whatsapp-mcp-python/"><span>Read chats with the WhatsApp MCP Python SDK</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+            <a class="row-link" href="/wa-mcp/whatsapp-bot-without-business-api/"><span>A WhatsApp bot without the Business API: OpenAI or ChatGPT?</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="container">
+        <div class="foot-top">
+          <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+          <nav aria-label="Footer">
+            <a href="../#guides">Guides</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg></a
+            ><a href="../llms.txt">llms.txt</a>
+          </nav>
+        </div>
+        <div class="foot-note">
+          <p>
+            <strong>Account risk.</strong> WA MCP uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or
+            ban a linked account, even with sending limits in place.
+          </p>
+          <span>Updated <time datetime="2026-11-23">23 Nov 2026</time></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

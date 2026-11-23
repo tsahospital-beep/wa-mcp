@@ -240,7 +240,8 @@ func retryDelay(attempt int) time.Duration {
 // permanent errors will not go away on retry.
 func permanent(err error) bool {
 	var pe *sender.PathError
-	return errors.Is(err, sender.ErrAgentPolicy) || errors.As(err, &pe) || errors.Is(err, sender.ErrEmpty) || errors.Is(err, sender.ErrNotOpus) ||
+	return errors.Is(err, sender.ErrAction) || errors.Is(err, sender.ErrNotOwn) || errors.Is(err, sender.ErrSourceChanged) || errors.Is(err, store.ErrNotFound) ||
+		errors.Is(err, sender.ErrAgentPolicy) || errors.As(err, &pe) || errors.Is(err, sender.ErrEmpty) || errors.Is(err, sender.ErrNotOpus) ||
 		errors.Is(err, wa.ErrBadTarget) || errors.Is(err, sender.ErrDuplicate) || errors.Is(err, sender.ErrTooLarge) ||
 		errors.Is(err, sender.ErrStickerFormat) || errors.Is(err, sender.ErrMediaAndSticker)
 }

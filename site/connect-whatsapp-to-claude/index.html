@@ -4,39 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
-    <title>Connect WhatsApp to Claude | WA MCP</title>
-    <meta
-      name="description"
-      content="Configure Claude Desktop for a linked WhatsApp account, including the v0.1.0 manual setup, config example and connection checks."
-    />
+    <title>Connect WhatsApp to Claude Desktop | WA MCP</title>
+    <meta name="description" content="Connect WhatsApp to Claude Desktop with the WA MCP extension or a manual config. Link your phone, select the right store and test your first chat search." />
     <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/" />
-    <link rel="describedby" href="../llms.txt" type="text/plain" />
-    <link rel="icon" href="../assets/brand/logo.svg" type="image/svg+xml" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="WA MCP" />
-    <meta property="og:title" content="Connect WhatsApp to Claude | WA MCP" />
-    <meta
-      property="og:description"
-      content="Configure Claude Desktop for a linked WhatsApp account, including the v0.1.0 manual setup, config example and connection checks."
-    />
+    <meta property="og:title" content="Connect WhatsApp to Claude Desktop | WA MCP" />
+    <meta property="og:description" content="Connect WhatsApp to Claude Desktop with the WA MCP extension or a manual config. Link your phone, select the right store and test your first chat search." />
     <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/" />
     <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
-    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Connect WhatsApp to Claude | WA MCP" />
-    <meta
-      name="twitter:description"
-      content="Configure Claude Desktop for a linked WhatsApp account, including the v0.1.0 manual setup, config example and connection checks."
-    />
+    <meta name="twitter:title" content="Connect WhatsApp to Claude Desktop | WA MCP" />
+    <meta name="twitter:description" content="Connect WhatsApp to Claude Desktop with the WA MCP extension or a manual config. Link your phone, select the right store and test your first chat search." />
     <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
     <script>
+      document.documentElement.classList.add("js");
       try {
         const t = localStorage.getItem("wa-theme");
         if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
       } catch {}
     </script>
-    <link rel="stylesheet" href="../style.css" />
-    <script defer src="../site.js"></script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -53,20 +55,27 @@
               {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "Connect WhatsApp to Claude",
+                "name": "Guides",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/#guides"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Claude Desktop",
                 "item": "https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/"
               }
             ]
           },
           {
             "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/#faq",
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": "Will the extension download work for v0.1.0?",
+                "name": "How do I connect WhatsApp to Claude Desktop with the extension?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "The v0.1.0 release has no .mcpb attachment. Use the manual entry on this page. For a release that lists wa-mcp.mcpb, open the asset, choose Install and select the bridge configuration in extension settings."
+                  "text": "Open wa-mcp.mcpb from the v0.1.1 release, choose Install and select the config.json used by the running bridge. Restart Claude Desktop and ask it to run bridge_status."
                 }
               },
               {
@@ -81,31 +90,32 @@
           },
           {
             "@type": "HowTo",
-            "name": "Connect WhatsApp to Claude",
-            "description": "To connect WhatsApp to Claude Desktop, link the WA MCP bridge with your phone and add the Python MCP server to Claude's configuration. For v0.1.0, use the manual configuration below. When a release includes the desktop extension, open its .mcpb file and select the same bridge configuration.",
+            "name": "Connect WhatsApp to Claude Desktop",
+            "description": "Connect WhatsApp to Claude Desktop with the WA MCP extension or a manual config. Link your phone, select the right store and test your first chat search.",
+            "url": "https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/",
             "step": [
               {
                 "@type": "HowToStep",
                 "name": "Link your phone first",
-                "text": "Start the bridge with its configuration file. In WhatsApp, open Linked devices, select Link a device and scan the QR code in the local window. If you have only the terminal in front of you, you can scan its code instead. Wait for the phone to accept the link and for the bridge to begin receiving history before asking Claude about a conversation. The bridge and Claude Desktop have separate jobs. The bridge maintains the device connection and stores messages. Claude launches a Python process to answer tool requests. Installing the Python package alone does not pair your phone. Leave the bridge running when you want Claude to see a newly arrived message or fetch an attachment that has not been downloaded.",
+                "text": "Start the bridge with its configuration file. In WhatsApp, open Linked devices, select Link a device and scan the QR code in the local window. If you have only the terminal in front of you, you can scan its code instead. Wait for the phone to accept the link and for the bridge to begin receiving history before asking Claude about a conversation.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/#section-1"
               },
               {
                 "@type": "HowToStep",
                 "name": "Configure Claude Desktop",
-                "text": "Install uv and make sure Claude can find its uvx executable. Open Settings, then Developer, then Edit Config in Claude Desktop. On Windows this opens the configuration under the Claude folder in AppData. On macOS the file lives in the Claude folder under Application Support in your user Library. Add the entry below to the existing server configuration and replace CONFIG_FILE with the absolute path on this machine. {\n  \"mcpServers\": {\n    \"wa-mcp\": {\n      \"command\": \"uvx\",\n      \"args\": [\n        \"--from\",\n        \"wa-mcp-server==0.1.0\",\n        \"--with\",\n        \"wa-mcp-sdk[encryption,files]\",\n        \"wa-mcp\",\n        \"--config\",\n        \"CONFIG_FILE\"\n      ]\n    }\n  }\n} The SDK extras allow this environment to read encrypted message fields and extract file text. Enter the command and each argument separately as shown. If the application cannot find uvx, use the path reported by where.exe uvx on Windows or command -v uvx on macOS. Quit the desktop application completely and reopen it to load the change.",
+                "text": "For the extension, open the WA MCP release assets , download wa-mcp.mcpb and open it in Claude Desktop. Select the same config.json as your bridge. The manual configuration below also works.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/#section-2"
               },
               {
                 "@type": "HowToStep",
                 "name": "Check what Claude can read",
-                "text": "Ask Claude to run bridge_status. Look for a true database result, then check the connected and logged_in values under bridge. If the database result fails, check which configuration file you selected. If only the bridge is unreachable, check that the bridge process is running with the same API address and that both processes run as the user who linked the account. Try asking for your five most recent chats. Pick one and ask for the context around its last invoice or meeting request. This checks that Claude can retrieve the original conversation after finding a match. If recent chats appear but an older exchange is missing, ask for history back to a particular date while the phone is online.",
+                "text": "Ask Claude to run bridge_status . Look for a true database result, then check the connected and logged_in values under bridge. If the database result fails, check which configuration file you selected. If only the bridge is unreachable, check that the bridge process is running with the same API address and that both processes run as the user who linked the account.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/#section-3"
               },
               {
                 "@type": "HowToStep",
                 "name": "Choose which Claude connection you need",
-                "text": "Claude Code also supports a local process. Its claude mcp add command accepts the server name followed by the executable and arguments. Choose user scope for access across projects or project scope for a project configuration file. The executable, SDK extras and absolute configuration path have the same meaning as in the desktop example. For a local Claude Code session, run the command below after replacing CONFIG_FILE, then use claude mcp list to check the registered name. This registers the tool command with Claude Code. Claude Desktop still reads its own configuration when it starts. claude mcp add wa-mcp -- uvx --from wa-mcp-server==0.1.0 --with \"wa-mcp-sdk[encryption,files]\" wa-mcp --config \"CONFIG_FILE\" A claude.ai custom connector uses a remote MCP service. Configure an HTTPS endpoint, enable OAuth on the server and enter the URL ending in /mcp in the connector. Approve the request on the server's consent page. This path involves hosting the service and managing access. For a single desktop connected to a local bridge, the configuration above is sufficient.",
+                "text": "Claude Code also supports a local process. Its claude mcp add command accepts the server name followed by the executable and arguments. Choose user scope for access across projects or project scope for a project configuration file. The executable, SDK extras and absolute configuration path have the same meaning as in the desktop example.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/#section-4"
               }
             ]
@@ -154,9 +164,8 @@
                 stroke-linecap="round"
               >
                 <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
-              >Star on GitHub <span class="star-count" hidden></span></a
-            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
-              >GitHub
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
               <svg
                 class="ui out"
                 aria-hidden="true"
@@ -202,19 +211,13 @@
     </header>
     <main id="main">
       <div class="container">
-        <nav aria-label="Breadcrumb" class="crumbs">
-          <a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / Client setup
-        </nav>
+        <nav aria-label="Breadcrumb" class="crumbs"><a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / <span aria-current="page">Claude Desktop</span></nav>
         <div class="guide-hero">
           <div>
             <div class="kicker">Client setup guide</div>
-            <h1>Connect WhatsApp to Claude</h1>
-            <p class="lead">
-              To connect WhatsApp to Claude Desktop, link the WA MCP bridge with your phone and add the Python MCP
-              server to Claude&#x27;s configuration. For v0.1.0, use the manual configuration below. When a release
-              includes the desktop extension, open its .mcpb file and select the same bridge configuration.
-            </p>
-            <div class="byline">v0.1.0 <span>·</span> Updated <time datetime="2026-11-23">23 November 2026</time></div>
+            <h1>Connect WhatsApp to Claude Desktop</h1>
+            <p class="lead">Connect WhatsApp to Claude Desktop by linking your phone and selecting the bridge configuration in the WA MCP extension. The v0.1.1 release includes wa-mcp.mcpb. You can also configure the local server manually.</p>
+            <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
           </div>
           <div class="plate guide-plate" aria-hidden="true">
             <div class="plate-inner">
@@ -242,8 +245,9 @@
         </div>
         <div class="reading">
           <aside>
-            <strong>On this page</strong>
-            <nav aria-label="On this page">
+            <strong class="toc-title">On this page</strong>
+            <button class="toc-toggle" type="button" aria-controls="contents" aria-expanded="false">On this page <span aria-hidden="true">+</span></button>
+            <nav id="contents" aria-label="On this page">
               <a href="#section-1">Link your phone first</a><a href="#section-2">Configure Claude Desktop</a
               ><a href="#section-3">Check what Claude can read</a
               ><a href="#section-4">Choose which Claude connection you need</a><a href="#faq">Questions</a>
@@ -267,6 +271,7 @@
             </section>
             <section id="section-2">
               <h2>Configure Claude Desktop</h2>
+              <p>For the extension, open <a href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">the WA MCP release assets</a>, download wa-mcp.mcpb and open it in Claude Desktop. Select the same config.json as your bridge. The manual configuration below also works.</p>
               <p>
                 Install uv and make sure Claude can find its uvx executable. Open Settings, then Developer, then Edit
                 Config in Claude Desktop. On Windows this opens the configuration under the Claude folder in AppData. On
@@ -274,13 +279,15 @@
                 below to the existing server configuration and replace CONFIG_FILE with the absolute path on this
                 machine.
               </p>
+              <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
               <pre><code>{
   &quot;mcpServers&quot;: {
     &quot;wa-mcp&quot;: {
       &quot;command&quot;: &quot;uvx&quot;,
       &quot;args&quot;: [
         &quot;--from&quot;,
-        &quot;wa-mcp-server==0.1.0&quot;,
+        &quot;wa-mcp-server==0.1.1&quot;,
         &quot;--with&quot;,
         &quot;wa-mcp-sdk[encryption,files]&quot;,
         &quot;wa-mcp&quot;,
@@ -290,6 +297,7 @@
     }
   }
 }</code></pre>
+            </div>
               <p>
                 The SDK extras allow this environment to read encrypted message fields and extract file text. Enter the
                 command and each argument separately as shown. If the application cannot find uvx, use the path reported
@@ -325,7 +333,10 @@
                 list to check the registered name. This registers the tool command with Claude Code. Claude Desktop
                 still reads its own configuration when it starts.
               </p>
-              <pre><code>claude mcp add wa-mcp -- uvx --from wa-mcp-server==0.1.0 --with &quot;wa-mcp-sdk[encryption,files]&quot; wa-mcp --config &quot;CONFIG_FILE&quot;</code></pre>
+              <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
+              <pre><code>claude mcp add wa-mcp -- uvx --from wa-mcp-server==0.1.1 --with &quot;wa-mcp-sdk[encryption,files]&quot; wa-mcp --config &quot;CONFIG_FILE&quot;</code></pre>
+            </div>
               <p>
                 A claude.ai custom connector uses a remote MCP service. Configure an HTTPS endpoint, enable OAuth on the
                 server and enter the URL ending in /mcp in the connector. Approve the request on the server&#x27;s
@@ -335,28 +346,9 @@
             </section>
             <section id="faq">
               <h2>Questions</h2>
-              <details>
-                <summary>
-                  Will the extension download work for v0.1.0?<svg
-                    class="ui down"
-                    aria-hidden="true"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.7"
-                    stroke-linejoin="round"
-                    stroke-linecap="round"
-                  >
-                    <path d="m5 9 7 7 7-7" />
-                  </svg>
-                </summary>
-                <p>
-                  The v0.1.0 release has no .mcpb attachment. Use the manual entry on this page. For a release that
-                  lists wa-mcp.mcpb, open the asset, choose Install and select the bridge configuration in extension
-                  settings.
-                </p>
-              </details>
-              <details>
+
+              <details><summary>How do I connect WhatsApp to Claude Desktop with the extension?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Open wa-mcp.mcpb from the v0.1.1 release, choose Install and select the config.json used by the running bridge. Restart Claude Desktop and ask it to run bridge_status.</p></details>
+          <details>
                 <summary>
                   Can Claude send a message after installation?<svg
                     class="ui down"
@@ -379,7 +371,7 @@
             </section>
             <p class="source">
               Project documentation ·
-              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/guides/mcp-clients.md"
+              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/guides/mcp-clients.md"
                 >mcp-clients.md
                 <svg
                   class="ui out"
@@ -451,8 +443,8 @@
           <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
           <nav aria-label="Footer">
             <a href="../#guides">Guides</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
             ><a href="https://github.com/tsahospital-beep/wa-mcp"
               >GitHub
               <svg

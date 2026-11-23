@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>A WhatsApp bot without the Business API: OpenAI or ChatGPT? | WA MCP</title>
+    <meta name="description" content="Build a draft-only WhatsApp bot without the Business API. Test the OpenAI provider, limit incoming chats and review a reply before enabling any sends." />
+    <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="WA MCP" />
+    <meta property="og:title" content="A WhatsApp bot without the Business API: OpenAI or ChatGPT? | WA MCP" />
+    <meta property="og:description" content="Build a draft-only WhatsApp bot without the Business API. Test the OpenAI provider, limit incoming chats and review a reply before enabling any sends." />
+    <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/" />
+    <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="A WhatsApp bot without the Business API: OpenAI or ChatGPT? | WA MCP" />
+    <meta name="twitter:description" content="Build a draft-only WhatsApp bot without the Business API. Test the OpenAI provider, limit incoming chats and review a reply before enabling any sends." />
+    <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <script>
+      document.documentElement.classList.add("js");
+      try {
+        const t = localStorage.getItem("wa-theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "WA MCP",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Guides",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/#guides"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Reply drafts",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Does this WhatsApp bot without the Business API connect to ChatGPT?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The documented connector uses an OpenAI API key or another configured provider. WA MCP does not document a native ChatGPT app setup. The worker can save drafts with sending disabled."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I test a WhatsApp reply before linking a phone?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Set up a provider and run wa-mcp agent-test with a synthetic event. It can incur provider usage charges. Live drafts need a linked, running bridge and an allowed chat."
+                }
+              }
+            ]
+          },
+          {
+            "@type": "HowTo",
+            "name": "A WhatsApp bot without the Business API: OpenAI or ChatGPT?",
+            "description": "Build a draft-only WhatsApp bot without the Business API. Test the OpenAI provider, limit incoming chats and review a reply before enabling any sends.",
+            "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/",
+            "step": [
+              {
+                "@type": "HowToStep",
+                "name": "Decide what should happen to a message",
+                "text": "A useful first test is a direct message from one consenting contact asking when you are free. The agent connector can produce a proposed reply, save it locally and leave the original conversation alone. You can inspect the suggestion, the contact selected and how much conversation history reached the provider before giving any program permission to send.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/#section-1"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Test a provider with a sample",
+                "text": "From a source checkout with the workspace dependencies installed, start with the OpenAI example in the agent guide. Put your API key in the environment of the worker. Keep the secret out of the JSON file. The provider can charge for a test request even when the number is unlinked and no WhatsApp message is sent.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/#section-2"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Limit the first live conversation",
+                "text": "Merge the agent settings into the configuration your bridge already uses. Replace the contact in this example with an exact address-book name or identifier that you control. The empty allow list permits nobody. Denied chats and senders take precedence over allowed ones.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/#section-3"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Inspect a draft and the decision",
+                "text": "In a source checkout with toolset selection, enable the agent tools along with core tools in the MCP server configuration, then restart the client connection. Use agent_status to inspect the mode, pending count and most recent successful poll. Use agent_drafts to inspect the suggestion. If a generated answer is inappropriate, leave it pending and adjust the prompt or the amount of context before another test.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/#section-4"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Understand approval and stopping",
+                "text": "Draft mode works while sending is disabled. Approval mode can ask in the worker terminal or leave a pending draft for approval from an MCP client when the worker is headless. Sending still depends on the bridge's outbound settings. Quiet hours can queue an approved reply, so a queued result and a delivered message represent different stages.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-bot-without-business-api/#section-5"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="container bar">
+        <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+        <button class="menu-button tool" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">
+          <svg
+            class="ui menu"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M3 7h18M3 16h18" />
+          </svg>
+        </button>
+        <div id="navigation" class="navigation">
+          <nav aria-label="Primary">
+            <a href="../#features">Features</a><a href="../#install">Install</a><a href="../#guides">Guides</a
+            ><a href="../whatsapp-mcp-security/">Security</a>
+          </nav>
+          <div class="actions">
+            <a
+              class="button star-button"
+              href="https://github.com/tsahospital-beep/wa-mcp"
+              title="Open the repository to star WA MCP"
+              ><svg
+                class="ui star"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg
+            ></a>
+          </div>
+        </div>
+        <button class="theme tool" aria-label="Switch color mode">
+          <svg
+            class="ui sun"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path
+              d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2 M16 12a4 4 0 1 0-8 0 4 4 0 1 0 8 0"
+            /></svg
+          ><svg
+            class="ui moon"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+    <main id="main">
+      <div class="container">
+        <nav aria-label="Breadcrumb" class="crumbs"><a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / <span aria-current="page">Reply drafts</span></nav>
+        <div class="guide-hero">
+          <div>
+            <div class="kicker">Agent setup guide</div>
+            <h1>A WhatsApp bot without the Business API: OpenAI or ChatGPT?</h1>
+            <p class="lead">Looking for a WhatsApp ChatGPT integration or a bot without the Business API? WA MCP documents a worker that drafts replies using the OpenAI API. Start with one allowed chat and review the draft before enabling sends.</p>
+            <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
+          </div>
+          <div class="plate guide-plate" aria-hidden="true">
+            <div class="plate-inner">
+              <svg class="dot-art" aria-hidden="true" viewBox="0 0 180 140">
+                <defs>
+                  <pattern id="p-my-day" width="3.6" height="3.6" patternUnits="userSpaceOnUse">
+                    <circle cx="1.8" cy="1.8" r="1.35" fill="white" />
+                  </pattern>
+                  <mask id="m-my-day">
+                    <path
+                      d="M3 16h18 M7 16a5 5 0 0 1 10 0 M12 4v2 M3.5 8l2 2 M20.5 8l-2 2 M6 20.5h12"
+                      transform="translate(31 13) scale(4.9)"
+                      fill="none"
+                      stroke="white"
+                      stroke-width="2.35"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </mask>
+                </defs>
+                <g mask="url(#m-my-day)"><rect width="180" height="140" fill="url(#p-my-day)" /></g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="reading">
+          <aside>
+            <strong class="toc-title">On this page</strong>
+            <button class="toc-toggle" type="button" aria-controls="contents" aria-expanded="false">On this page <span aria-hidden="true">+</span></button>
+            <nav id="contents" aria-label="On this page">
+              <a href="#section-1">Decide what should happen to a message</a>
+              <a href="#section-2">Test a provider with a sample</a>
+              <a href="#section-3">Limit the first live conversation</a>
+              <a href="#section-4">Inspect a draft and the decision</a>
+              <a href="#section-5">Understand approval and stopping</a>
+              <a href="#faq">Questions</a>
+            </nav>
+          </aside>
+          <article>
+            <section id="section-1">
+            <h2>Decide what should happen to a message</h2>
+            <p>A useful first test is a direct message from one consenting contact asking when you are free. The agent connector can produce a proposed reply, save it locally and leave the original conversation alone. You can inspect the suggestion, the contact selected and how much conversation history reached the provider before giving any program permission to send.</p>
+            <p>The connector is a worker that runs alongside the linked Go bridge. It can call the OpenAI API, an OpenAI-compatible endpoint, Anthropic, Ollama or your own reply service. The OpenAI preset takes an API key. You review the proposed reply in the WA MCP worker or with its agent tools. A ChatGPT subscription does not supply API credentials.</p>
+            </section>
+            <section id="section-2">
+            <h2>Test a provider with a sample</h2>
+            <p>From a source checkout with the workspace dependencies installed, start with the OpenAI example in the agent guide. Put your API key in the environment of the worker. Keep the secret out of the JSON file. The provider can charge for a test request even when the number is unlinked and no WhatsApp message is sent.</p>
+            <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
+              <pre><code class="language-shell">uv run wa-mcp agent-test --help</code></pre>
+            </div>
+            <p>Select the configuration file through <code>WA_MCP_CONFIG</code>. With the provider configured, run <code>uv run wa-mcp agent-test</code> to submit a synthetic event. Inspect the preview and timing. This isolates the provider configuration from phone pairing, chat selection and the live event feed. If the test fails, check which key and endpoint that preset expects before changing your bridge settings.</p>
+            </section>
+            <section id="section-3">
+            <h2>Limit the first live conversation</h2>
+            <p>Merge the agent settings into the configuration your bridge already uses. Replace the contact in this example with an exact address-book name or identifier that you control. The empty allow list permits nobody. Denied chats and senders take precedence over allowed ones.</p>
+            <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
+              <pre><code class="language-json">{
+  &quot;agent&quot;: {
+    &quot;enabled&quot;: true,
+    &quot;provider&quot;: &quot;openai&quot;,
+    &quot;mode&quot;: &quot;draft&quot;,
+    &quot;allow_chats&quot;: [&quot;Alice&quot;],
+    &quot;history&quot;: 0
+  }
+}</code></pre>
+            </div>
+            <p>Starting with zero history lets you inspect how the provider handles a single question. The documented default includes up to ten previous messages. Add context deliberately when a reply depends on something said earlier. The provider receives identifiers, names, message text and any transcript or selected history. Choose a test contact who understands where the conversation will be processed.</p>
+            <p>Start or restart the bridge with that config. Run <code>uv run wa-mcp agent</code> with the same configuration in another terminal. For multiple numbers, select the intended account explicitly and keep one worker per number. Send a fresh incoming message from the allowed contact. Old messages arriving during history sync cannot trigger a reply.</p>
+            </section>
+            <section id="section-4">
+            <h2>Inspect a draft and the decision</h2>
+            <p>In a source checkout with toolset selection, enable the agent tools along with core tools in the MCP server configuration, then restart the client connection. Use <code>agent_status</code> to inspect the mode, pending count and most recent successful poll. Use <code>agent_drafts</code> to inspect the suggestion. If a generated answer is inappropriate, leave it pending and adjust the prompt or the amount of context before another test.</p>
+            <p>An empty draft list can have several explanations. Confirm that the worker was running when the new message arrived. Check the exact allowed chat and whether a deny rule applies. Outgoing messages are skipped. A group must be listed explicitly, and the account must actually be mentioned. A per-chat cooldown also suppresses repeated triggers. Test with a fresh direct message after the interval.</p>
+            </section>
+            <section id="section-5">
+            <h2>Understand approval and stopping</h2>
+            <p>Draft mode works while sending is disabled. Approval mode can ask in the worker terminal or leave a pending draft for approval from an MCP client when the worker is headless. Sending still depends on the bridge's outbound settings. Quiet hours can queue an approved reply, so a queued result and a delivered message represent different stages.</p>
+            <p>The pause switch persists across restarts and cancels pending agent schedules. A send already handed to WhatsApp may complete. After resuming, use a new event to test the configuration. A stopped worker can miss live events. Keep a human review step when testing a different provider, prompt or set of allowed chats.</p>
+            <p>The linked account uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or ban the account. Draft mode helps you review what the software proposes, and it gives you a way to evaluate a provider without enabling outbound messages.</p>
+            </section>
+            <section id="faq"><h2>Questions</h2><details><summary>Does this WhatsApp bot without the Business API connect to ChatGPT?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>The documented connector uses an OpenAI API key or another configured provider. WA MCP does not document a native ChatGPT app setup. The worker can save drafts with sending disabled.</p></details>
+          <details><summary>Can I test a WhatsApp reply before linking a phone?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Yes. Set up a provider and run wa-mcp agent-test with a synthetic event. It can incur provider usage charges. Live drafts need a linked, running bridge and an allowed chat.</p></details></section>
+            <p class="source"><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/guides/agent-connector.md">Read the project agent connector guide</a></p>
+          </article>
+        </div>
+      </div>
+      <section class="related">
+        <div class="container">
+          <h2>Related guides</h2>
+          <div class="related-grid">
+            <a class="row-link" href="/wa-mcp/whatsapp-ai-assistant/"><span>An open source WhatsApp AI assistant</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+            <a class="row-link" href="/wa-mcp/whatsapp-mcp-security/"><span>WhatsApp MCP security and account risk</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+            <a class="row-link" href="/wa-mcp/whatsapp-voice-note-transcription/"><span>Transcribe WhatsApp voice messages</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="container">
+        <div class="foot-top">
+          <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+          <nav aria-label="Footer">
+            <a href="../#guides">Guides</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg></a
+            ><a href="../llms.txt">llms.txt</a>
+          </nav>
+        </div>
+        <div class="foot-note">
+          <p>
+            <strong>Account risk.</strong> WA MCP uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or
+            ban a linked account, even with sending limits in place.
+          </p>
+          <span>Updated <time datetime="2026-11-23">23 Nov 2026</time></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

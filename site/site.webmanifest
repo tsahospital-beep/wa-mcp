@@ -1,0 +1,24 @@
+{
+  "id": "/wa-mcp/",
+  "name": "WA MCP for WhatsApp",
+  "short_name": "WA MCP",
+  "start_url": "/wa-mcp/",
+  "scope": "/wa-mcp/",
+  "display": "standalone",
+  "theme_color": "#103e2c",
+  "background_color": "#fafbf6",
+  "icons": [
+    {
+      "src": "/wa-mcp/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/wa-mcp/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

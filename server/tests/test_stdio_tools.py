@@ -95,6 +95,8 @@ class FakeBridge(BaseHTTPRequestHandler):
             text = body["text"]
             parts = [text] if len(text) <= 4096 else ["(1/2) " + text[:4000], "(2/2) " + text[4000:]]
             self._reply(200, {"ok": True, "length": len(text), "parts": parts})
+        elif path in ("/messages/react", "/messages/edit", "/messages/delete", "/messages/forward"):
+            self._reply(200, {"ok": True, "id": "ACTION1", "sent_at": synth.T0})
         elif path == "/send":
             ids = ["SENT1", "SENT2"] if len(body.get("text") or "") > 4096 else []
             self._reply(200, {"ok": True, "id": "SENT1", "ids": ids, "sent_at": synth.T0, "waited_ms": 0})
@@ -206,7 +208,7 @@ async def _session(
     command, args = _command()
     environ = dict(os.environ, WA_MCP_CONFIG=str(cfg))
     environ.pop("WA_MCP_SENDING_ENABLED", None)
-    params = StdioServerParameters(command=command, args=args, env=environ)
+    params = StdioServerParameters(command=command, args=[*args, "--toolsets", "all"], env=environ)
     results: list[dict[str, Any]] = []
     async with (
         stdio_client(params) as (read, write),
@@ -641,3 +643,36 @@ def test_sending_disabled_by_default(tmp_path: Path) -> None:
         _session(cfg, [("send_message", {"to": synth.ALICE, "text": "x", "confirm": True})])
     )
     assert results[0]["ok"] is False and "disabled" in results[0]["error"]
+
+
+def test_message_actions_over_stdio(env: dict[str, Any]) -> None:
+    asked: list[str] = []
+
+    async def elicit(context: Any, params: Any) -> Any:
+        asked.append(params.message)
+        if len(asked) == 5:
+            return ElicitResult(action="decline")
+        return ElicitResult(action="accept", content={"approve": True})
+
+    own = {"chat": synth.ALICE, "message_id": "A2"}
+    incoming = {"chat": synth.ALICE, "message_id": "A1"}
+    calls = [
+        ("react_to_message", {**incoming, "emoji": THUMBS}),
+        ("edit_message", {**own, "text": "Updated meeting"}),
+        ("delete_message", own),
+        ("forward_message", {**incoming, "to": synth.BOB}),
+        ("delete_message", {**own, "confirm": True}),
+        ("edit_message", {**incoming, "text": "Rejected"}),
+    ]
+    start = len(FakeBridge.requests)
+    _, results = asyncio.run(_session(env["cfg"], calls, elicit=elicit))
+    assert [r["ok"] for r in results] == [True, True, True, True, False, False]
+    assert len(asked) == 5 and all(synth.ALICE in prompt for prompt in asked)
+    assert THUMBS in asked[0] and "Updated meeting" in asked[1] and "everyone" in asked[2]
+    assert synth.BOB in asked[3] and "Hello from Alice" in asked[3]
+    assert [(p, b) for _, p, b in FakeBridge.requests[start:] if p.startswith("/messages/")] == [
+        ("/messages/react", {**incoming, "emoji": THUMBS}),
+        ("/messages/edit", {**own, "text": "Updated meeting"}),
+        ("/messages/delete", own),
+        ("/messages/forward", {**incoming, "to": synth.BOB, "expected_text": "Hello from Alice"}),
+    ]

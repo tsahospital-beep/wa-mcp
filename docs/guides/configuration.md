@@ -26,7 +26,7 @@ same config path and they share the same store.
 - Missing keys keep their defaults. Nested objects are merged key by key.
 - The bridge logs a warning for every key it does not use, for example `unknown key "sending.enabeld" is
   ignored`, and carries on with the default. Read the log after a change.
-- The sections that only the Python side reads (`transcription`, `ai`, `vision`, `people`, `tasks`, `mentions`, `insight`, `server`)
+- The sections that only the Python side reads (`mcp`, `transcription`, `ai`, `vision`, `people`, `tasks`, `mentions`, `insight`, `server`)
   are not checked by the bridge. A wrong value in one of them is reported by the MCP server.
 - A wrong value in a section the bridge uses stops the bridge at start with a message that names the
   key.
@@ -35,6 +35,7 @@ same config path and they share the same store.
 
 | Variable | Read by | Effect |
 | --- | --- | --- |
+| `WA_MCP_TOOLSETS` | server | Comma-separated toolset names, for example `core,actions`. The `--toolsets` flag takes precedence. |
 | `WA_MCP_CONFIG` | both | Config file when `--config` is not given. |
 | `WA_MCP_STORE_DIR` | both | Overrides `store_dir`. |
 | `WA_MCP_DOWNLOADS_DIR` | both | Overrides `downloads_dir`. |
@@ -61,6 +62,22 @@ Webhook secrets are read from the variables named in each webhook's `secret_env`
 the database. In the default mode it finds the key in the OS keystore by itself, as the same user. With a
 passphrase or a key file, the variable or the file must be available to the server process as well. In an
 MCP client config, add the variable to the server's `env` block.
+
+## Toolsets
+
+Set `mcp.toolsets` to a nonempty JSON list. The default is `["core"]`, including when an older config omits
+the section. Include `core` alongside any additional sets you want. Use `["all"]` for the full catalog
+including all tools from 0.1.1. Each selection replaces the lower-priority selection in full.
+
+```json
+{"mcp": {"toolsets": ["core", "history", "actions"]}}
+```
+
+Both `wa-mcp --toolsets core,history,actions` and `wa-mcp serve --http --toolsets core,history,actions`
+override `WA_MCP_TOOLSETS`, which overrides the file. Restart the MCP server to apply a change.
+It logs the enabled sets at startup. Unknown names stop startup with an error. Tool selection controls
+MCP discovery and invocation. The bridge API and explicit embedding registrations have their own entry points.
+See the [tool names grouped by toolset](../reference/tools.md).
 
 ## Folders and API
 

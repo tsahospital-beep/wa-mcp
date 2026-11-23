@@ -240,6 +240,37 @@ class Bridge:
     ) -> dict[str, Any]:
         return self.send(to, text=text, reply_to={"id": reply_to_id}, mentions=mentions, human=human)
 
+    def react_to_message(self, chat: str, message_id: str, emoji: str) -> dict[str, Any]:
+        """Set a reaction. An empty string removes the account's reaction."""
+        return self._call(
+            "POST",
+            "/messages/react",
+            body={"chat": chat, "message_id": message_id, "emoji": emoji},
+            timeout="send",
+        )
+
+    def edit_message(self, chat: str, message_id: str, text: str) -> dict[str, Any]:
+        """Replace the text of an outgoing message."""
+        return self._call(
+            "POST",
+            "/messages/edit",
+            body={"chat": chat, "message_id": message_id, "text": text},
+            timeout="send",
+        )
+
+    def delete_message(self, chat: str, message_id: str) -> dict[str, Any]:
+        """Revoke an outgoing message for everyone."""
+        return self._call(
+            "POST", "/messages/delete", body={"chat": chat, "message_id": message_id}, timeout="send"
+        )
+
+    def forward_message(
+        self, chat: str, message_id: str, to: str, *, expected_text: str | None = None
+    ) -> dict[str, Any]:
+        """Forward stored text. Supply expected_text to bind delivery to an approved preview."""
+        body = _drop_none({"chat": chat, "message_id": message_id, "to": to, "expected_text": expected_text})
+        return self._call("POST", "/messages/forward", body=body, timeout="send")
+
     def mark_read(self, chat: str, ids: list[str], author: str | None = None) -> dict[str, Any]:
         return self._call("POST", "/read", body=_drop_none({"chat": chat, "ids": ids, "author": author}))
 

@@ -9,6 +9,12 @@ function currentTheme() {
 }
 
 function describeTheme() {
+  for (const tag of document.querySelectorAll('meta[name="theme-color"]')) {
+    const dark = tag.media.includes("dark");
+    tag.content = root.dataset.theme
+      ? (currentTheme() === "dark" ? "#101714" : "#fafbf6")
+      : (dark ? "#101714" : "#fafbf6");
+  }
   themeButton.setAttribute("aria-label", currentTheme() === "dark" ? "Switch to light mode" : "Switch to dark mode");
 }
 
@@ -41,6 +47,13 @@ document.addEventListener("click", (event) => {
 });
 matchMedia("(min-width: 801px)").addEventListener("change", () => setMenu(false));
 
+const contentsButton = document.querySelector(".toc-toggle");
+contentsButton?.addEventListener("click", () => {
+  const open = contentsButton.getAttribute("aria-expanded") !== "true";
+  contentsButton.setAttribute("aria-expanded", String(open));
+  contentsButton.querySelector("span").textContent = open ? "−" : "+";
+});
+
 async function updateStars() {
   const badge = document.querySelector(".star-count");
   function show(value, cached) {
@@ -56,41 +69,43 @@ async function updateStars() {
     }
   } catch {}
   try {
-    const response = await fetch("https://api.github.com/repos/tsahospital-beep/wa-mcp", {
+    const response = await fetch("https://img.shields.io/github/stars/tsahospital-beep/wa-mcp.json", {
       signal: AbortSignal.timeout(4500),
       credentials: "omit",
       referrerPolicy: "no-referrer"
     });
     if (!response.ok) return;
-    const { stargazers_count: count } = await response.json();
+    const { value } = await response.json();
+    if (typeof value !== "string" || !/^\d+$/.test(value)) return;
+    const count = Number(value);
     if (!Number.isSafeInteger(count) || count < 0) return;
     show(count, false);
     try { sessionStorage.setItem("wa-stars", JSON.stringify({ count, time: Date.now() })); } catch {}
   } catch {
-    // The repository link works with a cached count or without a badge.
+    // Keep the cached count or the dated count rendered in the page.
   }
 }
 updateStars();
 
-const copyButton = document.getElementById("copy");
-if (copyButton) {
-  const status = document.querySelector(".copy-feedback");
+for (const button of document.querySelectorAll("#copy, [data-copy]")) {
+  const snippet = button.closest(".snippet, .command");
+  const code = snippet.querySelector("code");
+  const status = snippet.querySelector('[role="status"]');
   let clearFeedback;
-  copyButton.addEventListener("click", async () => {
-    const command = document.getElementById("command");
+  button.addEventListener("click", async () => {
     try {
-      await navigator.clipboard.writeText(command.textContent);
+      await navigator.clipboard.writeText(code.textContent);
       status.textContent = "Copied";
     } catch {
       const range = document.createRange();
-      range.selectNodeContents(command);
+      range.selectNodeContents(code);
       const selection = window.getSelection();
       selection.removeAllRanges();
       selection.addRange(range);
-      status.textContent = "Command selected. Use Copy.";
+      status.textContent = "Selected. Use Copy.";
     }
     clearTimeout(clearFeedback);
-    clearFeedback = setTimeout(() => { status.textContent = ""; }, 2600);
+    clearFeedback = setTimeout(() => { status.textContent = ""; }, 3500);
   });
 }
 

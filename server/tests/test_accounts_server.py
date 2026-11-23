@@ -108,7 +108,7 @@ async def _session(cfg: Path, calls: list[tuple[str, dict[str, Any]]]) -> dict[s
     command, args = _command()
     environ = dict(os.environ, WA_MCP_CONFIG=str(cfg))
     environ.pop("WA_MCP_SENDING_ENABLED", None)
-    params = StdioServerParameters(command=command, args=args, env=environ)
+    params = StdioServerParameters(command=command, args=[*args, "--toolsets", "all"], env=environ)
     results: list[dict[str, Any]] = []
     async with stdio_client(params) as (read, write), ClientSession(read, write) as session:
         init = await session.initialize()

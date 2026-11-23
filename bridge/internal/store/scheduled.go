@@ -18,28 +18,30 @@ const (
 
 // Scheduled is one row of scheduled_messages.
 type Scheduled struct {
-	QuietQueued   bool     `json:"-"`
-	AgentRevision string   `json:"-"`
-	ID            int64    `json:"id"`
-	Target        string   `json:"target"`
-	Body          string   `json:"body"`
-	MediaPath     string   `json:"media_path,omitempty"`
-	Kind          string   `json:"kind,omitempty"` // text|image|video|audio|voice|document|sticker
-	Human         *bool    `json:"human,omitempty"`
-	ReplyToID     string   `json:"reply_to_id,omitempty"`
-	Mentions      []string `json:"mentions,omitempty"`
-	NextRun       int64    `json:"next_run"`
-	Recurrence    string   `json:"recurrence"`
-	Status        string   `json:"status"`
-	Attempts      int      `json:"attempts"`
-	LastError     string   `json:"last_error,omitempty"`
-	CreatedAt     int64    `json:"created_at"`
-	LastSentAt    int64    `json:"last_sent_at,omitempty"`
-	AnchorDay     int      `json:"-"`
+	SourceChat      string   `json:"source_chat,omitempty"`
+	SourceMessageID string   `json:"source_message_id,omitempty"`
+	QuietQueued     bool     `json:"-"`
+	AgentRevision   string   `json:"-"`
+	ID              int64    `json:"id"`
+	Target          string   `json:"target"`
+	Body            string   `json:"body"`
+	MediaPath       string   `json:"media_path,omitempty"`
+	Kind            string   `json:"kind,omitempty"` // Media kind or quiet-hours action.
+	Human           *bool    `json:"human,omitempty"`
+	ReplyToID       string   `json:"reply_to_id,omitempty"`
+	Mentions        []string `json:"mentions,omitempty"`
+	NextRun         int64    `json:"next_run"`
+	Recurrence      string   `json:"recurrence"`
+	Status          string   `json:"status"`
+	Attempts        int      `json:"attempts"`
+	LastError       string   `json:"last_error,omitempty"`
+	CreatedAt       int64    `json:"created_at"`
+	LastSentAt      int64    `json:"last_sent_at,omitempty"`
+	AnchorDay       int      `json:"-"`
 }
 
 const schedColumns = `id, target, body, media_path, kind, human, reply_to_id, mentions, next_run, recurrence, status,
-	attempts, last_error, created_at, last_sent_at, anchor_day, agent_revision, quiet_queued`
+	attempts, last_error, created_at, last_sent_at, anchor_day, agent_revision, quiet_queued, source_chat, source_message_id`
 
 // AddScheduled stores a new pending entry and returns its id.
 func (d *DB) AddScheduled(ctx context.Context, s *Scheduled) (int64, error) {
@@ -62,10 +64,10 @@ func (d *DB) AddScheduled(ctx context.Context, s *Scheduled) (int64, error) {
 		human = boolInt(*s.Human)
 	}
 	res, err := d.sql.ExecContext(ctx, `INSERT INTO scheduled_messages
-		(target, body, media_path, kind, human, reply_to_id, mentions, next_run, recurrence, status, attempts, created_at, anchor_day, agent_revision, quiet_queued)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)`,
+		(target, body, media_path, kind, human, reply_to_id, mentions, next_run, recurrence, status, attempts, created_at, anchor_day, agent_revision, quiet_queued, source_chat, source_message_id)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)`,
 		s.Target, body, nullText(s.MediaPath), nullText(s.Kind), human, nullText(s.ReplyToID), mentions, s.NextRun,
-		s.Recurrence, s.Status, s.CreatedAt, nullInt(int64(s.AnchorDay)), s.AgentRevision, s.QuietQueued)
+		s.Recurrence, s.Status, s.CreatedAt, nullInt(int64(s.AnchorDay)), s.AgentRevision, s.QuietQueued, s.SourceChat, s.SourceMessageID)
 	if err != nil {
 		return 0, err
 	}
@@ -78,7 +80,7 @@ func (d *DB) scanScheduled(row scanner) (*Scheduled, error) {
 	var media, kind, reply, mentions, lastErr sql.NullString
 	var human, lastSent, anchor sql.NullInt64
 	if err := row.Scan(&s.ID, &s.Target, &s.Body, &media, &kind, &human, &reply, &mentions, &s.NextRun, &s.Recurrence,
-		&s.Status, &s.Attempts, &lastErr, &s.CreatedAt, &lastSent, &anchor, &s.AgentRevision, &s.QuietQueued); err != nil {
+		&s.Status, &s.Attempts, &lastErr, &s.CreatedAt, &lastSent, &anchor, &s.AgentRevision, &s.QuietQueued, &s.SourceChat, &s.SourceMessageID); err != nil {
 		return nil, err
 	}
 	s.Body = d.openText(s.Body, field{"scheduled_messages", "body", s.Target, ""})

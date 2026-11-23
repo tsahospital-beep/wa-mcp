@@ -4,39 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
-    <title>Import a WhatsApp chat export | WA MCP</title>
-    <meta
-      name="description"
-      content="Preview a WhatsApp TXT or ZIP export, check the senders and time zone, and import older messages into the correct local chat."
-    />
+    <title>Export a WhatsApp chat for AI search | WA MCP</title>
+    <meta name="description" content="Export a WhatsApp chat for AI search with a TXT or ZIP file. Preview the conversation, confirm senders and dates, then import older history into WA MCP." />
     <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/" />
-    <link rel="describedby" href="../llms.txt" type="text/plain" />
-    <link rel="icon" href="../assets/brand/logo.svg" type="image/svg+xml" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="WA MCP" />
-    <meta property="og:title" content="Import a WhatsApp chat export | WA MCP" />
-    <meta
-      property="og:description"
-      content="Preview a WhatsApp TXT or ZIP export, check the senders and time zone, and import older messages into the correct local chat."
-    />
+    <meta property="og:title" content="Export a WhatsApp chat for AI search | WA MCP" />
+    <meta property="og:description" content="Export a WhatsApp chat for AI search with a TXT or ZIP file. Preview the conversation, confirm senders and dates, then import older history into WA MCP." />
     <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/" />
     <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
-    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Import a WhatsApp chat export | WA MCP" />
-    <meta
-      name="twitter:description"
-      content="Preview a WhatsApp TXT or ZIP export, check the senders and time zone, and import older messages into the correct local chat."
-    />
+    <meta name="twitter:title" content="Export a WhatsApp chat for AI search | WA MCP" />
+    <meta name="twitter:description" content="Export a WhatsApp chat for AI search with a TXT or ZIP file. Preview the conversation, confirm senders and dates, then import older history into WA MCP." />
     <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
     <script>
+      document.documentElement.classList.add("js");
       try {
         const t = localStorage.getItem("wa-theme");
         if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
       } catch {}
     </script>
-    <link rel="stylesheet" href="../style.css" />
-    <script defer src="../site.js"></script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -53,14 +55,29 @@
               {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "Import a WhatsApp chat export",
+                "name": "Guides",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/#guides"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Chat exports",
                 "item": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/"
               }
             ]
           },
           {
             "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/#faq",
             "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "How do I export a WhatsApp chat to AI without uploading the whole ZIP?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Use Export chat on the phone and import the file into the local WA MCP store. Let the assistant request a small result from that store. A hosted client processes the tool results it receives."
+                }
+              },
               {
                 "@type": "Question",
                 "name": "Will old requests appear in today's task list?",
@@ -81,37 +98,38 @@
           },
           {
             "@type": "HowTo",
-            "name": "Import a WhatsApp chat export",
-            "description": "Import a WhatsApp Export chat file into WA MCP to search older conversations alongside synced messages. The bridge accepts a text file or a ZIP with media and can preview the result before changing the store. Importing is local and sends nothing to the chat.",
+            "name": "Export a WhatsApp chat for AI search",
+            "description": "Export a WhatsApp chat for AI search with a TXT or ZIP file. Preview the conversation, confirm senders and dates, then import older history into WA MCP.",
+            "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/",
             "step": [
               {
                 "@type": "HowToStep",
                 "name": "Export a single conversation",
-                "text": "On Android, open the conversation and choose More and then Export chat from its menu. On iPhone, tap the chat name at the top and select Export chat. Choose whether to include media and transfer the file to the computer that holds the bridge. An export with media can cover a shorter stretch of history, so check its earliest date. A plain text file contains the conversation lines. A ZIP can supply the attachment files as well as their captions. The importer recognizes the Android and iPhone layouts, multiline messages and several clock formats. System notices and media placeholders are counted separately from ordinary messages. Replies, edits, deletions and reactions are absent from the export format.",
+                "text": "On Android, open the conversation and choose More and then Export chat from its menu. On iPhone, tap the chat name at the top and select Export chat. Choose whether to include media and transfer the file to the computer that holds the bridge. An export with media can cover a shorter stretch of history, so check its earliest date.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/#section-1"
               },
               {
                 "@type": "HowToStep",
                 "name": "Preview the destination and senders",
-                "text": "Choose the chat by phone number with country code, WhatsApp ID or an exact stored title. When a title matches several chats, use the ID from the candidate list. For a person with both phone and LID entries, choose the chat that list_chats shows with messages. Duplicate checking compares with the specific destination you chose. Pass your own sender name exactly as it appears in the file through the me option. The reader can infer some direct-chat identities, but a group export can have names with no unique match in your address book. Map a sender explicitly when necessary. Inspect the proposed identities in the dry run before relying on outgoing and incoming labels.",
+                "text": "Choose the chat by phone number with country code, WhatsApp ID or an exact stored title. When a title matches several chats, use the ID from the candidate list. For a person with both phone and LID entries, choose the chat that list_chats shows with messages. Duplicate checking compares with the specific destination you chose.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/#section-2"
               },
               {
                 "@type": "HowToStep",
                 "name": "Check dates before writing",
-                "text": "An export has no time zone. Give the zone where it was created, especially if your server is somewhere else. A date such as 04/05 can mean April 5 or May 4. The reader considers the fields and order of the messages, and reports how it selected the date order. If it could only assume an order, set dmy, mdy or ymd explicitly. A dry run reports the time range, proposed message count, duplicates, missing media and warnings. Compare the first and last times to what you see on the phone. Check skipped lines and sender mappings as well as the total. Keep the same time zone for subsequent imports because a different offset changes the generated message IDs.",
+                "text": "An export has no time zone. Give the zone where it was created, especially if your server is somewhere else. A date such as 04/05 can mean April 5 or May 4. The reader considers the fields and order of the messages, and reports how it selected the date order. If it could only assume an order, set dmy, mdy or ymd explicitly.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/#section-3"
               },
               {
                 "@type": "HowToStep",
                 "name": "Run the import",
-                "text": "With the bridge running, ask the assistant to use import_chat_export on a file in the configured downloads or exports directory, or another allowed directory. Use dry_run first, then repeat with the same arguments and dry_run disabled. The HTTP API also accepts a form upload. For the command line importer, stop the bridge before opening the store directly. wa-bridge import-export --file \"chat.zip\" --chat 15550100002 --dry-run Messages receive stable IDs derived from their contents and source information. A repeat of the same file skips records already imported. The reader also checks for a matching synced message near the same time. If you first imported text and later supply a ZIP, a placeholder can acquire its file without adding another copy of the message.",
+                "text": "In the v0.2.0 checkout, include history alongside core in mcp.toolsets and restart the MCP server to expose the import tool.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/#section-4"
               },
               {
                 "@type": "HowToStep",
                 "name": "Find the imported history",
-                "text": "For an output file you can read outside WhatsApp, use export_chat to write a Markdown transcript. It can include the time, sender, replies, transcripts and media paths. That output serves a different purpose from the phone's TXT or ZIP input. The tool reports a message count and a path in the exports directory. Search the destination chat for a phrase from the old conversation and ask for the messages around it. The result carries imported: true. Imported messages are marked read and are visible to search and analytics. The original export remains a separate file outside database field encryption, so keep it in a private location.",
+                "text": "For an output file you can read outside WhatsApp, use export_chat to write a Markdown transcript. It can include the time, sender, replies, transcripts and media paths. That output serves a different purpose from the phone's TXT or ZIP input. The tool reports a message count and a path in the exports directory.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/#section-5"
               }
             ]
@@ -160,9 +178,8 @@
                 stroke-linecap="round"
               >
                 <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
-              >Star on GitHub <span class="star-count" hidden></span></a
-            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
-              >GitHub
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
               <svg
                 class="ui out"
                 aria-hidden="true"
@@ -208,19 +225,13 @@
     </header>
     <main id="main">
       <div class="container">
-        <nav aria-label="Breadcrumb" class="crumbs">
-          <a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / Chats and media
-        </nav>
+        <nav aria-label="Breadcrumb" class="crumbs"><a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / <span aria-current="page">Chat exports</span></nav>
         <div class="guide-hero">
           <div>
             <div class="kicker">Chats and media guide</div>
-            <h1>Import a WhatsApp chat export</h1>
-            <p class="lead">
-              Import a WhatsApp Export chat file into WA MCP to search older conversations alongside synced messages.
-              The bridge accepts a text file or a ZIP with media and can preview the result before changing the store.
-              Importing is local and sends nothing to the chat.
-            </p>
-            <div class="byline">v0.1.0 <span>·</span> Updated <time datetime="2026-11-23">23 November 2026</time></div>
+            <h1>Export a WhatsApp chat for AI search</h1>
+            <p class="lead">Export a WhatsApp chat for AI search from the phone, then preview its TXT or ZIP file in WA MCP. Check the destination, date order and sender mapping before adding the conversation to your local store.</p>
+            <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
           </div>
           <div class="plate guide-plate" aria-hidden="true">
             <div class="plate-inner">
@@ -248,8 +259,9 @@
         </div>
         <div class="reading">
           <aside>
-            <strong>On this page</strong>
-            <nav aria-label="On this page">
+            <strong class="toc-title">On this page</strong>
+            <button class="toc-toggle" type="button" aria-controls="contents" aria-expanded="false">On this page <span aria-hidden="true">+</span></button>
+            <nav id="contents" aria-label="On this page">
               <a href="#section-1">Export a single conversation</a
               ><a href="#section-2">Preview the destination and senders</a
               ><a href="#section-3">Check dates before writing</a><a href="#section-4">Run the import</a
@@ -304,13 +316,17 @@
             </section>
             <section id="section-4">
               <h2>Run the import</h2>
+              <p>In the v0.2.0 checkout, include <code>history</code> alongside <code>core</code> in <code>mcp.toolsets</code> and restart the MCP server to expose the import tool.</p>
               <p>
                 With the bridge running, ask the assistant to use import_chat_export on a file in the configured
                 downloads or exports directory, or another allowed directory. Use dry_run first, then repeat with the
                 same arguments and dry_run disabled. The HTTP API also accepts a form upload. For the command line
                 importer, stop the bridge before opening the store directly.
               </p>
+              <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
               <pre><code>wa-bridge import-export --file &quot;chat.zip&quot; --chat 15550100002 --dry-run</code></pre>
+            </div>
               <p>
                 Messages receive stable IDs derived from their contents and source information. A repeat of the same
                 file skips records already imported. The reader also checks for a matching synced message near the same
@@ -335,7 +351,8 @@
             </section>
             <section id="faq">
               <h2>Questions</h2>
-              <details>
+              <details><summary>How do I export a WhatsApp chat to AI without uploading the whole ZIP?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Use Export chat on the phone and import the file into the local WA MCP store. Let the assistant request a small result from that store. A hosted client processes the tool results it receives.</p></details>
+          <details>
                 <summary>
                   Will old requests appear in today&#x27;s task list?<svg
                     class="ui down"
@@ -378,7 +395,7 @@
             </section>
             <p class="source">
               Project documentation ·
-              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/guides/import.md"
+              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/guides/import.md"
                 >import.md
                 <svg
                   class="ui out"
@@ -450,8 +467,8 @@
           <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
           <nav aria-label="Footer">
             <a href="../#guides">Guides</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
             ><a href="https://github.com/tsahospital-beep/wa-mcp"
               >GitHub
               <svg

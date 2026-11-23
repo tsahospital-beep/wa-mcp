@@ -4,39 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
-    <title>WhatsApp MCP security and privacy | WA MCP</title>
-    <meta
-      name="description"
-      content="See what WA MCP encrypts, what a connected assistant receives, how sending approval works and where to review linked-device alerts."
-    />
+    <title>WhatsApp MCP security and account risk | WA MCP</title>
+    <meta name="description" content="See what WA MCP encrypts, what a connected assistant receives, how sending approval works and where to review alerts about a linked WhatsApp device." />
     <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-security/" />
-    <link rel="describedby" href="../llms.txt" type="text/plain" />
-    <link rel="icon" href="../assets/brand/logo.svg" type="image/svg+xml" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="WA MCP" />
-    <meta property="og:title" content="WhatsApp MCP security and privacy | WA MCP" />
-    <meta
-      property="og:description"
-      content="See what WA MCP encrypts, what a connected assistant receives, how sending approval works and where to review linked-device alerts."
-    />
+    <meta property="og:title" content="WhatsApp MCP security and account risk | WA MCP" />
+    <meta property="og:description" content="See what WA MCP encrypts, what a connected assistant receives, how sending approval works and where to review alerts about a linked WhatsApp device." />
     <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-security/" />
     <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
-    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="WhatsApp MCP security and privacy | WA MCP" />
-    <meta
-      name="twitter:description"
-      content="See what WA MCP encrypts, what a connected assistant receives, how sending approval works and where to review linked-device alerts."
-    />
+    <meta name="twitter:title" content="WhatsApp MCP security and account risk | WA MCP" />
+    <meta name="twitter:description" content="See what WA MCP encrypts, what a connected assistant receives, how sending approval works and where to review alerts about a linked WhatsApp device." />
     <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
     <script>
+      document.documentElement.classList.add("js");
       try {
         const t = localStorage.getItem("wa-theme");
         if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
       } catch {}
     </script>
-    <link rel="stylesheet" href="../style.css" />
-    <script defer src="../site.js"></script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -53,14 +55,29 @@
               {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "WhatsApp MCP security and privacy",
+                "name": "Guides",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/#guides"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Account security",
                 "item": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-security/"
               }
             ]
           },
           {
             "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-security/#faq",
             "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Can WhatsApp restrict an account using MCP?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. WA MCP uses the unofficial WhatsApp Web protocol. A linked account can be restricted or banned even when sending limits are enabled."
+                }
+              },
               {
                 "@type": "Question",
                 "name": "How should I expose MCP to another device?",
@@ -123,9 +140,8 @@
                 stroke-linecap="round"
               >
                 <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
-              >Star on GitHub <span class="star-count" hidden></span></a
-            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
-              >GitHub
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
               <svg
                 class="ui out"
                 aria-hidden="true"
@@ -171,19 +187,13 @@
     </header>
     <main id="main">
       <div class="container">
-        <nav aria-label="Breadcrumb" class="crumbs">
-          <a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / Security
-        </nav>
+        <nav aria-label="Breadcrumb" class="crumbs"><a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / <span aria-current="page">Account security</span></nav>
         <div class="guide-hero">
           <div>
             <div class="kicker">Security guide</div>
-            <h1>WhatsApp MCP security and privacy</h1>
-            <p class="lead">
-              WA MCP encrypts message text at rest by default, binds its bridge API and login to loopback, and starts
-              with sending disabled. The assistant you connect receives the results of its tool calls. Protect the
-              linked-device session, downloads and exports separately from encrypted database fields.
-            </p>
-            <div class="byline">v0.1.0 <span>·</span> Updated <time datetime="2026-11-23">23 November 2026</time></div>
+            <h1>WhatsApp MCP security and account risk</h1>
+            <p class="lead">WhatsApp MCP security depends on the linked session, the local store and the client that reads it. Field encryption is on by default. Review what leaves the machine before giving a client access to your chats.</p>
+            <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
           </div>
           <div class="plate guide-plate" aria-hidden="true">
             <div class="plate-inner">
@@ -213,8 +223,9 @@
         </div>
         <div class="reading">
           <aside>
-            <strong>On this page</strong>
-            <nav aria-label="On this page">
+            <strong class="toc-title">On this page</strong>
+            <button class="toc-toggle" type="button" aria-controls="contents" aria-expanded="false">On this page <span aria-hidden="true">+</span></button>
+            <nav id="contents" aria-label="On this page">
               <a href="#section-1">Know what a copy reveals</a><a href="#section-2">Choose how to hold the key</a
               ><a href="#section-3">Review what leaves your machine</a
               ><a href="#section-4">Check outbound permissions</a><a href="#section-5">Inspect a session warning</a
@@ -293,7 +304,8 @@
             </section>
             <section id="faq">
               <h2>Questions</h2>
-              <details>
+              <details><summary>Can WhatsApp restrict an account using MCP?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Yes. WA MCP uses the unofficial WhatsApp Web protocol. A linked account can be restricted or banned even when sending limits are enabled.</p></details>
+          <details>
                 <summary>
                   How should I expose MCP to another device?<svg
                     class="ui down"
@@ -337,7 +349,7 @@
             </section>
             <p class="source">
               Project documentation ·
-              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/security.md"
+              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/security.md"
                 >security.md
                 <svg
                   class="ui out"
@@ -359,6 +371,7 @@
         <div class="container">
           <h2>Related guides</h2>
           <div class="related-grid">
+            <a class="row-link" href="/wa-mcp/whatsapp-bot-without-business-api/"><span>A WhatsApp bot without the Business API: OpenAI or ChatGPT?</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
             <a class="row-link" href="../whatsapp-chat-export-import/"
               ><span>Import a WhatsApp chat export</span
               ><svg
@@ -409,8 +422,8 @@
           <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
           <nav aria-label="Footer">
             <a href="../#guides">Guides</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
             ><a href="https://github.com/tsahospital-beep/wa-mcp"
               >GitHub
               <svg

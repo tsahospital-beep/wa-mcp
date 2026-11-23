@@ -13,7 +13,7 @@
   <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-4f7c9a?style=flat">
   <img alt="Compatible con MCP" src="https://img.shields.io/badge/MCP-compatible-5f8a7a?style=flat">
   <img alt="Plataformas: Windows, macOS, Linux" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-5f8a7a?style=flat">
-  <a href="../../CHANGELOG.md"><img alt="Versión 0.1.1" src="https://img.shields.io/badge/version-0.1.1-6c7a89?style=flat"></a>
+  <a href="../../CHANGELOG.md"><img alt="Versión 0.2.0" src="https://img.shields.io/badge/version-0.2.0-6c7a89?style=flat"></a>
 </p>
 
 <p align="center">
@@ -29,6 +29,41 @@
   <a href="../security.md">Seguridad</a> |
   <a href="../faq.md">Preguntas frecuentes</a>
 </p>
+
+## Pruébalo sin teléfono
+
+Si tienes uv instalado, `uvx wa-mcp-server --demo` abre un archivo ficticio con ocho chats. La demo requiere WA MCP 0.2.0 o posterior. Una vez instalada, funciona sin conexión y sin el puente de Go.
+
+[![Probar en Cursor](https://img.shields.io/badge/Probar%20en%20Cursor-4f7c9a?style=flat)](https://cursor.com/install-mcp?name=wa-mcp-demo&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJ3YS1tY3Atc2VydmVyIiwiLS1kZW1vIl19)
+[![Probar en VS Code](https://img.shields.io/badge/Probar%20en%20VS%20Code-4f7c9a?style=flat)](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp-demo%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522wa-mcp-server%2522%252C%2522--demo%2522%255D%257D)
+
+**Claude Code**
+
+```sh
+claude mcp add wa-mcp-demo -- uvx wa-mcp-server --demo
+```
+
+**Claude Desktop (`claude_desktop_config.json`) y Cursor (`.cursor/mcp.json`)**
+
+```json
+{
+  "mcpServers": {
+    "wa-mcp-demo": { "command": "uvx", "args": ["wa-mcp-server", "--demo"] }
+  }
+}
+```
+
+**VS Code (`.vscode/mcp.json`)**
+
+```json
+{
+  "servers": {
+    "wa-mcp-demo": { "type": "stdio", "command": "uvx", "args": ["wa-mcp-server", "--demo"] }
+  }
+}
+```
+
+Pregunta «¿Qué tareas tengo hoy?». Luego busca «blue umbrella» y lee la transcripción de la nota de voz. [Tutorial de dos minutos](../tutorials/00-demo.md)
 
 ## Funciones
 

@@ -7,6 +7,7 @@ from pydantic import Field
 
 from wa_mcp import ai, vision
 from wa_mcp_server.common import UNTRUSTED, Result, bridge, cfg, chat_jids, fail, hints, ok, safe
+from wa_mcp_server.demo import cached_media
 from wa_mcp_server.tools.inputs import Budget, Chat
 
 NO_OCR = (
@@ -49,6 +50,9 @@ def register(mcp: FastMCP) -> None:
         full stored text of one image.
         """
         c = cfg()
+        if c.demo:
+            cached = cached_media(chat_jids(chat), "image", since, limit)
+            return ok(read=[], **cached, note=UNTRUSTED)
         engine = None
         notes: list[str] = []
         try:

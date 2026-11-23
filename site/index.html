@@ -4,39 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
-    <title>WA MCP | A local WhatsApp MCP server for your assistant</title>
-    <meta
-      name="description"
-      content="WA MCP connects WhatsApp to Claude, Cursor and VS Code. Search chats, transcribe voice notes and track replies with a local bridge."
-    />
+    <title>WhatsApp MCP for your own chats | WA MCP</title>
+    <meta name="description" content="Connect WhatsApp to Claude, Cursor or VS Code with WA MCP. Search chat history, transcribe voice messages and review your tasks using a local bridge." />
     <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/" />
-    <link rel="describedby" href="llms.txt" type="text/plain" />
-    <link rel="icon" href="assets/brand/logo.svg" type="image/svg+xml" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="WA MCP" />
-    <meta property="og:title" content="WA MCP | A local WhatsApp MCP server for your assistant" />
-    <meta
-      property="og:description"
-      content="WA MCP connects WhatsApp to Claude, Cursor and VS Code. Search chats, transcribe voice notes and track replies with a local bridge."
-    />
+    <meta property="og:title" content="WhatsApp MCP for your own chats | WA MCP" />
+    <meta property="og:description" content="Connect WhatsApp to Claude, Cursor or VS Code with WA MCP. Search chat history, transcribe voice messages and review your tasks using a local bridge." />
     <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/" />
     <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
-    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="WA MCP | A local WhatsApp MCP server for your assistant" />
-    <meta
-      name="twitter:description"
-      content="WA MCP connects WhatsApp to Claude, Cursor and VS Code. Search chats, transcribe voice notes and track replies with a local bridge."
-    />
+    <meta name="twitter:title" content="WhatsApp MCP for your own chats | WA MCP" />
+    <meta name="twitter:description" content="Connect WhatsApp to Claude, Cursor or VS Code with WA MCP. Search chat history, transcribe voice messages and review your tasks using a local bridge." />
     <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
     <script>
+      document.documentElement.classList.add("js");
       try {
         const t = localStorage.getItem("wa-theme");
         if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
       } catch {}
     </script>
-    <link rel="stylesheet" href="style.css" />
-    <script defer src="site.js"></script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -44,9 +46,9 @@
           {
             "@type": "SoftwareApplication",
             "name": "WA MCP",
-            "description": "WA MCP connects WhatsApp to Claude, Cursor and VS Code. Search chats, transcribe voice notes and track replies with a local bridge.",
+            "description": "Connect WhatsApp to Claude, Cursor or VS Code with WA MCP. Search chat history, transcribe voice messages and review your tasks using a local bridge.",
             "url": "https://tsahospital-beep.github.io/wa-mcp/",
-            "softwareVersion": "0.1.1",
+            "softwareVersion": "0.2.0",
             "applicationCategory": "DeveloperApplication",
             "operatingSystem": "Windows, macOS, Linux",
             "license": "https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE",
@@ -55,7 +57,8 @@
               "@type": "Offer",
               "price": 0,
               "priceCurrency": "USD"
-            }
+            },
+            "image": "https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png"
           },
           {
             "@type": "BreadcrumbList",
@@ -70,7 +73,16 @@
           },
           {
             "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/#faq",
             "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What can I do with WhatsApp MCP?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Link your phone and ask your assistant for a recent chat, the context around a message or a daily list of open requests. Sending starts disabled."
+                }
+              },
               {
                 "@type": "Question",
                 "name": "What does my assistant see?",
@@ -149,9 +161,8 @@
                 stroke-linecap="round"
               >
                 <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
-              >Star on GitHub <span class="star-count" hidden></span></a
-            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
-              >GitHub
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
               <svg
                 class="ui out"
                 aria-hidden="true"
@@ -198,8 +209,8 @@
     <main id="main">
       <div class="container hero">
         <div class="hero-copy">
-          <a class="release" href="https://github.com/tsahospital-beep/wa-mcp/releases/tag/v0.1.0"
-            ><span class="light-dot"></span> Open source <span>/</span> v0.1.0
+          <a class="release" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest"
+            ><span class="light-dot"></span> Open source <span>/</span> Latest release
             <svg
               class="ui out"
               aria-hidden="true"
@@ -212,11 +223,8 @@
             >
               <path d="M6 18 18 6M6 6h12v12" /></svg
           ></a>
-          <h1 id="name">Ask your<br /><em>WhatsApp.</em></h1>
-          <p class="lead">
-            WA MCP connects WhatsApp to Claude, Cursor and VS Code. Search chats, transcribe voice notes and track
-            replies with a local bridge.
-          </p>
+          <h1 id="name">WhatsApp<br /><em>MCP.</em></h1>
+          <p class="lead">WhatsApp MCP connects your own chats to Claude, Cursor or VS Code. Find a promise you made, read a voice note as text or see who is waiting for a reply.</p>
           <div class="hero-actions">
             <a class="button green" href="#install"
               >Get started
@@ -277,7 +285,7 @@
         </div>
         <div class="demo plate">
           <div class="stage-bar">
-            <span><i class="light-dot"></i> Interactive demo</span
+            <span><i class="light-dot"></i> Example conversation</span
             ><button id="replay" type="button">
               <svg
                 class="ui replay"
@@ -326,8 +334,8 @@
       <div class="fact-band">
         <dl class="container facts">
           <div>
-            <dt>MCP tools</dt>
-            <dd>49</dd>
+            <dt>MCP tools in v0.2.0 source</dt>
+            <dd>11 default / 53 total</dd>
           </div>
           <div>
             <dt>Implementation</dt>
@@ -618,7 +626,7 @@
           <div class="kicker">Installation</div>
           <h2>Bring your<br />own client.</h2>
           <p class="lead">Link your phone once. Choose where you want to ask the next question.</p>
-          <a class="text-link" href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/getting-started.md"
+          <a class="text-link" href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/getting-started.md"
             >Bridge setup
             <svg
               class="ui out"
@@ -640,7 +648,7 @@
           </p>
           <a class="install-link" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest"
             ><svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#chat-history" /></svg>
-            <div><strong>Claude Desktop</strong><span>Release assets (.mcpb)</span></div>
+            <div><strong>Claude Desktop</strong><span>Find wa-mcp.mcpb in Releases</span></div>
             <svg
               class="ui out"
               aria-hidden="true"
@@ -654,7 +662,7 @@
               <path d="M6 18 18 6M6 6h12v12" /></svg></a
           ><a
             class="install-link"
-            href="https://cursor.com/install-mcp?name=wa-mcp&amp;config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLWZyb20iLCJ3YS1tY3Atc2VydmVyPT0wLjEuMCIsIi0td2l0aCIsIndhLW1jcC1zZGtbZW5jcnlwdGlvbixmaWxlc10iLCJ3YS1tY3AiXX0%3D"
+            href="https://cursor.com/install-mcp?name=wa-mcp&amp;config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLWZyb20iLCJ3YS1tY3Atc2VydmVyPT0wLjEuMSIsIi0td2l0aCIsIndhLW1jcC1zZGtbZW5jcnlwdGlvbixmaWxlc10iLCJ3YS1tY3AiXX0%3D"
             ><svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#agent-connector" /></svg>
             <div><strong>Cursor</strong><span>Add the stdio server</span></div>
             <svg
@@ -670,7 +678,7 @@
               <path d="M6 18 18 6M6 6h12v12" /></svg></a
           ><a
             class="install-link"
-            href="https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522--from%2522%252C%2522wa-mcp-server%253D%253D0.1.0%2522%252C%2522--with%2522%252C%2522wa-mcp-sdk%255Bencryption%252Cfiles%255D%2522%252C%2522wa-mcp%2522%255D%257D"
+            href="https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522--from%2522%252C%2522wa-mcp-server%253D%253D0.1.1%2522%252C%2522--with%2522%252C%2522wa-mcp-sdk%255Bencryption%252Cfiles%255D%2522%252C%2522wa-mcp%2522%255D%257D"
             ><svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#remote-mcp" /></svg>
             <div><strong>VS Code</strong><span>Install for agent mode</span></div>
             <svg
@@ -686,8 +694,8 @@
               <path d="M6 18 18 6M6 6h12v12" /></svg
           ></a>
           <p class="note">
-            <strong>Claude Desktop v0.1.0</strong> ships without the bundle. Use the
-            <a href="connect-whatsapp-to-claude/">manual configuration</a> for this release.
+            <strong>The v0.1.1 desktop extension</strong> is available in release assets.<br />See the
+            <a href="connect-whatsapp-to-claude/">manual setup for Claude Desktop</a>.
           </p>
           <details>
             <summary>
@@ -709,7 +717,10 @@
               Use Python 3.11 or newer. After installing the server, add the SDK extras for encrypted fields and file
               text.
             </p>
-            <pre><code>pipx inject --force wa-mcp-server &#x27;wa-mcp-sdk[encryption,files]&#x27;</code></pre>
+            <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
+              <pre><code>pipx inject --force wa-mcp-server &#x27;wa-mcp-sdk[encryption,files]&#x27;</code></pre>
+            </div>
             <p>
               Set your client command to <code>wa-mcp</code> with <code>--config</code> and the absolute config path.
               Check the connection with <code>bridge_status</code>.
@@ -778,11 +789,11 @@
             <h2 id="compare-title">Compare the servers.</h2>
           </div>
           <p>
-            November 2026 comparison. Other servers are linked by language and license. Partial means limited or
+            November 2026 comparison. The column headings link to each project. Partial means limited or
             unconfirmed support.
           </p>
         </div>
-        <p class="scroll-hint">Swipe across the table to compare all six servers.</p>
+        <p class="scroll-hint">Scroll across the table to compare all six servers.</p>
         <div
           class="table-scroll"
           role="region"
@@ -969,7 +980,7 @@
           </div>
           <div class="index-cols">
             <div>
-              <h3>Connect a client</h3>
+              <h3>Clients and architecture</h3>
               <a class="row-link" href="whatsapp-mcp-server/"
                 ><span>WhatsApp MCP server</span
                 ><svg
@@ -983,7 +994,8 @@
                   stroke-linecap="round"
                 >
                   <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
-              ><a class="row-link" href="connect-whatsapp-to-claude/"
+              >
+              <a class="row-link" href="/wa-mcp/whatsmeow-go-bridge/"><span>Embed the whatsmeow Go bridge for WhatsApp MCP</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a><a class="row-link" href="connect-whatsapp-to-claude/"
                 ><span>Connect WhatsApp to Claude</span
                 ><svg
                   class="ui arrow"
@@ -1039,7 +1051,8 @@
                   stroke-linecap="round"
                 >
                   <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
-              ><a class="row-link" href="search-whatsapp-messages-with-ai/"
+              >
+              <a class="row-link" href="/wa-mcp/whatsapp-bot-without-business-api/"><span>A WhatsApp bot without the Business API: OpenAI or ChatGPT?</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a><a class="row-link" href="search-whatsapp-messages-with-ai/"
                 ><span>Search WhatsApp messages with AI</span
                 ><svg
                   class="ui arrow"
@@ -1081,7 +1094,7 @@
               ></a>
             </div>
             <div>
-              <h3>Run a server</h3>
+              <h3>Hosting and integrations</h3>
               <a class="row-link" href="self-hosted-whatsapp-api/"
                 ><span>A self-hosted WhatsApp API</span
                 ><svg
@@ -1095,7 +1108,8 @@
                   stroke-linecap="round"
                 >
                   <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
-              ><a class="row-link" href="whatsapp-mcp-security/"
+              >
+              <a class="row-link" href="/wa-mcp/whatsapp-mcp-python/"><span>Read chats with the WhatsApp MCP Python SDK</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a><a class="row-link" href="whatsapp-mcp-security/"
                 ><span>WhatsApp MCP security and privacy</span
                 ><svg
                   class="ui arrow"
@@ -1122,6 +1136,7 @@
                 >
                   <path d="M5 12h14m-6-6 6 6-6 6" /></svg
               ></a>
+              <a class="row-link" href="/wa-mcp/whatsapp-webhook-workflows/"><span>WhatsApp webhooks or an n8n AI workflow?</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
             </div>
           </div>
         </div>
@@ -1132,6 +1147,7 @@
           <h2 id="faq-title">Questions.</h2>
         </div>
         <div>
+          <details><summary>What can I do with WhatsApp MCP?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Link your phone and ask your assistant for a recent chat, the context around a message or a daily list of open requests. Sending starts disabled.</p></details>
           <details>
             <summary>
               What does my assistant see?<svg
@@ -1221,8 +1237,8 @@
           <a class="brand" href="./"><img width="32" height="32" src="assets/brand/logo.svg" alt="" />WA MCP</a>
           <nav aria-label="Footer">
             <a href="#guides">Guides</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
             ><a href="https://github.com/tsahospital-beep/wa-mcp"
               >GitHub
               <svg

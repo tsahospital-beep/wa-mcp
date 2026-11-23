@@ -100,7 +100,7 @@ async def _session(
 ) -> tuple[list[Any], list[dict[str, Any]]]:
     command, args = _command()
     environ = dict(os.environ, WA_MCP_CONFIG=str(cfg))
-    params = StdioServerParameters(command=command, args=args, env=environ)
+    params = StdioServerParameters(command=command, args=[*args, "--toolsets", "all"], env=environ)
     results: list[dict[str, Any]] = []
     async with stdio_client(params) as (read, write), ClientSession(read, write) as session:
         await session.initialize()

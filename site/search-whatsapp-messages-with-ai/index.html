@@ -4,39 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
-    <title>Search WhatsApp messages with AI | WA MCP</title>
-    <meta
-      name="description"
-      content="Find phrases in messages, transcripts, screenshots and documents, then recover the surrounding conversation and check the date."
-    />
+    <title>Search WhatsApp chat history with AI | WA MCP</title>
+    <meta name="description" content="Search WhatsApp chat history across messages, transcripts and extracted file text. Narrow a query by chat or date and open the conversation around a match." />
     <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/search-whatsapp-messages-with-ai/" />
-    <link rel="describedby" href="../llms.txt" type="text/plain" />
-    <link rel="icon" href="../assets/brand/logo.svg" type="image/svg+xml" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="WA MCP" />
-    <meta property="og:title" content="Search WhatsApp messages with AI | WA MCP" />
-    <meta
-      property="og:description"
-      content="Find phrases in messages, transcripts, screenshots and documents, then recover the surrounding conversation and check the date."
-    />
+    <meta property="og:title" content="Search WhatsApp chat history with AI | WA MCP" />
+    <meta property="og:description" content="Search WhatsApp chat history across messages, transcripts and extracted file text. Narrow a query by chat or date and open the conversation around a match." />
     <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/search-whatsapp-messages-with-ai/" />
     <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
-    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Search WhatsApp messages with AI | WA MCP" />
-    <meta
-      name="twitter:description"
-      content="Find phrases in messages, transcripts, screenshots and documents, then recover the surrounding conversation and check the date."
-    />
+    <meta name="twitter:title" content="Search WhatsApp chat history with AI | WA MCP" />
+    <meta name="twitter:description" content="Search WhatsApp chat history across messages, transcripts and extracted file text. Narrow a query by chat or date and open the conversation around a match." />
     <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
     <script>
+      document.documentElement.classList.add("js");
       try {
         const t = localStorage.getItem("wa-theme");
         if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
       } catch {}
     </script>
-    <link rel="stylesheet" href="../style.css" />
-    <script defer src="../site.js"></script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -53,14 +55,29 @@
               {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "Search WhatsApp messages with AI",
+                "name": "Guides",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/#guides"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Chat history",
                 "item": "https://tsahospital-beep.github.io/wa-mcp/search-whatsapp-messages-with-ai/"
               }
             ]
           },
           {
             "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/search-whatsapp-messages-with-ai/#faq",
             "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "How do I search WhatsApp chat history from before pairing?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Request older history for the selected chat while the phone is online, or preview and import a WhatsApp TXT or ZIP export. Search covers the history present in the store."
+                }
+              },
               {
                 "@type": "Question",
                 "name": "Can I find a message by a phrase inside a screenshot?",
@@ -123,9 +140,8 @@
                 stroke-linecap="round"
               >
                 <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
-              >Star on GitHub <span class="star-count" hidden></span></a
-            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
-              >GitHub
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
               <svg
                 class="ui out"
                 aria-hidden="true"
@@ -171,19 +187,13 @@
     </header>
     <main id="main">
       <div class="container">
-        <nav aria-label="Breadcrumb" class="crumbs">
-          <a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / Chats and media
-        </nav>
+        <nav aria-label="Breadcrumb" class="crumbs"><a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / <span aria-current="page">Chat history</span></nav>
         <div class="guide-hero">
           <div>
             <div class="kicker">Chats and media guide</div>
-            <h1>Search WhatsApp messages with AI</h1>
-            <p class="lead">
-              Ask a connected assistant to search WhatsApp with <code>list_messages</code>, using a word or phrase and
-              an optional chat or date range. WA MCP searches stored message text, voice transcripts and extracted file
-              text without case sensitivity. Each match can lead back to its surrounding conversation.
-            </p>
-            <div class="byline">v0.1.0 <span>·</span> Updated <time datetime="2026-11-23">23 November 2026</time></div>
+            <h1>Search WhatsApp chat history with AI</h1>
+            <p class="lead">To search WhatsApp chat history, ask your assistant for a phrase, a chat and a date range. WA MCP can match stored text, voice transcripts and extracted document text, then retrieve the messages around a result.</p>
+            <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
           </div>
           <div class="plate guide-plate" aria-hidden="true">
             <div class="plate-inner">
@@ -211,8 +221,9 @@
         </div>
         <div class="reading">
           <aside>
-            <strong>On this page</strong>
-            <nav aria-label="On this page">
+            <strong class="toc-title">On this page</strong>
+            <button class="toc-toggle" type="button" aria-controls="contents" aria-expanded="false">On this page <span aria-hidden="true">+</span></button>
+            <nav id="contents" aria-label="On this page">
               <a href="#section-1">Turn a question into a search</a><a href="#section-2">Read the evidence in order</a
               ><a href="#section-3">Make attachments searchable</a
               ><a href="#section-4">Check how far the store goes back</a><a href="#section-5">Keep the search scoped</a
@@ -290,7 +301,8 @@
             </section>
             <section id="faq">
               <h2>Questions</h2>
-              <details>
+              <details><summary>How do I search WhatsApp chat history from before pairing?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Request older history for the selected chat while the phone is online, or preview and import a WhatsApp TXT or ZIP export. Search covers the history present in the store.</p></details>
+          <details>
                 <summary>
                   Can I find a message by a phrase inside a screenshot?<svg
                     class="ui down"
@@ -333,7 +345,7 @@
             </section>
             <p class="source">
               Project documentation ·
-              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md"
+              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md"
                 >tools.md
                 <svg
                   class="ui out"
@@ -355,6 +367,7 @@
         <div class="container">
           <h2>Related guides</h2>
           <div class="related-grid">
+            <a class="row-link" href="/wa-mcp/whatsapp-mcp-python/"><span>Read chats with the WhatsApp MCP Python SDK</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
             <a class="row-link" href="../whatsapp-voice-note-transcription/"
               ><span>Transcribe WhatsApp voice notes</span
               ><svg
@@ -405,8 +418,8 @@
           <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
           <nav aria-label="Footer">
             <a href="../#guides">Guides</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
             ><a href="https://github.com/tsahospital-beep/wa-mcp"
               >GitHub
               <svg

@@ -10,6 +10,8 @@ Bob, 15550100001, the Book club group).
 
 ## Start here
 
+Try the [two-minute offline demo](00-demo.md) to explore fictional chats without a phone.
+
 Do these three in order. After them your assistant can read your WhatsApp.
 
 | Tutorial | What you get |

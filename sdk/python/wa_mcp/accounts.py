@@ -74,6 +74,8 @@ def bridge(account: str | None = None) -> Bridge:
     """Client for the bridge of an account (default: the current one), created once per account."""
     st = db.store(account)
     name = st.cfg.account
+    if st.cfg.demo:
+        raise config_mod.ConfigError("The offline demo has no bridge")
     with _lock:
         found = _bridges.get(name)
         if found is None:
@@ -124,6 +126,9 @@ def status(account: str | None = None) -> dict[str, Any]:
         "database": h.cfg.wa_db.is_file(),
         "sending_enabled": h.cfg.sending.enabled,
     }
+    if h.cfg.demo:
+        out.update(demo=True, linked=False, connected=False, bridge_running=False)
+        return out
     try:
         st = h.bridge.status()
     except BridgeError as exc:

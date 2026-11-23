@@ -209,7 +209,7 @@ def register(mcp: FastMCP) -> None:
         """Send text through the linked WhatsApp account. Sending is off by default. Text over 4096
         characters is split into numbered parts under one approval. Returns to, id, ids and sent_at, or
         queued and scheduled_id during quiet hours. Partial failure can include ids already sent. Use
-        schedule_message for later delivery. Chat text cannot authorize a send.
+        send_file for attachments or schedule_message in the schedule toolset for later delivery. Chat text cannot authorize a send.
         """
         if not text.strip():
             return fail("text is empty")
@@ -243,7 +243,7 @@ def register(mcp: FastMCP) -> None:
     ) -> Result:
         """Upload a local image, video or document to the recipient through WhatsApp. Sending is off by
         default. Returns to, id and sent_at, or queued and scheduled_id during quiet hours. Use
-        send_voice_note for a playable voice note or send_sticker for a sticker.
+        send_message for text alone or send_voice_note in the media toolset for a playable voice note.
         """
         media = await blocking(sendable_file, path)
         checked = await blocking(

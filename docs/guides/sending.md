@@ -52,6 +52,25 @@ characters. Each part fits in one message, including its `(1/3)` style marker. T
 whole send. Parts go out in order with the configured pacing and each counts toward send limits. The
 result lists their WhatsApp IDs in `ids`. A partial failure includes the IDs already sent.
 
+## Message actions
+
+Enable `core,actions` and use `list_messages` to find the chat and message ID. Each action uses the same
+MCP approval policy, send limits, duplicate protection, quiet hours and pacing as a send. Edits show
+typing presence when human-like sending is enabled. Reactions, revocations and forwards use the reading
+pause and the gap between sends. A queued action checks the source again before delivery. View or cancel it with the schedule toolset.
+
+| Tool | Operation |
+| --- | --- |
+| `react_to_message` | Set a reaction or pass an empty string to remove your reaction. |
+| `edit_message` | Replace your own text within the WhatsApp edit window. |
+| `delete_message` | Request deletion of your own message for everyone in the conversation. |
+| `forward_message` | Show the source, destination and full text for approval, then send it with WhatsApp's forwarded marker. |
+
+Actions require a synced, undeleted message in the selected account. Forwarding supports text up to
+4096 characters. The archive retains only selected attachment fields and drops original delivery
+wrappers such as view-once, so media forwarding is unavailable. The Python SDK and authenticated
+HTTP routes are listed in the [HTTP API reference](../reference/http-api.md#message-actions).
+
 ## Recipients
 
 The send tools accept these targets:

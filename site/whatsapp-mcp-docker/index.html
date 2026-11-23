@@ -4,39 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
-    <title>Run WhatsApp MCP in Docker | WA MCP</title>
-    <meta
-      name="description"
-      content="Run the bridge, MCP server and HTTPS proxy with Docker Compose, pair the phone and plan backups for the data, key and session."
-    />
+    <title>Run WhatsApp MCP with Docker Compose | WA MCP</title>
+    <meta name="description" content="Run WhatsApp MCP with Docker Compose and Caddy. Check the services, link a phone and back up the message volume, session and encryption key separately." />
     <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/" />
-    <link rel="describedby" href="../llms.txt" type="text/plain" />
-    <link rel="icon" href="../assets/brand/logo.svg" type="image/svg+xml" />
+    <link rel="describedby" href="/wa-mcp/llms.txt" type="text/plain" />
+    <link rel="shortcut icon" href="/wa-mcp/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/wa-mcp/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="icon" href="/wa-mcp/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/wa-mcp/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/wa-mcp/site.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafbf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101714" />
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="WA MCP" />
-    <meta property="og:title" content="Run WhatsApp MCP in Docker | WA MCP" />
-    <meta
-      property="og:description"
-      content="Run the bridge, MCP server and HTTPS proxy with Docker Compose, pair the phone and plan backups for the data, key and session."
-    />
+    <meta property="og:title" content="Run WhatsApp MCP with Docker Compose | WA MCP" />
+    <meta property="og:description" content="Run WhatsApp MCP with Docker Compose and Caddy. Check the services, link a phone and back up the message volume, session and encryption key separately." />
     <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/" />
     <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
-    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta property="og:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Run WhatsApp MCP in Docker | WA MCP" />
-    <meta
-      name="twitter:description"
-      content="Run the bridge, MCP server and HTTPS proxy with Docker Compose, pair the phone and plan backups for the data, key and session."
-    />
+    <meta name="twitter:title" content="Run WhatsApp MCP with Docker Compose | WA MCP" />
+    <meta name="twitter:description" content="Run WhatsApp MCP with Docker Compose and Caddy. Check the services, link a phone and back up the message volume, session and encryption key separately." />
     <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta name="twitter:image:alt" content="WA MCP for AI assistants beside the WhatsApp linked-device QR code screen" />
     <script>
+      document.documentElement.classList.add("js");
       try {
         const t = localStorage.getItem("wa-theme");
         if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
       } catch {}
     </script>
-    <link rel="stylesheet" href="../style.css" />
-    <script defer src="../site.js"></script>
+    <link rel="stylesheet" href="/wa-mcp/style.css" />
+    <script defer src="/wa-mcp/site.js"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -53,14 +55,29 @@
               {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "Run WhatsApp MCP in Docker",
+                "name": "Guides",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/#guides"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Docker Compose",
                 "item": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/"
               }
             ]
           },
           {
             "@type": "FAQPage",
+            "@id": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/#faq",
             "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Can I test WhatsApp MCP in Docker before linking a number?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. The preview override starts the stack with fake login codes. Check service health there, then use the normal configuration for real pairing."
+                }
+              },
               {
                 "@type": "Question",
                 "name": "Do I need a desktop keystore in Docker?",
@@ -81,31 +98,32 @@
           },
           {
             "@type": "HowTo",
-            "name": "Run WhatsApp MCP in Docker",
-            "description": "WA MCP can run its linked WhatsApp bridge and MCP server in Docker Compose, with Caddy providing HTTPS for remote clients. The bridge keeps the device connection on the host while the server handles authenticated MCP requests. A preview override lets you test the stack without linking WhatsApp.",
+            "name": "Run WhatsApp MCP with Docker Compose",
+            "description": "Run WhatsApp MCP with Docker Compose and Caddy. Check the services, link a phone and back up the message volume, session and encryption key separately.",
+            "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/",
             "step": [
               {
                 "@type": "HowToStep",
                 "name": "Map the services and volumes",
-                "text": "The bridge owns the WhatsApp connection and serves its API on loopback inside its network namespace. The server shares that namespace, so it can reach the API without publishing the bridge port. Caddy forwards the public login path to the bridge and other requests to the MCP service. Only ports 80 and 443 need to be publicly reachable for the documented HTTPS setup. Both application containers run as user 65532 with read-only root filesystems and no capabilities. They share the wa-data volume for the message database, downloads and exports. Only the bridge mounts wa-session, which holds the linked-device session keys. The database encryption key is supplied separately through a Docker secret. Those three pieces have different roles when backing up or restoring.",
+                "text": "The bridge owns the WhatsApp connection and serves its API on loopback inside its network namespace. The server shares that namespace, so it can reach the API without publishing the bridge port. Caddy forwards the public login path to the bridge and other requests to the MCP service. Only ports 80 and 443 need to be publicly reachable for the documented HTTPS setup.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/#section-1"
               },
               {
                 "@type": "HowToStep",
                 "name": "Prepare a host and database key",
-                "text": "Use a Linux host with Docker Engine and the Compose plugin. Point the DNS record for your domain or subdomain at that host. In the repository's deploy/docker directory, copy env.example to .env, restrict the permissions and set WA_MCP_DOMAIN. Set TZ to the intended time zone because quiet hours, schedules and the daily briefing use it. Run the provided secrets/make-key.sh script to create the 32-byte key. It sets the owner and permissions needed by the containers and may request sudo to change ownership. Keep a protected copy of the key away from the server. Losing it means losing access to encrypted message fields, even if the data volume itself survives.",
+                "text": "Use a Linux host with Docker Engine and the Compose plugin. Point the DNS record for your domain or subdomain at that host. In the repository's deploy/docker directory, copy env.example to .env, restrict the permissions and set WA_MCP_DOMAIN. Set TZ to the intended time zone because quiet hours, schedules and the daily briefing use it.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/#section-2"
               },
               {
                 "@type": "HowToStep",
                 "name": "Start the stack and verify health",
-                "text": "From the deployment directory, start Compose with the caddy profile. Wait for the bridge and server to report healthy in compose ps and for the proxy to obtain its certificate. Check the root health URL for your domain before moving on to login. The server health check also checks the bridge. docker compose --profile caddy up -d --build\ndocker compose ps For a test that requires no WhatsApp account, use the documented preview override. It starts the bridge with fake codes and lets you exercise the services without a real login. A healthy preview confirms the services can start and communicate. For a real account, continue with the normal configuration and verify that the bridge is both connected and logged in.",
+                "text": "From the deployment directory, start Compose with the caddy profile. Wait for the bridge and server to report healthy in compose ps and for the proxy to obtain its certificate. Check the root health URL for your domain before moving on to login. The server health check also checks the bridge.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/#section-3"
               },
               {
                 "@type": "HowToStep",
                 "name": "Pair the device and authorize a client",
-                "text": "Run docker compose exec bridge wa-bridge login-url to get a one-time HTTPS link. Open it and scan the QR code from Linked devices on your phone. If you need to revisit the login window, generate a fresh link. Keep the address private because it grants access to the login page. For a client using a static token, create a token in the server container and give it a device-specific name. The value is shown once. Configure the client with the public HTTPS /mcp address and its bearer credential. A claude.ai connector can use OAuth with owner approval. The consent link for the documented configuration is available through the server logs.",
+                "text": "Run docker compose exec bridge wa-bridge login-url to get a one-time HTTPS link. Open it and scan the QR code from Linked devices on your phone. If you need to revisit the login window, generate a fresh link. Keep the address private because it grants access to the login page.",
                 "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/#section-4"
               },
               {
@@ -160,9 +178,8 @@
                 stroke-linecap="round"
               >
                 <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
-              >Star on GitHub <span class="star-count" hidden></span></a
-            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
-              >GitHub
+              >Star on GitHub <span class="star-count" title="4 stars checked on 23 November 2026">4</span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest">Releases
               <svg
                 class="ui out"
                 aria-hidden="true"
@@ -208,19 +225,13 @@
     </header>
     <main id="main">
       <div class="container">
-        <nav aria-label="Breadcrumb" class="crumbs">
-          <a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / Deployment
-        </nav>
+        <nav aria-label="Breadcrumb" class="crumbs"><a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / <span aria-current="page">Docker Compose</span></nav>
         <div class="guide-hero">
           <div>
             <div class="kicker">Deployment guide</div>
-            <h1>Run WhatsApp MCP in Docker</h1>
-            <p class="lead">
-              WA MCP can run its linked WhatsApp bridge and MCP server in Docker Compose, with Caddy providing HTTPS for
-              remote clients. The bridge keeps the device connection on the host while the server handles authenticated
-              MCP requests. A preview override lets you test the stack without linking WhatsApp.
-            </p>
-            <div class="byline">v0.1.0 <span>·</span> Updated <time datetime="2026-11-23">23 November 2026</time></div>
+            <h1>Run WhatsApp MCP with Docker Compose</h1>
+            <p class="lead">Run WhatsApp MCP with Docker Compose to keep the linked phone available when your desktop is closed. The bridge owns the session, the MCP server handles client requests and Caddy provides HTTPS for remote access.</p>
+            <div class="byline">Updated <time datetime="2026-11-23">23 November 2026</time></div>
           </div>
           <div class="plate guide-plate" aria-hidden="true">
             <div class="plate-inner">
@@ -250,8 +261,9 @@
         </div>
         <div class="reading">
           <aside>
-            <strong>On this page</strong>
-            <nav aria-label="On this page">
+            <strong class="toc-title">On this page</strong>
+            <button class="toc-toggle" type="button" aria-controls="contents" aria-expanded="false">On this page <span aria-hidden="true">+</span></button>
+            <nav id="contents" aria-label="On this page">
               <a href="#section-1">Map the services and volumes</a
               ><a href="#section-2">Prepare a host and database key</a
               ><a href="#section-3">Start the stack and verify health</a
@@ -298,8 +310,11 @@
                 report healthy in compose ps and for the proxy to obtain its certificate. Check the root health URL for
                 your domain before moving on to login. The server health check also checks the bridge.
               </p>
+              <div class="snippet">
+              <div class="snippet-tools"><span role="status"></span><button type="button" data-copy>Copy code</button></div>
               <pre><code>docker compose --profile caddy up -d --build
 docker compose ps</code></pre>
+            </div>
               <p>
                 For a test that requires no WhatsApp account, use the documented preview override. It starts the bridge
                 with fake codes and lets you exercise the services without a real login. A healthy preview confirms the
@@ -332,7 +347,8 @@ docker compose ps</code></pre>
             </section>
             <section id="faq">
               <h2>Questions</h2>
-              <details>
+              <details><summary>Can I test WhatsApp MCP in Docker before linking a number?<svg class="ui down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></summary><p>Yes. The preview override starts the stack with fake login codes. Check service health there, then use the normal configuration for real pairing.</p></details>
+          <details>
                 <summary>
                   Do I need a desktop keystore in Docker?<svg
                     class="ui down"
@@ -377,7 +393,7 @@ docker compose ps</code></pre>
             </section>
             <p class="source">
               Project documentation ·
-              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/guides/server.md"
+              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/guides/server.md"
                 >server.md
                 <svg
                   class="ui out"
@@ -399,6 +415,7 @@ docker compose ps</code></pre>
         <div class="container">
           <h2>Related guides</h2>
           <div class="related-grid">
+            <a class="row-link" href="/wa-mcp/whatsapp-webhook-workflows/"><span>WhatsApp webhooks or an n8n AI workflow?</span><svg class="ui arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
             <a class="row-link" href="../self-hosted-whatsapp-api/"
               ><span>A self-hosted WhatsApp API</span
               ><svg
@@ -449,8 +466,8 @@ docker compose ps</code></pre>
           <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
           <nav aria-label="Footer">
             <a href="../#guides">Guides</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
-            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/HEAD/LICENSE">MIT license</a
             ><a href="https://github.com/tsahospital-beep/wa-mcp"
               >GitHub
               <svg

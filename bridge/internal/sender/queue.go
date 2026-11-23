@@ -7,6 +7,7 @@ import (
 
 	"github.com/tsahospital-beep/wa-mcp/bridge/internal/common"
 	"github.com/tsahospital-beep/wa-mcp/bridge/internal/store"
+	"github.com/tsahospital-beep/wa-mcp/bridge/internal/wa"
 )
 
 // ErrMediaAndSticker is returned when one stored entry would need two files.
@@ -47,11 +48,16 @@ func (s *Sender) queue(ctx context.Context, req Request, target string, at, now 
 	if req.ReplyTo != nil {
 		reply = req.ReplyTo.ID
 	}
-	id, err := s.DB.AddScheduled(ctx, &store.Scheduled{
+	entry := &store.Scheduled{
 		QuietQueued:   true,
 		AgentRevision: req.AgentRevision, Target: target, Body: req.Text, MediaPath: media, Kind: kind, Human: req.Human, ReplyToID: reply,
 		Mentions: req.Mentions, NextRun: at.Unix(), Recurrence: "once", CreatedAt: now.Unix(),
-	})
+	}
+	if a := req.Action; a != nil {
+		entry.Kind, entry.Body = a.Kind, a.Value
+		entry.SourceChat, entry.SourceMessageID = a.Chat, a.MessageID
+	}
+	id, err := s.DB.AddScheduled(ctx, entry)
 	if err != nil {
 		return Result{}, err
 	}
@@ -70,6 +76,9 @@ func RequestFromSchedule(sc *store.Scheduled) Request {
 	}
 	p := sc.MediaPath
 	switch sc.Kind {
+	case "react", "edit", "delete", "forward":
+		req.Action = &wa.MessageAction{Kind: sc.Kind, Chat: sc.SourceChat, MessageID: sc.SourceMessageID, Value: sc.Body}
+		req.Text = ""
 	case store.KindSticker:
 		req.StickerPath = p
 	case store.KindVoice:

@@ -6,17 +6,18 @@ from mcp.server.fastmcp import FastMCP
 
 from wa_mcp import transcribe, vision
 from wa_mcp.client import BridgeError, load_token
-from wa_mcp_server.common import READ_ONLY, Result, bridge, cfg, load_errors, ok, safe
+from wa_mcp_server.common import Result, bridge, cfg, hints, load_errors, ok, safe
 
 
 def register(mcp: FastMCP) -> None:
-    @mcp.tool(annotations=READ_ONLY)
+    @mcp.tool(annotations=hints("Check bridge status", read_only=True))
     @safe
     def bridge_status() -> Result:
-        """Check the setup: is the bridge running and logged in, is sending enabled, which transcription
-        backend and OCR engine, the AI provider, and whether optional tool modules failed to load.
-        Shows app state sync and recovery by collection. Also shows how the store is protected and recent session security events (a logout, another
-        client with this session, a new linked device); tell the user about any warning event."""
+        """Check whether one account's bridge is reachable and logged in before requesting history or
+        sending. Returns bridge, database, sending_enabled, require_confirm, backend readiness and
+        security_events. Report security warnings to the user. Use list_accounts to discover other
+        accounts.
+        """
         c = cfg()
         info: dict[str, Any] = {
             "database": c.wa_db.is_file(),

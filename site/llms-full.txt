@@ -1,0 +1,500 @@
+# WA MCP
+
+> WA MCP v0.1.0 is an MIT-licensed WhatsApp MCP server with 49 MCP tools. The Go bridge links a phone and stores messages locally. The Python server exposes tools to a connected assistant.
+
+Field encryption is on by default. Sending and optional background AI providers start disabled. The assistant receives requested tool results. The unofficial WhatsApp Web protocol carries a risk of account restrictions or a ban.
+
+## Project
+
+- [Home](https://tsahospital-beep.github.io/wa-mcp/): Features, install links and comparison.
+
+## Guides
+
+- [WhatsApp MCP server](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-server/): Read how the Go bridge and Python server give MCP clients 49 tools for working with a linked WhatsApp account.
+- [Connect WhatsApp to Claude](https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/): Configure Claude Desktop for a linked WhatsApp account, including the v0.1.0 manual setup, config example and connection checks.
+- [WhatsApp MCP for Cursor](https://tsahospital-beep.github.io/wa-mcp/whatsapp-cursor-mcp/): Install WA MCP in Cursor, choose a project or user configuration and verify that the editor can read the right WhatsApp store.
+- [WhatsApp MCP for VS Code](https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/): Set up WhatsApp tools in VS Code agent mode with a workspace or user configuration, or connect to a remote MCP endpoint.
+- [A WhatsApp assistant for your day](https://tsahospital-beep.github.io/wa-mcp/whatsapp-ai-assistant/): Use my_day to find open requests, promises, unanswered chats, missed calls and scheduled messages across your linked WhatsApp accounts.
+- [Search WhatsApp messages with AI](https://tsahospital-beep.github.io/wa-mcp/search-whatsapp-messages-with-ai/): Find phrases in messages, transcripts, screenshots and documents, then recover the surrounding conversation and check the date.
+- [Transcribe WhatsApp voice notes](https://tsahospital-beep.github.io/wa-mcp/whatsapp-voice-note-transcription/): Choose a local speech backend or HTTP endpoint, transcribe a WhatsApp chat and find spoken words in the message store.
+- [Import a WhatsApp chat export](https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/): Preview a WhatsApp TXT or ZIP export, check the senders and time zone, and import older messages into the correct local chat.
+- [A self-hosted WhatsApp API](https://tsahospital-beep.github.io/wa-mcp/self-hosted-whatsapp-api/): Read WhatsApp through a token-authenticated local REST API, handle status responses and receive signed webhook events.
+- [WhatsApp MCP security and privacy](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-security/): See what WA MCP encrypts, what a connected assistant receives, how sending approval works and where to review linked-device alerts.
+- [Run WhatsApp MCP in Docker](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/): Run the bridge, MCP server and HTTPS proxy with Docker Compose, pair the phone and plan backups for the data, key and session.
+
+
+## [WhatsApp MCP server](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-server/)
+
+WA MCP is a WhatsApp Model Context Protocol server that gives an assistant 49 tools for working with your linked account. A Go bridge receives messages and a Python server makes the stored history available to clients such as Claude Desktop, Cursor and VS Code.
+
+### Follow a message from phone to client
+Link the bridge as a companion device from WhatsApp on your phone. It receives recent history after linking and continues to record new messages while it runs. It also applies edits, deletions and reactions. The result is a local SQLite database that a second process, the MCP server, can read when a client asks a question.
+
+For example, ask for the last conversation about an invoice. The client can call `list_messages` with a search term and use the returned chat and message ID to retrieve the surrounding conversation. A request to download an attachment takes a different route. The server calls the bridge's authenticated HTTP API because the bridge owns the connection to WhatsApp.
+
+### Start with one linked account
+Build the bridge with Go 1.26 or newer, or run the published bridge image. Copy the example configuration and start the bridge. Open Linked devices on your phone and scan the QR code in its login window. If the window does not open, the terminal also displays the code. The login window offers pairing by phone number when you cannot scan.
+
+Install uv so your client can launch the Python server with uvx. Give it the absolute path of the same `config.json` that the bridge uses. Relative configuration paths can lead the client to look for an empty store in its working directory. Start with `bridge_status` and check three separate results: the database is readable, the bridge is connected and the phone account is logged in.
+
+### Choose a transport
+On a desktop, the client starts the server as a child process and communicates over standard input and output. That requires no listening port for MCP. You can close the client between questions and leave the bridge collecting messages. When the bridge is stopped, database reads remain available from the stored history. Live operations such as asking the phone for another page require the connection.
+
+For a server shared with remote clients, enable Streamable HTTP. Each request to the MCP endpoint needs a bearer token. A device can use its own revocable token, or an OAuth client can request approval from the owner. The deployment guide describes an HTTPS proxy, host checks and the addresses that may forward requests.
+
+### Add history and other numbers
+A new link receives only the history that the phone supplies. For a specific conversation, request older pages back to a date. Keep the phone online and continue a time-limited sync if it returns an incomplete result. An existing WhatsApp text or ZIP export gives you another source for older messages. Preview the import before writing it into the selected chat.
+
+Each additional number needs its own bridge, store and sending limits. One Python server can present all the configured accounts. Ask for `list_accounts` to see the available names, then pass an account to scope a tool call. The daily overview has a useful exception to the default selection: without an account argument it combines the day's items across numbers.
+
+### Decide what the client may see
+Message text is encrypted in the database by default. The server reads it as the operating system user that holds the key and returns requested results to the assistant. Consider the client you choose and where it processes those results. Search and daily briefings work with sending disabled, so you can try both before deciding whether you want to enable outbound messages.
+
+#### Is there a required background model?
+No. The assistant interprets the tool results. Task detection uses local rules. A separately configured provider can add an optional summary or image description.
+#### What license covers the project?
+WA MCP v0.1.0 is published under the MIT license. The implementation includes the Go bridge, Python SDK and Python MCP server.
+
+## [Connect WhatsApp to Claude](https://tsahospital-beep.github.io/wa-mcp/connect-whatsapp-to-claude/)
+
+To connect WhatsApp to Claude Desktop, link the WA MCP bridge with your phone and add the Python MCP server to Claude's configuration. For v0.1.0, use the manual configuration below. When a release includes the desktop extension, open its .mcpb file and select the same bridge configuration.
+
+### Link your phone first
+Start the bridge with its configuration file. In WhatsApp, open Linked devices, select Link a device and scan the QR code in the local window. If you have only the terminal in front of you, you can scan its code instead. Wait for the phone to accept the link and for the bridge to begin receiving history before asking Claude about a conversation.
+
+The bridge and Claude Desktop have separate jobs. The bridge maintains the device connection and stores messages. Claude launches a Python process to answer tool requests. Installing the Python package alone does not pair your phone. Leave the bridge running when you want Claude to see a newly arrived message or fetch an attachment that has not been downloaded.
+
+### Configure Claude Desktop
+Install uv and make sure Claude can find its uvx executable. Open Settings, then Developer, then Edit Config in Claude Desktop. On Windows this opens the configuration under the Claude folder in AppData. On macOS the file lives in the Claude folder under Application Support in your user Library. Add the entry below to the existing server configuration and replace CONFIG_FILE with the absolute path on this machine.
+
+
+```
+{
+  "mcpServers": {
+    "wa-mcp": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "wa-mcp-server==0.1.0",
+        "--with",
+        "wa-mcp-sdk[encryption,files]",
+        "wa-mcp",
+        "--config",
+        "CONFIG_FILE"
+      ]
+    }
+  }
+}
+```
+
+The SDK extras allow this environment to read encrypted message fields and extract file text. Enter the command and each argument separately as shown. If the application cannot find uvx, use the path reported by `where.exe uvx` on Windows or `command -v uvx` on macOS. Quit the desktop application completely and reopen it to load the change.
+
+### Check what Claude can read
+Ask Claude to run `bridge_status`. Look for a true database result, then check the connected and logged_in values under bridge. If the database result fails, check which configuration file you selected. If only the bridge is unreachable, check that the bridge process is running with the same API address and that both processes run as the user who linked the account.
+
+Try asking for your five most recent chats. Pick one and ask for the context around its last invoice or meeting request. This checks that Claude can retrieve the original conversation after finding a match. If recent chats appear but an older exchange is missing, ask for history back to a particular date while the phone is online.
+
+### Choose which Claude connection you need
+Claude Code also supports a local process. Its `claude mcp add` command accepts the server name followed by the executable and arguments. Choose user scope for access across projects or project scope for a project configuration file. The executable, SDK extras and absolute configuration path have the same meaning as in the desktop example.
+
+For a local Claude Code session, run the command below after replacing CONFIG_FILE, then use claude mcp list to check the registered name. This registers the tool command with Claude Code. Claude Desktop still reads its own configuration when it starts.
+
+
+```
+claude mcp add wa-mcp -- uvx --from wa-mcp-server==0.1.0 --with "wa-mcp-sdk[encryption,files]" wa-mcp --config "CONFIG_FILE"
+```
+
+A claude.ai custom connector uses a remote MCP service. Configure an HTTPS endpoint, enable OAuth on the server and enter the URL ending in /mcp in the connector. Approve the request on the server's consent page. This path involves hosting the service and managing access. For a single desktop connected to a local bridge, the configuration above is sufficient.
+
+#### Will the extension download work for v0.1.0?
+The v0.1.0 release has no .mcpb attachment. Use the manual entry on this page. For a release that lists wa-mcp.mcpb, open the asset, choose Install and select the bridge configuration in extension settings.
+#### Can Claude send a message after installation?
+Sending starts disabled. If you enable it, a client with MCP elicitation asks you to approve the exact send. Search, history reads and the daily overview are available while sending remains disabled.
+
+## [WhatsApp MCP for Cursor](https://tsahospital-beep.github.io/wa-mcp/whatsapp-cursor-mcp/)
+
+Add WA MCP to Cursor using the install link, set the absolute path of the linked bridge configuration and enable the server in Cursor Settings. Cursor can then search WhatsApp messages, read a thread or ask for a daily overview through its MCP tools.
+
+### Install the server in Cursor
+Install uv on the computer that runs Cursor, then use the Cursor button below. The link configures uvx to launch the published Python server and includes the SDK extras for encryption and file text. It sets up a command for the editor to run when it needs the server. Your phone is linked separately by the Go bridge.
+
+[Add to Cursor](https://cursor.com/install-mcp?name=wa-mcp&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLWZyb20iLCJ3YS1tY3Atc2VydmVyPT0wLjEuMCIsIi0td2l0aCIsIndhLW1jcC1zZGtbZW5jcnlwdGlvbixmaWxlc10iLCJ3YS1tY3AiXX0%3D)
+
+Set `WA_MCP_CONFIG` in the environment that Cursor inherits to the absolute path of the bridge's config.json. Restart Cursor after changing that environment. Alternatively, add the config option and path to the installed arguments. This matters when you switch workspaces: the editor's current directory can change while the WhatsApp store stays in the same place.
+
+### Choose the scope of the configuration
+For access across projects, edit the mcp.json file in the .cursor directory under your home folder. For one project, use .cursor/mcp.json in that project. Both locations accept an mcpServers object. If you prefer to inspect exactly what Cursor will run, enter the following configuration manually and replace CONFIG_FILE with your local path.
+
+
+```
+{
+  "mcpServers": {
+    "wa-mcp": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "wa-mcp-server==0.1.0",
+        "--with",
+        "wa-mcp-sdk[encryption,files]",
+        "wa-mcp",
+        "--config",
+        "CONFIG_FILE"
+      ]
+    }
+  }
+}
+```
+
+Open Cursor Settings and look under MCP for wa-mcp. Switch the server on. A source checkout can run through uv with its repository directory, while a persistent pipx installation can launch wa-mcp directly. Use the command for the installation you actually have. In particular, an editor started from the desktop may need an absolute path to the executable.
+
+### Trace a request from the editor
+Start with a read that needs no outbound message. Ask Cursor to find the last mention of an invoice and show the messages immediately before and after it. The lookup searches text already stored by the bridge. Once Cursor has the chat and message ID, it can fetch the surrounding exchange and distinguish the original request from a later correction.
+
+For work split across phone numbers, ask for the configured accounts first. Specify the intended account when looking for a project conversation. The server exposes one set of tool names with an optional account argument. Each number has its own bridge and store, so a missing result may mean the search used the default number.
+
+### Diagnose an empty tool list
+Run the published command with the help flag in a terminal to check the executable and package before debugging a chat. If Cursor lists the server but tools fail, ask for bridge_status. A readable database means Cursor can reach stored messages. A disconnected bridge explains why an attachment download or a request for older messages cannot proceed.
+
+A recent installation may have few conversations because the phone has only sent its first batch of history. Ask to list recent chats with their dates, choose one, then request older pages for that chat. Keep the phone online and repeat the request if the sync reports that its time budget expired with work remaining.
+
+### Connect Cursor to a hosted bridge
+Cursor can also use the Streamable HTTP endpoint of a hosted deployment. Put its HTTPS URL ending in /mcp in the server entry and supply the Authorization bearer header. Create a token specifically for this device and keep the credential out of project files shared with other people. Revoking that token stops its next request without affecting tokens for other devices.
+
+#### Does Cursor need the WhatsApp API token in its local configuration?
+In the usual local setup the bridge and Python server obtain the token through the shared configuration and user keystore. A remote MCP token is a separate credential for a hosted endpoint.
+#### Can I keep sending disabled?
+Yes. The message lookup and context requests above only read your stored conversations. You can also extract document text and search transcripts without turning on the sending pipeline.
+
+## [WhatsApp MCP for VS Code](https://tsahospital-beep.github.io/wa-mcp/whatsapp-vs-code-mcp/)
+
+To use WhatsApp in VS Code agent mode, install the WA MCP server and point it to the configuration of a running, linked bridge. VS Code starts the local server over stdio and displays its tools in chat. You can install it for one workspace or use your user configuration.
+
+### Add the VS Code server entry
+Install uv so VS Code can launch uvx, then open the VS Code install link. The link provides the stdio transport, executable and arguments for the Python server. Set WA_MCP_CONFIG to the absolute path of the bridge configuration in the environment inherited by VS Code. Restart the editor so the server starts with that setting.
+
+[Install in VS Code](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522--from%2522%252C%2522wa-mcp-server%253D%253D0.1.0%2522%252C%2522--with%2522%252C%2522wa-mcp-sdk%255Bencryption%252Cfiles%255D%2522%252C%2522wa-mcp%2522%255D%257D)
+
+To configure a workspace manually, create .vscode/mcp.json in that workspace. For an entry that applies across workspaces, run the command named MCP: Open User Configuration. VS Code expects a servers object and a transport type in the local entry. Preserve any servers that are already in the file when you add the example below.
+
+
+```
+{
+  "servers": {
+    "wa-mcp": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "wa-mcp-server==0.1.0",
+        "--with",
+        "wa-mcp-sdk[encryption,files]",
+        "wa-mcp",
+        "--config",
+        "CONFIG_FILE"
+      ]
+    }
+  }
+}
+```
+
+### Check the path from agent mode
+Replace CONFIG_FILE in the example with the file your bridge uses, including its full directory. A config inside the current project is unnecessary when the bridge lives elsewhere. The file tells the Python server where to read stored messages, which encryption settings to use and where it can reach the bridge API for live actions.
+
+Open chat in agent mode and ask the assistant to run bridge_status. Check the database result and the bridge's connected and logged_in flags. A missing database can indicate the wrong directory or a bridge that has never started there. A missing API token can indicate that the editor is running as a different operating system user from the bridge.
+
+### Read a thread while working
+Ask for a particular term in one conversation and include the date you care about. For example, find messages containing “invoice” in the last week, then show the surrounding messages for the latest match. This gives the assistant a bounded question and gives you a way to check its answer against the conversation. Sending can remain disabled throughout.
+
+Search can include more than the message body. For a screenshot, first ask for text recognition on images in the relevant chat. For a voice note, transcribe the audio. Both operations attach derived text to the message, so a later lookup can retrieve it through the same conversation and time filters. Your MCP client receives the tool output it requests.
+
+### Keep remote credentials in secret storage
+If the bridge runs on a server, configure VS Code with the HTTP transport and the HTTPS /mcp URL. Create a separate token for the editor. The documented remote configuration uses a password promptString input, then refers to that input from the Authorization header. VS Code asks for the value once and keeps it in its secret storage.
+
+In the remote example below, replace the example domain with the host where you run the MCP service. Keep the input identifier consistent in both places. When VS Code prompts for the secret, give it the token created for this client by the MCP server. The bridge API token belongs to the local service on the host.
+
+
+```
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "wa-mcp-token",
+      "description": "WA MCP token",
+      "password": true
+    }
+  ],
+  "servers": {
+    "wa-mcp": {
+      "type": "http",
+      "url": "https://wa.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${input:wa-mcp-token}"
+      }
+    }
+  }
+}
+```
+
+The local and hosted configurations solve different deployment problems. The local process needs access to the bridge's configuration, database and encryption key as the same user. A VS Code client calling the hosted endpoint needs the endpoint address and a credential. The hosted Python process handles access to the message database on that machine.
+
+#### Where do I look if a tool is missing?
+Check tool_modules_failed in bridge_status for optional modules that could not load. If there are no tools at all, test uvx in a terminal and verify the config path before checking the editor's MCP log.
+#### Can stored history be read when the bridge stops?
+Database-only tools can still answer from messages already on disk. Start the bridge for incoming history, remote media downloads and actions that require a live WhatsApp connection.
+
+## [A WhatsApp assistant for your day](https://tsahospital-beep.github.io/wa-mcp/whatsapp-ai-assistant/)
+
+A WhatsApp AI assistant connected to WA MCP can tell you who needs a reply, what you promised and which messages are scheduled today. Ask “What are my tasks today?” and the assistant can call `my_day`, a local tool that organizes requests from your chats using plain rules.
+
+### Start with the message behind a task
+A short daily list is easier to act on if each item points back to the original exchange. The daily tool returns a chat, message ID, time and a short line of context for each item. Ask the assistant to show the messages around a request before deciding that it still needs a reply.
+
+The project's example includes an open invoice request, a promise to send photos, a question in a book club chat and a scheduled reminder. These are different kinds of work. A scheduled send is already queued in the bridge, while an unanswered question may only require a decision. The overview also includes missed calls that have not been returned.
+
+### Set the date and scope
+With no date supplied, my_day uses today. Ask for a particular date to review another day, or provide the chat to focus on one conversation. With several configured accounts, a call without an account combines the overview from all numbers and labels the results. Supply an account name for a briefing limited to that number.
+
+Check the history before relying on an empty overview. List a few recent conversations and their last message dates. If the store has little history, ask to page back in one chat with the phone online. When a sync reports incomplete work, another call can continue it. Imported archive messages are excluded from task detection unless you explicitly include them.
+
+### Understand the task tracker
+Use tasks_overview to find open tasks, task_detail to see the steps of a task and which_task to trace an individual message to its task. A detail view can show why a message was attached to an existing request. For changes over a recent period, ask what moved in the last day with whats_new.
+
+The tracker distinguishes new, in progress, waiting, done, cancelled and stale tasks. An inactive open request becomes stale after 60 days with the default settings. It disappears from the daily list but remains in the tracker until the retention period passes. If a recent request is missing after messages changed, refresh the tracker and check the wording in the source chat.
+
+### Teach the rules your working vocabulary
+The built-in word lists are English. Extend tasks.keywords in your configuration with the phrases your group uses for requests, urgent work and deliverables. A trailing asterisk matches word endings. Adding a phrase for “updated invoice”, for example, lets you describe a recurring deliverable in the same terms that people use in the chat.
+
+In a group, a message must mention you, reply to you or use one of your names to count as addressed to you. Configure the names people actually use under insight.my_names. Set project keywords and relevant chats if generic terms mix unrelated work. Watched words provide a separate way to find mentions across messages, transcripts and extracted file text.
+
+### Choose who writes the summary
+Task detection works without a background model. Your client can phrase the structured result as a short briefing. If you configure a separate provider and request summary=true, the provider receives selected fields including names, due hints and clipped context. A remote provider therefore sees that input. Leave the optional provider off to use the rule-based result alone.
+
+#### Does a daily briefing send replies?
+Reading the overview does not send a WhatsApp message. Sending is a separate capability that starts disabled. A scheduled item in the overview refers to a send already scheduled in the bridge.
+#### Can a voice note contribute to a task?
+Yes. Once a voice note has a transcript, its text becomes available for task detection and search. Ask for transcription in the relevant chat before looking for spoken requests.
+
+## [Search WhatsApp messages with AI](https://tsahospital-beep.github.io/wa-mcp/search-whatsapp-messages-with-ai/)
+
+Ask a connected assistant to search WhatsApp with `list_messages`, using a word or phrase and an optional chat or date range. WA MCP searches stored message text, voice transcripts and extracted file text without case sensitivity. Each match can lead back to its surrounding conversation.
+
+### Turn a question into a search
+Suppose you remember an invoice but cannot remember who sent it. Ask the assistant to find messages containing “invoice” across chats for the week in question. Omit the chat argument for an account-wide lookup. If you know the sender, include that detail. A date can be supplied as a calendar date, ISO timestamp or Unix time.
+
+This is a text lookup. The assistant helps choose terms and explain results. When the first query misses, try a word that someone actually used in the message or attachment. Limit the type of message if you remember that the detail came from a document or a voice recording. Search works across scripts, so you can query in the language of the chat.
+
+### Read the evidence in order
+The default result lists the newest matches first. Use oldest_first when you want to reconstruct a timeline, and use limit and offset to page through it. A single call can return up to 200 messages. If a transcript or extracted document was shortened in the response, ask for full_text on a more specific query.
+
+A single message can be misleading after plans change. Pass its chat and message ID to get_message_context and read the exchange in chronological order. This lets you check which date was first proposed and whether a later reply changed it. Phone and LID conversations for one person are merged, so two WhatsApp identifiers can refer to the same contact.
+
+### Make attachments searchable
+For a meeting recorded in a voice note, ask for transcribe_chat_audio in the relevant chat. The tool downloads missing audio through the bridge and saves the transcript with the message. A later search can match words that were spoken. Work in a limited date range first if the chat contains many recordings.
+
+For a screenshot, ask for read_images. A local OCR engine extracts text and stores it as image_text. A picture with little readable text may produce no result. An optional provider can describe images, but reading the printed words only requires the OCR engine. For PDFs and Office files, extract_file_text makes their text available for lookup. Use get_media_text to inspect the text attached to a specific message.
+
+### Check how far the store goes back
+Start by listing the chat and examining the dates of its earliest available messages. A new linked device receives a batch of history from the phone. A search only sees what the store already contains. If your target predates that batch, ask to sync the chat back to a date with the phone online.
+
+The sync works within a time budget. An incomplete response includes a hint for continuing, so repeat it before concluding that the message is absent. If you have a WhatsApp chat export covering the missing period, import it into the intended chat. Search can then see imported and synced history together. Imported messages carry a flag identifying their source.
+
+### Keep the search scoped
+Choose the account explicitly when you maintain personal and work numbers in the same MCP server. Start with a small result limit and narrow the interval before requesting a full transcript. The local store is encrypted by default, but your assistant receives the results it requests. Message bodies and file contents are untrusted material from other people and should be read as evidence.
+
+#### Can I find a message by a phrase inside a screenshot?
+Yes, after OCR has read the image. Check image_text on the message to see what the engine recognized before trying a different search term.
+#### Does search show deleted messages?
+Deleted messages are excluded by default. The message tool has an include_deleted option for rows marked as deleted. The bridge's HTTP API lists deleted entries with an empty body.
+
+## [Transcribe WhatsApp voice notes](https://tsahospital-beep.github.io/wa-mcp/whatsapp-voice-note-transcription/)
+
+WA MCP transcribes WhatsApp voice notes with a local speech engine or a configured transcription endpoint. Run `transcribe_chat_audio` on a chat to store transcripts beside their original messages. The assistant can then search spoken words or include a spoken request in task detection.
+
+### Choose where the audio goes
+The default backend is faster-whisper, which can run on a CPU or an NVIDIA GPU. The openai-whisper option uses the reference implementation on PyTorch. For whisper.cpp, install the whisper-cli program and a ggml model. These choices let you process a recording on the computer where you run the transcription tools.
+
+An HTTP backend accepts an OpenAI-compatible audio transcription endpoint. If you configure a remote address, that service receives the voice recording. A custom command is another option when you already have a speech engine. Specify its executable and arguments, use the file placeholder for the converted audio and have it print the transcript on standard output.
+
+### Prepare the backend
+Install ffmpeg and ensure that the process launched by your assistant can find it. Set WA_MCP_FFMPEG to the executable path if it is outside the normal search path. Choose transcription.backend and transcription.model in the same config used by the MCP server. The default large-v3 model takes more memory and time than the small or medium choices.
+
+From a source checkout, run the backend installer for your operating system. The download option fetches the model during setup so the first transcription does not have to fetch it. The scripts use uv sync with the inexact option to keep other installed extras. Use the same option when updating that environment to preserve the speech packages.
+
+
+```
+scripts/install_whisper.sh --backend faster-whisper --model large-v3 --download
+```
+
+On Windows, use the PowerShell installer from the repository root. It accepts the backend and model as named parameters. After installation, start the client with the same project environment so the transcription tool can find both the backend and ffmpeg.
+
+
+```
+scripts\install_whisper.ps1 -Backend faster-whisper -Model large-v3 -Download
+```
+
+Ask for bridge_status and inspect transcription_backend, transcription_ready and transcription_hint. Read the hint before testing a long recording. It can distinguish a missing program or package from a problem retrieving the voice note itself. When using a source environment with optional packages, make sure the client launches the server from that environment.
+
+### Transcribe one conversation
+Start with one chat and a small limit. By default the tool covers the most recent 14 days. It downloads missing attachments through the bridge, converts the audio to 16 kHz mono WAV and divides longer recordings at quiet points. The selected backend transcribes each part and the tool joins the text in message order.
+
+The tool stores the text, detected language and confidence with the original message. A configured language overrides detection. Otherwise the first chunk supplies the detected language. For a short or uncertain clip, earlier confident transcripts in the same conversation can supply a more likely language. This helps explain why a brief reply can inherit the chat's usual language.
+
+### Continue a long archive
+Use full_archive to include older stored recordings and limit to bound the number handled per call. The time budget defaults to 120 seconds and allows up to 600. An incomplete result reports remaining clips. Repeat the call with force disabled so completed transcripts are skipped. Reserve force for recordings you intend to process again.
+
+If a file has expired on WhatsApp's servers, the bridge can ask the phone to upload it again. The phone must be online and still have the file. A backend that is ready cannot transcribe audio that is unavailable. Check an individual recording before repeating an archive-wide request that keeps missing the same clips.
+
+#### How do I read the transcript afterward?
+Ask for the original message with list_messages. Its transcript is shown inline. You can also search for a phrase you heard or inspect the conversation around the matching voice message.
+#### Is the transcript protected at rest?
+With default encryption, the transcript field is encrypted in the message database. Downloaded audio has separate filesystem protection needs. The assistant receives transcript text when it requests the message.
+
+## [Import a WhatsApp chat export](https://tsahospital-beep.github.io/wa-mcp/whatsapp-chat-export-import/)
+
+Import a WhatsApp Export chat file into WA MCP to search older conversations alongside synced messages. The bridge accepts a text file or a ZIP with media and can preview the result before changing the store. Importing is local and sends nothing to the chat.
+
+### Export a single conversation
+On Android, open the conversation and choose More and then Export chat from its menu. On iPhone, tap the chat name at the top and select Export chat. Choose whether to include media and transfer the file to the computer that holds the bridge. An export with media can cover a shorter stretch of history, so check its earliest date.
+
+A plain text file contains the conversation lines. A ZIP can supply the attachment files as well as their captions. The importer recognizes the Android and iPhone layouts, multiline messages and several clock formats. System notices and media placeholders are counted separately from ordinary messages. Replies, edits, deletions and reactions are absent from the export format.
+
+### Preview the destination and senders
+Choose the chat by phone number with country code, WhatsApp ID or an exact stored title. When a title matches several chats, use the ID from the candidate list. For a person with both phone and LID entries, choose the chat that list_chats shows with messages. Duplicate checking compares with the specific destination you chose.
+
+Pass your own sender name exactly as it appears in the file through the me option. The reader can infer some direct-chat identities, but a group export can have names with no unique match in your address book. Map a sender explicitly when necessary. Inspect the proposed identities in the dry run before relying on outgoing and incoming labels.
+
+### Check dates before writing
+An export has no time zone. Give the zone where it was created, especially if your server is somewhere else. A date such as 04/05 can mean April 5 or May 4. The reader considers the fields and order of the messages, and reports how it selected the date order. If it could only assume an order, set dmy, mdy or ymd explicitly.
+
+A dry run reports the time range, proposed message count, duplicates, missing media and warnings. Compare the first and last times to what you see on the phone. Check skipped lines and sender mappings as well as the total. Keep the same time zone for subsequent imports because a different offset changes the generated message IDs.
+
+### Run the import
+With the bridge running, ask the assistant to use import_chat_export on a file in the configured downloads or exports directory, or another allowed directory. Use dry_run first, then repeat with the same arguments and dry_run disabled. The HTTP API also accepts a form upload. For the command line importer, stop the bridge before opening the store directly.
+
+
+```
+wa-bridge import-export --file "chat.zip" --chat 15550100002 --dry-run
+```
+
+Messages receive stable IDs derived from their contents and source information. A repeat of the same file skips records already imported. The reader also checks for a matching synced message near the same time. If you first imported text and later supply a ZIP, a placeholder can acquire its file without adding another copy of the message.
+
+### Find the imported history
+For an output file you can read outside WhatsApp, use export_chat to write a Markdown transcript. It can include the time, sender, replies, transcripts and media paths. That output serves a different purpose from the phone's TXT or ZIP input. The tool reports a message count and a path in the exports directory.
+
+Search the destination chat for a phrase from the old conversation and ask for the messages around it. The result carries imported: true. Imported messages are marked read and are visible to search and analytics. The original export remains a separate file outside database field encryption, so keep it in a private location.
+
+#### Will old requests appear in today's task list?
+By default the task tracker, task detection and my_day skip imported messages. Enable tasks.include_imported when you intend old exports to contribute to those results.
+#### Does an import notify anyone?
+No. The import updates your local store. It emits no webhook event and does not deliver a message or attachment to anyone in the original conversation.
+
+## [A self-hosted WhatsApp API](https://tsahospital-beep.github.io/wa-mcp/self-hosted-whatsapp-api/)
+
+WA MCP provides a self-hosted WhatsApp REST API through its Go bridge. Link a phone, then send authenticated requests to the local /api/v1 endpoints to read messages, retrieve media or manage scheduled sends. The bridge publishes an OpenAPI 3.1 description for clients in any language.
+
+### Make the first read
+Start the linked bridge and check its health endpoint on loopback. This endpoint is at the root and can report whether the service is running even during login preview. For account details, request the status endpoint inside the versioned API. Read its connected and logged_in fields separately from the overall health result.
+
+Retrieve the API token as the same operating system user that runs the bridge. The api-token command prints the current value for a script. Send it in the Authorization header with the Bearer scheme for versioned API requests. In the default keystore mode the bridge protects the generated token with the user's operating system credentials.
+
+
+```
+TOKEN=$(./wa-bridge api-token)
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://127.0.0.1:8080/api/v1/messages?query=invoice&limit=5"
+```
+
+### Query the message store
+The example searches for the term invoice and limits the number of results. Use the API reference for the parameters of each endpoint, or request /api/v1/openapi.yaml from the bridge. Times in responses are Unix seconds. Requests accept Unix timestamps, RFC 3339 timestamps or a calendar date interpreted in local time.
+
+A chat address can be a WhatsApp ID or a phone number with its country code. Keep that identifier with a result when your application needs to retrieve media or inspect the same conversation later. Remember that a chat ID can contain a phone number. Even a log that omits message content may disclose contact information if you include request details.
+
+### Understand responses and permissions
+Versioned API responses are JSON objects with an ok field. An error response also includes an explanation. A 401 points to the token. A 403 can mean a Host mismatch, a disabled capability or an operation refused by a path or quiet-hours rule. Read the response before asking the user to link the phone again.
+
+A 503 can indicate a bridge that has not logged in or has lost its connection. A 429 indicates a sending limit. Message sends, read receipts and imports have different settings and inputs. For instance, ordinary JSON requests have a 256 KiB body limit, while the import endpoint accepts a form upload under the configured import size limit.
+
+### Receive changes with webhooks
+If you need to react to a new message, configure a webhook URL. The bridge publishes events for messages, receipts, calls, connections, schedules and security changes. Each destination has its own delivery queue. Failed deliveries are retried, so a receiver should expect to see a delivery ID more than once.
+
+When a webhook secret is set, verify the HMAC signature over the timestamp, delivery ID and raw request body. Keep the raw bytes for verification, check the timestamp for freshness and process each verified delivery ID once. A receiver that schedules a follow-up action benefits from this distinction between a new event and a retry of an earlier one.
+
+### Choose the right interface for an application
+A Python application can use the wa_mcp SDK for bridge access, local database reads, exports and transcription. A Go application can embed the bridge with wabridge when it needs hooks for stored messages or extra HTTP routes. An assistant that already speaks MCP can instead use the Python server with its documented tool arguments.
+
+Remote MCP and the bridge API have different callers and credentials. The bridge API defaults to loopback. In the documented Docker deployment it stays inside the bridge network namespace, while remote assistants connect to the authenticated /mcp endpoint through an HTTPS proxy. Use the deployment instructions when moving a local integration to a server.
+
+#### Is this the official WhatsApp Business API?
+WA MCP is independent and uses the unofficial companion-device protocol. WhatsApp can limit or block a linked account. Sending limits and quiet hours cannot guarantee the account's safety.
+#### Must an assistant stay open for scheduled sends?
+No. The bridge handles scheduled messages and can deliver them while the assistant is closed. Keep the bridge running and connected for delivery.
+
+## [WhatsApp MCP security and privacy](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-security/)
+
+WA MCP encrypts message text at rest by default, binds its bridge API and login to loopback, and starts with sending disabled. The assistant you connect receives the results of its tool calls. Protect the linked-device session, downloads and exports separately from encrypted database fields.
+
+### Know what a copy reveals
+The message database protects fields including message text, transcripts, reactions, attachment names and media keys. The default store key belongs to the operating system user running the bridge. A copy of protected fields requires access to that key. Chat identifiers, titles and timestamps remain readable, and a WhatsApp ID can include a phone number.
+
+The linked-device database contains the keys used to connect to WhatsApp. Field encryption of messages does not cover that database. On Windows the bridge enables EFS for the store folder by default. On macOS and Linux, use full disk encryption for the session file. Media files, Markdown exports and original chat exports also need private storage and backup handling.
+
+### Choose how to hold the key
+On Windows the default mode wraps the store key with DPAPI. On macOS the key lives in the login Keychain. Linux uses Secret Service through secret-tool. Run the Python server as the same user so it can read protected fields. The bridge also keeps its generated API token in the keystore under this configuration.
+
+A headless machine may lack a desktop keystore. Use the documented keyfile mode with a restricted key file, or supply a passphrase. The container configuration uses a Docker secret for its key. Protect a separate backup of the key because the encrypted data needs it for recovery. An already encrypted store records what kind of key it expects.
+
+### Review what leaves your machine
+A search can run against a local database while its results go to a hosted assistant. Choose a client whose handling of message content suits the account. Voice notes sent to a remote transcription endpoint leave the machine as audio. An optional remote vision provider receives the images you ask it to describe. Local OCR works without requesting a description.
+
+The same distinction applies to daily summaries. The task detector uses rules locally. If you enable a provider and ask for a summary, it receives selected names, due hints and short context lines. Text recovered from a file, spoken in a recording or written in a chat is untrusted input. The server tells the client to treat it as content from other people.
+
+### Check outbound permissions
+You can search and review history with sending switched off. If sending is enabled, a client that supports MCP elicitation asks for approval of the recipient and content. A client without that ability needs a separate setting to accept confirm=true. The model can supply this flag itself, so it provides a weaker approval check.
+
+Quiet hours, limits and duplicate protection also apply to sends. By default attachment sending is restricted to the downloads and exports directories. The bridge denies sending the store and configuration files. These controls help limit what an enabled send tool can do. They do not remove the account risk of using the unofficial WhatsApp Web protocol.
+
+### Inspect a session warning
+Ask for bridge_status and review its protection details and recent security events. The status endpoint retains the latest 20 session events, including a remote logout, another client using the session and changes to linked devices. A security webhook can deliver those events to a configured receiver. Review an unfamiliar linked device on your phone under Linked devices.
+
+#### How should I expose MCP to another device?
+Use the documented remote mode with an HTTPS proxy and trusted proxy configuration. Give each device its own revocable token or use the supported OAuth flow with owner approval.
+#### Can encryption protect a downloaded export?
+Database field encryption applies to the stored message fields. A file written into the exports directory needs filesystem protection of its own. Include that directory when deciding how to protect backups.
+
+## [Run WhatsApp MCP in Docker](https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-docker/)
+
+WA MCP can run its linked WhatsApp bridge and MCP server in Docker Compose, with Caddy providing HTTPS for remote clients. The bridge keeps the device connection on the host while the server handles authenticated MCP requests. A preview override lets you test the stack without linking WhatsApp.
+
+### Map the services and volumes
+The bridge owns the WhatsApp connection and serves its API on loopback inside its network namespace. The server shares that namespace, so it can reach the API without publishing the bridge port. Caddy forwards the public login path to the bridge and other requests to the MCP service. Only ports 80 and 443 need to be publicly reachable for the documented HTTPS setup.
+
+Both application containers run as user 65532 with read-only root filesystems and no capabilities. They share the wa-data volume for the message database, downloads and exports. Only the bridge mounts wa-session, which holds the linked-device session keys. The database encryption key is supplied separately through a Docker secret. Those three pieces have different roles when backing up or restoring.
+
+### Prepare a host and database key
+Use a Linux host with Docker Engine and the Compose plugin. Point the DNS record for your domain or subdomain at that host. In the repository's deploy/docker directory, copy env.example to .env, restrict the permissions and set WA_MCP_DOMAIN. Set TZ to the intended time zone because quiet hours, schedules and the daily briefing use it.
+
+Run the provided secrets/make-key.sh script to create the 32-byte key. It sets the owner and permissions needed by the containers and may request sudo to change ownership. Keep a protected copy of the key away from the server. Losing it means losing access to encrypted message fields, even if the data volume itself survives.
+
+### Start the stack and verify health
+From the deployment directory, start Compose with the caddy profile. Wait for the bridge and server to report healthy in compose ps and for the proxy to obtain its certificate. Check the root health URL for your domain before moving on to login. The server health check also checks the bridge.
+
+
+```
+docker compose --profile caddy up -d --build
+docker compose ps
+```
+
+For a test that requires no WhatsApp account, use the documented preview override. It starts the bridge with fake codes and lets you exercise the services without a real login. A healthy preview confirms the services can start and communicate. For a real account, continue with the normal configuration and verify that the bridge is both connected and logged in.
+
+### Pair the device and authorize a client
+Run docker compose exec bridge wa-bridge login-url to get a one-time HTTPS link. Open it and scan the QR code from Linked devices on your phone. If you need to revisit the login window, generate a fresh link. Keep the address private because it grants access to the login page.
+
+For a client using a static token, create a token in the server container and give it a device-specific name. The value is shown once. Configure the client with the public HTTPS /mcp address and its bearer credential. A claude.ai connector can use OAuth with owner approval. The consent link for the documented configuration is available through the server logs.
+
+### Plan a restorable backup
+Stop the stack before copying the shared data volume. Back up the session volume if you want to preserve the existing phone link, and encrypt that archive because it contains device keys. Store the database key separately from the data backup. Without the session volume you need to pair the phone again. Without the encryption key a new pairing will not decrypt the old message fields.
+
+#### Do I need a desktop keystore in Docker?
+No. The supplied container configuration uses keyfile mode with a Docker secret. A passphrase is another documented option. Both application processes need access to the key material for their own roles.
+#### How do I customize the container configuration?
+Copy the supplied container configuration to the documented local config.json, edit the copy and mount it read-only in both services. Preserve the paths under /data and the documented listening addresses so the services can still communicate.

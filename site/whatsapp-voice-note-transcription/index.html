@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Transcribe WhatsApp voice notes | WA MCP</title>
+    <meta
+      name="description"
+      content="Choose a local speech backend or HTTP endpoint, transcribe a WhatsApp chat and find spoken words in the message store."
+    />
+    <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/whatsapp-voice-note-transcription/" />
+    <link rel="describedby" href="../llms.txt" type="text/plain" />
+    <link rel="icon" href="../assets/brand/logo.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="WA MCP" />
+    <meta property="og:title" content="Transcribe WhatsApp voice notes | WA MCP" />
+    <meta
+      property="og:description"
+      content="Choose a local speech backend or HTTP endpoint, transcribe a WhatsApp chat and find spoken words in the message store."
+    />
+    <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/whatsapp-voice-note-transcription/" />
+    <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Transcribe WhatsApp voice notes | WA MCP" />
+    <meta
+      name="twitter:description"
+      content="Choose a local speech backend or HTTP endpoint, transcribe a WhatsApp chat and find spoken words in the message store."
+    />
+    <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <script>
+      try {
+        const t = localStorage.getItem("wa-theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="../style.css" />
+    <script defer src="../site.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "WA MCP",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Transcribe WhatsApp voice notes",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-voice-note-transcription/"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "How do I read the transcript afterward?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Ask for the original message with list_messages. Its transcript is shown inline. You can also search for a phrase you heard or inspect the conversation around the matching voice message."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is the transcript protected at rest?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "With default encryption, the transcript field is encrypted in the message database. Downloaded audio has separate filesystem protection needs. The assistant receives transcript text when it requests the message."
+                }
+              }
+            ]
+          },
+          {
+            "@type": "HowTo",
+            "name": "Transcribe WhatsApp voice notes",
+            "description": "WA MCP transcribes WhatsApp voice notes with a local speech engine or a configured transcription endpoint. Run transcribe_chat_audio on a chat to store transcripts beside their original messages. The assistant can then search spoken words or include a spoken request in task detection.",
+            "step": [
+              {
+                "@type": "HowToStep",
+                "name": "Choose where the audio goes",
+                "text": "The default backend is faster-whisper, which can run on a CPU or an NVIDIA GPU. The openai-whisper option uses the reference implementation on PyTorch. For whisper.cpp, install the whisper-cli program and a ggml model. These choices let you process a recording on the computer where you run the transcription tools. An HTTP backend accepts an OpenAI-compatible audio transcription endpoint. If you configure a remote address, that service receives the voice recording. A custom command is another option when you already have a speech engine. Specify its executable and arguments, use the file placeholder for the converted audio and have it print the transcript on standard output.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-voice-note-transcription/#section-1"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Prepare the backend",
+                "text": "Install ffmpeg and ensure that the process launched by your assistant can find it. Set WA_MCP_FFMPEG to the executable path if it is outside the normal search path. Choose transcription.backend and transcription.model in the same config used by the MCP server. The default large-v3 model takes more memory and time than the small or medium choices. From a source checkout, run the backend installer for your operating system. The download option fetches the model during setup so the first transcription does not have to fetch it. The scripts use uv sync with the inexact option to keep other installed extras. Use the same option when updating that environment to preserve the speech packages. scripts/install_whisper.sh --backend faster-whisper --model large-v3 --download On Windows, use the PowerShell installer from the repository root. It accepts the backend and model as named parameters. After installation, start the client with the same project environment so the transcription tool can find both the backend and ffmpeg. scripts\\install_whisper.ps1 -Backend faster-whisper -Model large-v3 -Download Ask for bridge_status and inspect transcription_backend, transcription_ready and transcription_hint. Read the hint before testing a long recording. It can distinguish a missing program or package from a problem retrieving the voice note itself. When using a source environment with optional packages, make sure the client launches the server from that environment.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-voice-note-transcription/#section-2"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Transcribe one conversation",
+                "text": "Start with one chat and a small limit. By default the tool covers the most recent 14 days. It downloads missing attachments through the bridge, converts the audio to 16 kHz mono WAV and divides longer recordings at quiet points. The selected backend transcribes each part and the tool joins the text in message order. The tool stores the text, detected language and confidence with the original message. A configured language overrides detection. Otherwise the first chunk supplies the detected language. For a short or uncertain clip, earlier confident transcripts in the same conversation can supply a more likely language. This helps explain why a brief reply can inherit the chat's usual language.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-voice-note-transcription/#section-3"
+              },
+              {
+                "@type": "HowToStep",
+                "name": "Continue a long archive",
+                "text": "Use full_archive to include older stored recordings and limit to bound the number handled per call. The time budget defaults to 120 seconds and allows up to 600. An incomplete result reports remaining clips. Repeat the call with force disabled so completed transcripts are skipped. Reserve force for recordings you intend to process again. If a file has expired on WhatsApp's servers, the bridge can ask the phone to upload it again. The phone must be online and still have the file. A backend that is ready cannot transcribe audio that is unavailable. Check an individual recording before repeating an archive-wide request that keeps missing the same clips.",
+                "url": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-voice-note-transcription/#section-4"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="container bar">
+        <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+        <button class="menu-button tool" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">
+          <svg
+            class="ui menu"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M3 7h18M3 16h18" />
+          </svg>
+        </button>
+        <div id="navigation" class="navigation">
+          <nav aria-label="Primary">
+            <a href="../#features">Features</a><a href="../#install">Install</a><a href="../#guides">Guides</a
+            ><a href="../whatsapp-mcp-security/">Security</a>
+          </nav>
+          <div class="actions">
+            <a
+              class="button star-button"
+              href="https://github.com/tsahospital-beep/wa-mcp"
+              title="Open the repository to star WA MCP"
+              ><svg
+                class="ui star"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
+              >Star on GitHub <span class="star-count" hidden></span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg
+            ></a>
+          </div>
+        </div>
+        <button class="theme tool" aria-label="Switch color mode">
+          <svg
+            class="ui sun"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path
+              d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2 M16 12a4 4 0 1 0-8 0 4 4 0 1 0 8 0"
+            /></svg
+          ><svg
+            class="ui moon"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+    <main id="main">
+      <div class="container">
+        <nav aria-label="Breadcrumb" class="crumbs">
+          <a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / Chats and media
+        </nav>
+        <div class="guide-hero">
+          <div>
+            <div class="kicker">Chats and media guide</div>
+            <h1>Transcribe WhatsApp voice notes</h1>
+            <p class="lead">
+              WA MCP transcribes WhatsApp voice notes with a local speech engine or a configured transcription endpoint.
+              Run <code>transcribe_chat_audio</code> on a chat to store transcripts beside their original messages. The
+              assistant can then search spoken words or include a spoken request in task detection.
+            </p>
+            <div class="byline">v0.1.0 <span>·</span> Updated <time datetime="2026-11-23">23 November 2026</time></div>
+          </div>
+          <div class="plate guide-plate" aria-hidden="true">
+            <div class="plate-inner">
+              <svg class="dot-art" aria-hidden="true" viewBox="0 0 180 140">
+                <defs>
+                  <pattern id="p-voice-transcription" width="3.6" height="3.6" patternUnits="userSpaceOnUse">
+                    <circle cx="1.8" cy="1.8" r="1.35" fill="white" />
+                  </pattern>
+                  <mask id="m-voice-transcription">
+                    <path
+                      d="M2.5 10v4 M7 4v16 M11.5 7v10 M16 8h5.5 M16 13h4"
+                      transform="translate(31 13) scale(4.9)"
+                      fill="none"
+                      stroke="white"
+                      stroke-width="2.35"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </mask>
+                </defs>
+                <g mask="url(#m-voice-transcription)">
+                  <rect width="180" height="140" fill="url(#p-voice-transcription)" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="reading">
+          <aside>
+            <strong>On this page</strong>
+            <nav aria-label="On this page">
+              <a href="#section-1">Choose where the audio goes</a><a href="#section-2">Prepare the backend</a
+              ><a href="#section-3">Transcribe one conversation</a><a href="#section-4">Continue a long archive</a
+              ><a href="#faq">Questions</a>
+            </nav>
+          </aside>
+          <article>
+            <section id="section-1">
+              <h2>Choose where the audio goes</h2>
+              <p>
+                The default backend is faster-whisper, which can run on a CPU or an NVIDIA GPU. The openai-whisper
+                option uses the reference implementation on PyTorch. For whisper.cpp, install the whisper-cli program
+                and a ggml model. These choices let you process a recording on the computer where you run the
+                transcription tools.
+              </p>
+              <p>
+                An HTTP backend accepts an OpenAI-compatible audio transcription endpoint. If you configure a remote
+                address, that service receives the voice recording. A custom command is another option when you already
+                have a speech engine. Specify its executable and arguments, use the file placeholder for the converted
+                audio and have it print the transcript on standard output.
+              </p>
+            </section>
+            <section id="section-2">
+              <h2>Prepare the backend</h2>
+              <p>
+                Install ffmpeg and ensure that the process launched by your assistant can find it. Set WA_MCP_FFMPEG to
+                the executable path if it is outside the normal search path. Choose transcription.backend and
+                transcription.model in the same config used by the MCP server. The default large-v3 model takes more
+                memory and time than the small or medium choices.
+              </p>
+              <p>
+                From a source checkout, run the backend installer for your operating system. The download option fetches
+                the model during setup so the first transcription does not have to fetch it. The scripts use uv sync
+                with the inexact option to keep other installed extras. Use the same option when updating that
+                environment to preserve the speech packages.
+              </p>
+              <pre><code>scripts/install_whisper.sh --backend faster-whisper --model large-v3 --download</code></pre>
+              <p>
+                On Windows, use the PowerShell installer from the repository root. It accepts the backend and model as
+                named parameters. After installation, start the client with the same project environment so the
+                transcription tool can find both the backend and ffmpeg.
+              </p>
+              <pre><code>scripts\install_whisper.ps1 -Backend faster-whisper -Model large-v3 -Download</code></pre>
+              <p>
+                Ask for bridge_status and inspect transcription_backend, transcription_ready and transcription_hint.
+                Read the hint before testing a long recording. It can distinguish a missing program or package from a
+                problem retrieving the voice note itself. When using a source environment with optional packages, make
+                sure the client launches the server from that environment.
+              </p>
+            </section>
+            <section id="section-3">
+              <h2>Transcribe one conversation</h2>
+              <p>
+                Start with one chat and a small limit. By default the tool covers the most recent 14 days. It downloads
+                missing attachments through the bridge, converts the audio to 16 kHz mono WAV and divides longer
+                recordings at quiet points. The selected backend transcribes each part and the tool joins the text in
+                message order.
+              </p>
+              <p>
+                The tool stores the text, detected language and confidence with the original message. A configured
+                language overrides detection. Otherwise the first chunk supplies the detected language. For a short or
+                uncertain clip, earlier confident transcripts in the same conversation can supply a more likely
+                language. This helps explain why a brief reply can inherit the chat&#x27;s usual language.
+              </p>
+            </section>
+            <section id="section-4">
+              <h2>Continue a long archive</h2>
+              <p>
+                Use full_archive to include older stored recordings and limit to bound the number handled per call. The
+                time budget defaults to 120 seconds and allows up to 600. An incomplete result reports remaining clips.
+                Repeat the call with force disabled so completed transcripts are skipped. Reserve force for recordings
+                you intend to process again.
+              </p>
+              <p>
+                If a file has expired on WhatsApp&#x27;s servers, the bridge can ask the phone to upload it again. The
+                phone must be online and still have the file. A backend that is ready cannot transcribe audio that is
+                unavailable. Check an individual recording before repeating an archive-wide request that keeps missing
+                the same clips.
+              </p>
+            </section>
+            <section id="faq">
+              <h2>Questions</h2>
+              <details>
+                <summary>
+                  How do I read the transcript afterward?<svg
+                    class="ui down"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                  >
+                    <path d="m5 9 7 7 7-7" />
+                  </svg>
+                </summary>
+                <p>
+                  Ask for the original message with list_messages. Its transcript is shown inline. You can also search
+                  for a phrase you heard or inspect the conversation around the matching voice message.
+                </p>
+              </details>
+              <details>
+                <summary>
+                  Is the transcript protected at rest?<svg
+                    class="ui down"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                  >
+                    <path d="m5 9 7 7 7-7" />
+                  </svg>
+                </summary>
+                <p>
+                  With default encryption, the transcript field is encrypted in the message database. Downloaded audio
+                  has separate filesystem protection needs. The assistant receives transcript text when it requests the
+                  message.
+                </p>
+              </details>
+            </section>
+            <p class="source">
+              Project documentation ·
+              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/guides/transcription.md"
+                >transcription.md
+                <svg
+                  class="ui out"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M6 18 18 6M6 6h12v12" /></svg
+              ></a>
+            </p>
+          </article>
+        </div>
+      </div>
+      <section class="related">
+        <div class="container">
+          <h2>Related guides</h2>
+          <div class="related-grid">
+            <a class="row-link" href="../search-whatsapp-messages-with-ai/"
+              ><span>Search WhatsApp messages with AI</span
+              ><svg
+                class="ui arrow"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+            ><a class="row-link" href="../whatsapp-ai-assistant/"
+              ><span>A WhatsApp assistant for your day</span
+              ><svg
+                class="ui arrow"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+            ><a class="row-link" href="../whatsapp-mcp-security/"
+              ><span>WhatsApp MCP security and privacy</span
+              ><svg
+                class="ui arrow"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+            ></a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="container">
+        <div class="foot-top">
+          <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+          <nav aria-label="Footer">
+            <a href="../#guides">Guides</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg></a
+            ><a href="../llms.txt">llms.txt</a>
+          </nav>
+        </div>
+        <div class="foot-note">
+          <p>
+            <strong>Account risk.</strong> WA MCP uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or
+            ban a linked account, even with sending limits in place.
+          </p>
+          <span>Updated <time datetime="2026-11-23">23 Nov 2026</time></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

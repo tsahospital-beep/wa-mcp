@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>A self-hosted WhatsApp API | WA MCP</title>
+    <meta
+      name="description"
+      content="Read WhatsApp through a token-authenticated local REST API, handle status responses and receive signed webhook events."
+    />
+    <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/self-hosted-whatsapp-api/" />
+    <link rel="describedby" href="../llms.txt" type="text/plain" />
+    <link rel="icon" href="../assets/brand/logo.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="WA MCP" />
+    <meta property="og:title" content="A self-hosted WhatsApp API | WA MCP" />
+    <meta
+      property="og:description"
+      content="Read WhatsApp through a token-authenticated local REST API, handle status responses and receive signed webhook events."
+    />
+    <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/self-hosted-whatsapp-api/" />
+    <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="A self-hosted WhatsApp API | WA MCP" />
+    <meta
+      name="twitter:description"
+      content="Read WhatsApp through a token-authenticated local REST API, handle status responses and receive signed webhook events."
+    />
+    <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <script>
+      try {
+        const t = localStorage.getItem("wa-theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="../style.css" />
+    <script defer src="../site.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "WA MCP",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "A self-hosted WhatsApp API",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/self-hosted-whatsapp-api/"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is this the official WhatsApp Business API?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "WA MCP is independent and uses the unofficial companion-device protocol. WhatsApp can limit or block a linked account. Sending limits and quiet hours cannot guarantee the account's safety."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Must an assistant stay open for scheduled sends?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. The bridge handles scheduled messages and can deliver them while the assistant is closed. Keep the bridge running and connected for delivery."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="container bar">
+        <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+        <button class="menu-button tool" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">
+          <svg
+            class="ui menu"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M3 7h18M3 16h18" />
+          </svg>
+        </button>
+        <div id="navigation" class="navigation">
+          <nav aria-label="Primary">
+            <a href="../#features">Features</a><a href="../#install">Install</a><a href="../#guides">Guides</a
+            ><a href="../whatsapp-mcp-security/">Security</a>
+          </nav>
+          <div class="actions">
+            <a
+              class="button star-button"
+              href="https://github.com/tsahospital-beep/wa-mcp"
+              title="Open the repository to star WA MCP"
+              ><svg
+                class="ui star"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
+              >Star on GitHub <span class="star-count" hidden></span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg
+            ></a>
+          </div>
+        </div>
+        <button class="theme tool" aria-label="Switch color mode">
+          <svg
+            class="ui sun"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path
+              d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2 M16 12a4 4 0 1 0-8 0 4 4 0 1 0 8 0"
+            /></svg
+          ><svg
+            class="ui moon"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+    <main id="main">
+      <div class="container">
+        <nav aria-label="Breadcrumb" class="crumbs">
+          <a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / Development
+        </nav>
+        <div class="guide-hero">
+          <div>
+            <div class="kicker">Development guide</div>
+            <h1>A self-hosted WhatsApp API</h1>
+            <p class="lead">
+              WA MCP provides a self-hosted WhatsApp REST API through its Go bridge. Link a phone, then send
+              authenticated requests to the local /api/v1 endpoints to read messages, retrieve media or manage scheduled
+              sends. The bridge publishes an OpenAPI 3.1 description for clients in any language.
+            </p>
+            <div class="byline">v0.1.0 <span>·</span> Updated <time datetime="2026-11-23">23 November 2026</time></div>
+          </div>
+          <div class="plate guide-plate" aria-hidden="true">
+            <div class="plate-inner">
+              <svg class="dot-art" aria-hidden="true" viewBox="0 0 180 140">
+                <defs>
+                  <pattern id="p-webhooks-and-python-sdk" width="3.6" height="3.6" patternUnits="userSpaceOnUse">
+                    <circle cx="1.8" cy="1.8" r="1.35" fill="white" />
+                  </pattern>
+                  <mask id="m-webhooks-and-python-sdk">
+                    <path
+                      d="M7 8l-5 4 5 4 M17 8l5 4-5 4 M14 3.5v10q0 5.5-4.5 7"
+                      transform="translate(31 13) scale(4.9)"
+                      fill="none"
+                      stroke="white"
+                      stroke-width="2.35"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </mask>
+                </defs>
+                <g mask="url(#m-webhooks-and-python-sdk)">
+                  <rect width="180" height="140" fill="url(#p-webhooks-and-python-sdk)" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="reading">
+          <aside>
+            <strong>On this page</strong>
+            <nav aria-label="On this page">
+              <a href="#section-1">Make the first read</a><a href="#section-2">Query the message store</a
+              ><a href="#section-3">Understand responses and permissions</a
+              ><a href="#section-4">Receive changes with webhooks</a
+              ><a href="#section-5">Choose the right interface for an application</a><a href="#faq">Questions</a>
+            </nav>
+          </aside>
+          <article>
+            <section id="section-1">
+              <h2>Make the first read</h2>
+              <p>
+                Start the linked bridge and check its health endpoint on loopback. This endpoint is at the root and can
+                report whether the service is running even during login preview. For account details, request the status
+                endpoint inside the versioned API. Read its connected and logged_in fields separately from the overall
+                health result.
+              </p>
+              <p>
+                Retrieve the API token as the same operating system user that runs the bridge. The api-token command
+                prints the current value for a script. Send it in the Authorization header with the Bearer scheme for
+                versioned API requests. In the default keystore mode the bridge protects the generated token with the
+                user&#x27;s operating system credentials.
+              </p>
+              <pre><code>TOKEN=$(./wa-bridge api-token)
+curl -H &quot;Authorization: Bearer $TOKEN&quot; \
+  &quot;http://127.0.0.1:8080/api/v1/messages?query=invoice&amp;limit=5&quot;</code></pre>
+            </section>
+            <section id="section-2">
+              <h2>Query the message store</h2>
+              <p>
+                The example searches for the term invoice and limits the number of results. Use the API reference for
+                the parameters of each endpoint, or request /api/v1/openapi.yaml from the bridge. Times in responses are
+                Unix seconds. Requests accept Unix timestamps, RFC 3339 timestamps or a calendar date interpreted in
+                local time.
+              </p>
+              <p>
+                A chat address can be a WhatsApp ID or a phone number with its country code. Keep that identifier with a
+                result when your application needs to retrieve media or inspect the same conversation later. Remember
+                that a chat ID can contain a phone number. Even a log that omits message content may disclose contact
+                information if you include request details.
+              </p>
+            </section>
+            <section id="section-3">
+              <h2>Understand responses and permissions</h2>
+              <p>
+                Versioned API responses are JSON objects with an ok field. An error response also includes an
+                explanation. A 401 points to the token. A 403 can mean a Host mismatch, a disabled capability or an
+                operation refused by a path or quiet-hours rule. Read the response before asking the user to link the
+                phone again.
+              </p>
+              <p>
+                A 503 can indicate a bridge that has not logged in or has lost its connection. A 429 indicates a sending
+                limit. Message sends, read receipts and imports have different settings and inputs. For instance,
+                ordinary JSON requests have a 256 KiB body limit, while the import endpoint accepts a form upload under
+                the configured import size limit.
+              </p>
+            </section>
+            <section id="section-4">
+              <h2>Receive changes with webhooks</h2>
+              <p>
+                If you need to react to a new message, configure a webhook URL. The bridge publishes events for
+                messages, receipts, calls, connections, schedules and security changes. Each destination has its own
+                delivery queue. Failed deliveries are retried, so a receiver should expect to see a delivery ID more
+                than once.
+              </p>
+              <p>
+                When a webhook secret is set, verify the HMAC signature over the timestamp, delivery ID and raw request
+                body. Keep the raw bytes for verification, check the timestamp for freshness and process each verified
+                delivery ID once. A receiver that schedules a follow-up action benefits from this distinction between a
+                new event and a retry of an earlier one.
+              </p>
+            </section>
+            <section id="section-5">
+              <h2>Choose the right interface for an application</h2>
+              <p>
+                A Python application can use the wa_mcp SDK for bridge access, local database reads, exports and
+                transcription. A Go application can embed the bridge with wabridge when it needs hooks for stored
+                messages or extra HTTP routes. An assistant that already speaks MCP can instead use the Python server
+                with its documented tool arguments.
+              </p>
+              <p>
+                Remote MCP and the bridge API have different callers and credentials. The bridge API defaults to
+                loopback. In the documented Docker deployment it stays inside the bridge network namespace, while remote
+                assistants connect to the authenticated /mcp endpoint through an HTTPS proxy. Use the deployment
+                instructions when moving a local integration to a server.
+              </p>
+            </section>
+            <section id="faq">
+              <h2>Questions</h2>
+              <details>
+                <summary>
+                  Is this the official WhatsApp Business API?<svg
+                    class="ui down"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                  >
+                    <path d="m5 9 7 7 7-7" />
+                  </svg>
+                </summary>
+                <p>
+                  WA MCP is independent and uses the unofficial companion-device protocol. WhatsApp can limit or block a
+                  linked account. Sending limits and quiet hours cannot guarantee the account&#x27;s safety.
+                </p>
+              </details>
+              <details>
+                <summary>
+                  Must an assistant stay open for scheduled sends?<svg
+                    class="ui down"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                  >
+                    <path d="m5 9 7 7 7-7" />
+                  </svg>
+                </summary>
+                <p>
+                  No. The bridge handles scheduled messages and can deliver them while the assistant is closed. Keep the
+                  bridge running and connected for delivery.
+                </p>
+              </details>
+            </section>
+            <p class="source">
+              Project documentation ·
+              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/http-api.md"
+                >http-api.md
+                <svg
+                  class="ui out"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M6 18 18 6M6 6h12v12" /></svg
+              ></a>
+            </p>
+          </article>
+        </div>
+      </div>
+      <section class="related">
+        <div class="container">
+          <h2>Related guides</h2>
+          <div class="related-grid">
+            <a class="row-link" href="../whatsapp-mcp-docker/"
+              ><span>Run WhatsApp MCP in Docker</span
+              ><svg
+                class="ui arrow"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+            ><a class="row-link" href="../whatsapp-mcp-security/"
+              ><span>WhatsApp MCP security and privacy</span
+              ><svg
+                class="ui arrow"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+            ><a class="row-link" href="../whatsapp-mcp-server/"
+              ><span>WhatsApp MCP server</span
+              ><svg
+                class="ui arrow"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+            ></a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="container">
+        <div class="foot-top">
+          <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+          <nav aria-label="Footer">
+            <a href="../#guides">Guides</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg></a
+            ><a href="../llms.txt">llms.txt</a>
+          </nav>
+        </div>
+        <div class="foot-note">
+          <p>
+            <strong>Account risk.</strong> WA MCP uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or
+            ban a linked account, even with sending limits in place.
+          </p>
+          <span>Updated <time datetime="2026-11-23">23 Nov 2026</time></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

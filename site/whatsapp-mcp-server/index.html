@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>WhatsApp MCP server | WA MCP</title>
+    <meta
+      name="description"
+      content="Read how the Go bridge and Python server give MCP clients 49 tools for working with a linked WhatsApp account."
+    />
+    <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-server/" />
+    <link rel="describedby" href="../llms.txt" type="text/plain" />
+    <link rel="icon" href="../assets/brand/logo.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="WA MCP" />
+    <meta property="og:title" content="WhatsApp MCP server | WA MCP" />
+    <meta
+      property="og:description"
+      content="Read how the Go bridge and Python server give MCP clients 49 tools for working with a linked WhatsApp account."
+    />
+    <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-server/" />
+    <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="WhatsApp MCP server | WA MCP" />
+    <meta
+      name="twitter:description"
+      content="Read how the Go bridge and Python server give MCP clients 49 tools for working with a linked WhatsApp account."
+    />
+    <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <script>
+      try {
+        const t = localStorage.getItem("wa-theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="../style.css" />
+    <script defer src="../site.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "WA MCP",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "WhatsApp MCP server",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/whatsapp-mcp-server/"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is there a required background model?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. The assistant interprets the tool results. Task detection uses local rules. A separately configured provider can add an optional summary or image description."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What license covers the project?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "WA MCP v0.1.0 is published under the MIT license. The implementation includes the Go bridge, Python SDK and Python MCP server."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="container bar">
+        <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+        <button class="menu-button tool" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">
+          <svg
+            class="ui menu"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M3 7h18M3 16h18" />
+          </svg>
+        </button>
+        <div id="navigation" class="navigation">
+          <nav aria-label="Primary">
+            <a href="../#features">Features</a><a href="../#install">Install</a><a href="../#guides">Guides</a
+            ><a href="../whatsapp-mcp-security/">Security</a>
+          </nav>
+          <div class="actions">
+            <a
+              class="button star-button"
+              href="https://github.com/tsahospital-beep/wa-mcp"
+              title="Open the repository to star WA MCP"
+              ><svg
+                class="ui star"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
+              >Star on GitHub <span class="star-count" hidden></span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg
+            ></a>
+          </div>
+        </div>
+        <button class="theme tool" aria-label="Switch color mode">
+          <svg
+            class="ui sun"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path
+              d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2 M16 12a4 4 0 1 0-8 0 4 4 0 1 0 8 0"
+            /></svg
+          ><svg
+            class="ui moon"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+    <main id="main">
+      <div class="container">
+        <nav aria-label="Breadcrumb" class="crumbs">
+          <a href="../">WA MCP</a> / <a href="../#guides">Guides</a> / Architecture
+        </nav>
+        <div class="guide-hero">
+          <div>
+            <div class="kicker">Architecture guide</div>
+            <h1>WhatsApp MCP server</h1>
+            <p class="lead">
+              WA MCP is a WhatsApp Model Context Protocol server that gives an assistant 49 tools for working with your
+              linked account. A Go bridge receives messages and a Python server makes the stored history available to
+              clients such as Claude Desktop, Cursor and VS Code.
+            </p>
+            <div class="byline">v0.1.0 <span>·</span> Updated <time datetime="2026-11-23">23 November 2026</time></div>
+          </div>
+          <div class="plate guide-plate" aria-hidden="true">
+            <div class="plate-inner">
+              <svg class="dot-art" aria-hidden="true" viewBox="0 0 180 140">
+                <defs>
+                  <pattern id="p-remote-mcp" width="3.6" height="3.6" patternUnits="userSpaceOnUse">
+                    <circle cx="1.8" cy="1.8" r="1.35" fill="white" />
+                  </pattern>
+                  <mask id="m-remote-mcp">
+                    <path
+                      d="M8 15H6a4 4 0 0 1-.4-8A6.4 6.4 0 0 1 18 6.8a4.2 4.2 0 0 1 0 8.4h-2 M12 11.5v9 M7.5 20.5h9"
+                      transform="translate(31 13) scale(4.9)"
+                      fill="none"
+                      stroke="white"
+                      stroke-width="2.35"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </mask>
+                </defs>
+                <g mask="url(#m-remote-mcp)"><rect width="180" height="140" fill="url(#p-remote-mcp)" /></g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="reading">
+          <aside>
+            <strong>On this page</strong>
+            <nav aria-label="On this page">
+              <a href="#section-1">Follow a message from phone to client</a
+              ><a href="#section-2">Start with one linked account</a><a href="#section-3">Choose a transport</a
+              ><a href="#section-4">Add history and other numbers</a
+              ><a href="#section-5">Decide what the client may see</a><a href="#faq">Questions</a>
+            </nav>
+          </aside>
+          <article>
+            <section id="section-1">
+              <h2>Follow a message from phone to client</h2>
+              <p>
+                Link the bridge as a companion device from WhatsApp on your phone. It receives recent history after
+                linking and continues to record new messages while it runs. It also applies edits, deletions and
+                reactions. The result is a local SQLite database that a second process, the MCP server, can read when a
+                client asks a question.
+              </p>
+              <p>
+                For example, ask for the last conversation about an invoice. The client can call
+                <code>list_messages</code> with a search term and use the returned chat and message ID to retrieve the
+                surrounding conversation. A request to download an attachment takes a different route. The server calls
+                the bridge&#x27;s authenticated HTTP API because the bridge owns the connection to WhatsApp.
+              </p>
+            </section>
+            <section id="section-2">
+              <h2>Start with one linked account</h2>
+              <p>
+                Build the bridge with Go 1.26 or newer, or run the published bridge image. Copy the example
+                configuration and start the bridge. Open Linked devices on your phone and scan the QR code in its login
+                window. If the window does not open, the terminal also displays the code. The login window offers
+                pairing by phone number when you cannot scan.
+              </p>
+              <p>
+                Install uv so your client can launch the Python server with uvx. Give it the absolute path of the same
+                <code>config.json</code> that the bridge uses. Relative configuration paths can lead the client to look
+                for an empty store in its working directory. Start with <code>bridge_status</code> and check three
+                separate results: the database is readable, the bridge is connected and the phone account is logged in.
+              </p>
+            </section>
+            <section id="section-3">
+              <h2>Choose a transport</h2>
+              <p>
+                On a desktop, the client starts the server as a child process and communicates over standard input and
+                output. That requires no listening port for MCP. You can close the client between questions and leave
+                the bridge collecting messages. When the bridge is stopped, database reads remain available from the
+                stored history. Live operations such as asking the phone for another page require the connection.
+              </p>
+              <p>
+                For a server shared with remote clients, enable Streamable HTTP. Each request to the MCP endpoint needs
+                a bearer token. A device can use its own revocable token, or an OAuth client can request approval from
+                the owner. The deployment guide describes an HTTPS proxy, host checks and the addresses that may forward
+                requests.
+              </p>
+            </section>
+            <section id="section-4">
+              <h2>Add history and other numbers</h2>
+              <p>
+                A new link receives only the history that the phone supplies. For a specific conversation, request older
+                pages back to a date. Keep the phone online and continue a time-limited sync if it returns an incomplete
+                result. An existing WhatsApp text or ZIP export gives you another source for older messages. Preview the
+                import before writing it into the selected chat.
+              </p>
+              <p>
+                Each additional number needs its own bridge, store and sending limits. One Python server can present all
+                the configured accounts. Ask for <code>list_accounts</code> to see the available names, then pass an
+                account to scope a tool call. The daily overview has a useful exception to the default selection:
+                without an account argument it combines the day&#x27;s items across numbers.
+              </p>
+            </section>
+            <section id="section-5">
+              <h2>Decide what the client may see</h2>
+              <p>
+                Message text is encrypted in the database by default. The server reads it as the operating system user
+                that holds the key and returns requested results to the assistant. Consider the client you choose and
+                where it processes those results. Search and daily briefings work with sending disabled, so you can try
+                both before deciding whether you want to enable outbound messages.
+              </p>
+            </section>
+            <section id="faq">
+              <h2>Questions</h2>
+              <details>
+                <summary>
+                  Is there a required background model?<svg
+                    class="ui down"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                  >
+                    <path d="m5 9 7 7 7-7" />
+                  </svg>
+                </summary>
+                <p>
+                  No. The assistant interprets the tool results. Task detection uses local rules. A separately
+                  configured provider can add an optional summary or image description.
+                </p>
+              </details>
+              <details>
+                <summary>
+                  What license covers the project?<svg
+                    class="ui down"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                  >
+                    <path d="m5 9 7 7 7-7" />
+                  </svg>
+                </summary>
+                <p>
+                  WA MCP v0.1.0 is published under the MIT license. The implementation includes the Go bridge, Python
+                  SDK and Python MCP server.
+                </p>
+              </details>
+            </section>
+            <p class="source">
+              Project documentation ·
+              <a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md"
+                >tools.md
+                <svg
+                  class="ui out"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M6 18 18 6M6 6h12v12" /></svg
+              ></a>
+            </p>
+          </article>
+        </div>
+      </div>
+      <section class="related">
+        <div class="container">
+          <h2>Related guides</h2>
+          <div class="related-grid">
+            <a class="row-link" href="../connect-whatsapp-to-claude/"
+              ><span>Connect WhatsApp to Claude</span
+              ><svg
+                class="ui arrow"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+            ><a class="row-link" href="../self-hosted-whatsapp-api/"
+              ><span>A self-hosted WhatsApp API</span
+              ><svg
+                class="ui arrow"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+            ><a class="row-link" href="../whatsapp-mcp-docker/"
+              ><span>Run WhatsApp MCP in Docker</span
+              ><svg
+                class="ui arrow"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+            ></a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="container">
+        <div class="foot-top">
+          <a class="brand" href="../"><img width="32" height="32" src="../assets/brand/logo.svg" alt="" />WA MCP</a>
+          <nav aria-label="Footer">
+            <a href="../#guides">Guides</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg></a
+            ><a href="../llms.txt">llms.txt</a>
+          </nav>
+        </div>
+        <div class="foot-note">
+          <p>
+            <strong>Account risk.</strong> WA MCP uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or
+            ban a linked account, even with sending limits in place.
+          </p>
+          <span>Updated <time datetime="2026-11-23">23 Nov 2026</time></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

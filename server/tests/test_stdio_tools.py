@@ -479,6 +479,12 @@ def test_tool_annotations(tmp_path: Path) -> None:
     cfg.write_text('{"store_dir":"private","api":{"listen":"127.0.0.1:0"}}', encoding="utf-8")
     tools: list[Any] = []
     asyncio.run(_session(cfg, [], tools_out=tools))
+    for tool in tools:
+        assert tool.description and tool.annotations and tool.annotations.title, tool.name
+        for key in ("readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint"):
+            assert isinstance(getattr(tool.annotations, key), bool), (tool.name, key)
+        for name, prop in tool.inputSchema["properties"].items():
+            assert prop.get("description"), (tool.name, name)
     ann = {t.name: t.annotations for t in tools}
     for name in (
         "send_message",
@@ -500,13 +506,16 @@ def test_tool_annotations(tmp_path: Path) -> None:
         assert ann[name] is not None and ann[name].readOnlyHint is True, name
     # Tools that may refresh the local task cache (insight.db) are honest about it.
     writes = {"refresh_tasks", "my_day", "chat_analytics", "tasks_overview", "task_detail", "which_task"}
-    writes |= {"project_overview", "whats_new"}
+    writes |= {"chat_analytics_compare", "project_overview", "whats_new"}
     for name in INSIGHT_TOOLS - writes:
         assert ann[name] is not None and ann[name].readOnlyHint is True, name
     for name in writes:
         a = ann[name]
-        assert a is not None and a.readOnlyHint is False and a.destructiveHint is False, name
-    assert ann["check_links"] is not None and ann["check_links"].openWorldHint is True
+        assert a is not None and a.readOnlyHint is False, name
+        assert a.destructiveHint == (name != "chat_analytics_compare"), name
+    for name in ("my_day", "check_links", "read_images", "extract_file_text", "transcribe_chat_audio"):
+        assert ann[name] is not None and ann[name].openWorldHint is True, name
+    assert ann["check_links"].readOnlyHint is True
 
 
 def test_agent_tools_over_stdio(env: dict[str, Any], tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

@@ -5,6 +5,10 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-11-23
+
+Clearer tool descriptions and annotations, glama.json.
+
 ## [0.1.0] - 2026-11-23
 
 Initial release.
@@ -215,4 +219,5 @@ Initial release.
   than 2 MiB are refused. The untrusted-content note also names transcripts, image text, image descriptions
   and AI summaries.
 
+[0.1.1]: https://github.com/tsahospital-beep/wa-mcp/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/tsahospital-beep/wa-mcp/releases/tag/v0.1.0

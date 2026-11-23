@@ -11,7 +11,7 @@
   <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-4f7c9a?style=flat">
   <img alt="MCP compatible" src="https://img.shields.io/badge/MCP-compatible-5f8a7a?style=flat">
   <img alt="Platform: Windows, macOS, Linux" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-5f8a7a?style=flat">
-  <a href="CHANGELOG.md"><img alt="Version 0.1.0" src="https://img.shields.io/badge/version-0.1.0-6c7a89?style=flat"></a>
+  <a href="CHANGELOG.md"><img alt="Version 0.1.1" src="https://img.shields.io/badge/version-0.1.1-6c7a89?style=flat"></a>
 </p>
 
 <p align="center">
@@ -26,6 +26,7 @@
   <a href="docs/reference/http-api.md">HTTP API</a> |
   <a href="docs/security.md">Security</a> |
   <a href="docs/faq.md">FAQ</a>
+  <br>English | <a href="docs/i18n/README.pt-BR.md">Português</a> | <a href="docs/i18n/README.es.md">Español</a> | <a href="docs/i18n/README.hi.md">हिन्दी</a>
 </p>
 
 ## Features
@@ -63,7 +64,7 @@
 | HTTP API | Local REST API with token authentication and an OpenAPI 3.1 document. |
 | Embedding | The Go package `bridge/pkg/wabridge` runs the bridge inside another program, with hooks for every stored message and chat, extra HTTP routes and access to sending, media and history. `wa_mcp_server.embed.register` adds chosen tools to another MCP server. |
 | Remote access | `wa-mcp serve --http` serves MCP over Streamable HTTP for remote clients such as claude.ai custom connectors, Claude Code, Cursor and VS Code. Per-device bearer tokens (stored hashed) or OAuth 2.1 with PKCE, dynamic registration and an owner approval page. Rate limits, Host and Origin checks, no CORS by default, and TLS proxy support. See [Connect remotely](docs/guides/remote-clients.md). |
-| Server deployment | Docker images for the bridge and the server (non-root, read-only file system, health checks) and a Compose file with optional Caddy for automatic HTTPS. The login page works through the proxy with a one-time link. See [Run on a server](docs/guides/server.md). The images have not been built on a real Docker host yet. CI builds them and starts the preview stack on pushes to `main`. |
+| Server deployment | Docker images for the bridge and the server (non-root, read-only file system, health checks) and a Compose file with optional Caddy for automatic HTTPS. The login page works through the proxy with a one-time link. See [Run on a server](docs/guides/server.md). Public images are available for v0.1.0. CI builds them and starts the preview stack on pushes to `main`. |
 | AI providers (optional) | Off by default: your assistant does the thinking. You can set one background provider, Ollama, an OpenAI-compatible server or Anthropic, for `my_day` summaries and image descriptions. Keys come from environment variables, and daily call and input limits guard the cost. |
 | Python SDK | The `wa_mcp` package: bridge client, read access to the local database, transcription and exports. |
 | Encryption | On by default: message text, attachment names, reactions, transcripts and media keys in the database are encrypted with a key kept in the OS keystore (Windows DPAPI, macOS Keychain, Linux Secret Service), or with a passphrase or key file. The API token is kept there too, and on Windows the store folder gets EFS. See [Encryption and keys](docs/guides/encryption.md). |
@@ -104,66 +105,61 @@ Checked in November 2026 from each project's public repository. Corrections are 
 
 ## Quick start
 
-You need Go 1.26 or newer, [uv](https://docs.astral.sh/uv/) and a phone with WhatsApp. `wa-bridge` (Go)
-keeps a local database and an API. `wa-mcp` (Python) is the MCP server that reads that database and
-calls the API.
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) so your MCP client can run `uvx`.
+The buttons install the Python server. Keep a linked bridge running for live messages and bridge tools.
+
+[![Add to Cursor](https://img.shields.io/badge/Add%20to%20Cursor-4f7c9a?style=flat)](https://cursor.com/install-mcp?name=wa-mcp&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLWZyb20iLCJ3YS1tY3Atc2VydmVyPT0wLjEuMCIsIi0td2l0aCIsIndhLW1jcC1zZGtbZW5jcnlwdGlvbixmaWxlc10iLCJ3YS1tY3AiXX0%3D)
+[![Install in VS Code](https://img.shields.io/badge/Install%20in%20VS%20Code-4f7c9a?style=flat)](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522--from%2522%252C%2522wa-mcp-server%253D%253D0.1.0%2522%252C%2522--with%2522%252C%2522wa-mcp-sdk%255Bencryption%252Cfiles%255D%2522%252C%2522wa-mcp%2522%255D%257D)
+[![Install in VS Code Insiders](https://img.shields.io/badge/Install%20in%20VS%20Code%20Insiders-4f7c9a?style=flat)](https://vscode.dev/redirect?url=vscode-insiders%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522--from%2522%252C%2522wa-mcp-server%253D%253D0.1.0%2522%252C%2522--with%2522%252C%2522wa-mcp-sdk%255Bencryption%252Cfiles%255D%2522%252C%2522wa-mcp%2522%255D%257D)
+
+<details>
+<summary>Copy the native Cursor install link</summary>
+
+```text
+cursor://anysphere.cursor-deeplink/mcp/install?name=wa-mcp&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLWZyb20iLCJ3YS1tY3Atc2VydmVyPT0wLjEuMCIsIi0td2l0aCIsIndhLW1jcC1zZGtbZW5jcnlwdGlvbixmaWxlc10iLCJ3YS1tY3AiXX0%3D
+```
+
+</details>
+
+**Claude Desktop.** Download `wa-mcp.mcpb` from the [latest release](https://github.com/tsahospital-beep/wa-mcp/releases/latest) and open it. Select the bridge's `config.json` when prompted. For v0.1.0, use the manual PyPI command below until a release includes the bundle.
+
+**Start the bridge.** With Go 1.26 or newer, clone the repository and build the bridge. On Windows, use
+`../wa-bridge.exe` as the build output.
 
 ```bash
 git clone https://github.com/tsahospital-beep/wa-mcp.git
 cd wa-mcp
-go build -C bridge -o ../wa-bridge ./cmd/wa-bridge    # on Windows use ../wa-bridge.exe
-./wa-bridge                                           # opens the login window
-uv sync                                               # in a second terminal
+go build -C bridge -o ../wa-bridge ./cmd/wa-bridge
+cp config.example.json config.json
+./wa-bridge
 ```
 
-In the login window scan the QR code with WhatsApp: Menu or Settings, Linked devices, Link a device. When
-the window shows Connected it closes itself, and the bridge keeps running. The full walkthrough, including
-pairing by phone number, is in [Getting started](docs/getting-started.md).
+In WhatsApp, open **Linked devices**, choose **Link a device**, and scan the QR code. To run the
+public bridge image instead, follow [Run the bridge in Docker](docs/getting-started.md#run-the-bridge-in-docker).
 
-## Connect an AI client
+**Connect the server.** For the buttons, set `WA_MCP_CONFIG` to the absolute path of the bridge's
+`config.json` in the environment your client inherits, then restart the client. You can also append
+`--config` and that path to the installed server's arguments. This lets the server find the same
+message store even when the client starts in another directory.
 
-The server speaks MCP over stdio, so any MCP client can start it. For Claude Desktop, Cursor and Windsurf
-add this to the client's MCP config file (see [Connect an MCP client](docs/guides/mcp-clients.md) for the
-file locations). Replace `REPOSITORY_DIRECTORY` and `CONFIG_FILE` with their absolute paths.
-
-```json
-{
-  "mcpServers": {
-    "wa-mcp": {
-      "command": "uv",
-      "args": [
-        "run", "--directory", "REPOSITORY_DIRECTORY",
-        "wa-mcp", "--config", "CONFIG_FILE"
-      ]
-    }
-  }
-}
-```
-
-Claude Code:
+Check the published command from a terminal.
 
 ```bash
-claude mcp add wa-mcp -- uv run --directory "REPOSITORY_DIRECTORY" wa-mcp --config "CONFIG_FILE"
+uvx --from wa-mcp-server==0.1.0 wa-mcp --help
 ```
 
-VS Code, in `.vscode/mcp.json`:
+For a persistent install, use pipx with Python 3.11 or newer.
 
-```json
-{
-  "servers": {
-    "wa-mcp": {
-      "type": "stdio",
-      "command": "uv",
-      "args": [
-        "run", "--directory", "REPOSITORY_DIRECTORY",
-        "wa-mcp", "--config", "CONFIG_FILE"
-      ]
-    }
-  }
-}
+```bash
+pipx install wa-mcp-server
+pipx inject --force wa-mcp-server 'wa-mcp-sdk[encryption,files]'
+wa-mcp --help
 ```
 
-Then ask the assistant to run `bridge_status` to check the setup.
+The buttons include the SDK extras for encrypted messages and file text extraction. A pipx client
+can launch `wa-mcp` directly with `--config` and the absolute config path. Run `bridge_status` in
+your client to check the database and phone connection. See [Getting started](docs/getting-started.md)
+and [Connect an MCP client](docs/guides/mcp-clients.md) for manual setup.
 
 ## Tutorials
 

@@ -1,14 +1,14 @@
 # Getting started
 
-This guide takes you from a fresh clone to an AI assistant that can read your WhatsApp chats. It takes
-about ten minutes. Sending stays off until you turn it on.
+Your MCP client starts the Python server. A separate bridge links your phone, syncs messages and
+serves live requests. Sending stays off by default.
 
 ## What you need
 
 - A phone with the WhatsApp account you want to link.
-- [Go](https://go.dev/dl/) 1.26 or newer, to build the bridge.
-- [uv](https://docs.astral.sh/uv/getting-started/installation/), to install the Python packages. uv can
-  also download Python 3.11 or newer for you.
+- [Go](https://go.dev/dl/) 1.26 or newer for the native bridge, or Docker Engine for the bridge image.
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) for the buttons and the Claude Desktop
+  bundle, or pipx with Python 3.11 or newer for manual setup.
 - An MCP client such as Claude Desktop, Claude Code, Cursor, Windsurf or VS Code.
 - Optional: [ffmpeg](https://ffmpeg.org/) on your `PATH`, needed for voice notes, stickers and
   transcription.
@@ -16,13 +16,32 @@ about ten minutes. Sending stays off until you turn it on.
   small app window when the bridge finds a supported browser. Otherwise, run `wa-bridge login-url`
   during login and open the link yourself.
 
-## 1. Build the bridge and install the server
+## 1. Install the server from PyPI
+
+Check the v0.1.0 entry point from any directory. The package is `wa-mcp-server` and its executable is `wa-mcp`.
+
+```bash
+uvx --from wa-mcp-server==0.1.0 wa-mcp --help
+```
+
+For a persistent installation, use pipx. The SDK extras support the default encrypted store and
+document text extraction.
+
+```bash
+pipx install wa-mcp-server
+pipx inject --force wa-mcp-server 'wa-mcp-sdk[encryption,files]'
+wa-mcp --help
+```
+
+## 2. Set up one bridge
+
+### Build the native bridge
 
 ```bash
 git clone https://github.com/tsahospital-beep/wa-mcp.git
 cd wa-mcp
 go build -C bridge -o ../wa-bridge ./cmd/wa-bridge
-uv sync
+cp config.example.json config.json
 ```
 
 On Windows, name the output `../wa-bridge.exe`:
@@ -35,34 +54,52 @@ Check the result:
 
 ```bash
 ./wa-bridge --version
-uv run wa-mcp --help
 ```
 
-`go build` downloads the Go modules on the first run. `uv sync` creates `.venv` with the SDK, the MCP
-server and the optional packages for encryption and file text extraction.
+The example keeps the API on loopback and the message store beside the config. Both programs resolve
+relative settings from the config's directory. See [Configuration](guides/configuration.md) for the defaults.
 
-## 2. Configuration (optional)
+### Run the bridge in Docker
 
-The bridge and the MCP server work without a config file. Every key has a safe default: sending is off,
-and the API listens on `127.0.0.1:8080`. To change something, copy the example and edit it:
+On Linux, the host server and container can share a private directory. For a fresh installation,
+start in a new, empty directory owned by your user. Create the key once and keep it for future starts.
 
 ```bash
-cp config.example.json config.json
+umask 077
+openssl rand -hex -out store.key 32
+cat > config.json <<'EOF'
+{
+  "encryption": { "mode": "keyfile", "key_file": "store.key" }
+}
+EOF
 ```
 
-Both programs read the same `config.json` from the folder you start them in. The bridge prints a warning
-for keys it does not know, which usually points to a typo. See [Configuration](guides/configuration.md)
-for every key.
+Run the published image from that directory. The user ID keeps the files readable by your desktop
+client. Docker publishes the API on host loopback. The container prints the QR code.
+
+```bash
+docker run --rm -it --name wa-mcp-bridge \
+  --user "$(id -u):$(id -g)" \
+  --mount "type=bind,src=$PWD,dst=/data" \
+  -p 127.0.0.1:8080:8080 \
+  -e WA_MCP_CONFIG=/data/config.json \
+  -e WA_MCP_API_LISTEN=0.0.0.0:8080 \
+  ghcr.io/tsahospital-beep/wa-mcp-bridge:0.1.0
+```
+
+The desktop client uses the host copy of `config.json`. Leave its API address at the default
+`127.0.0.1:8080`. For a deployment with both components in containers, see [Run on a server](guides/server.md).
 
 ## 3. Link your account
 
-Start the bridge from the repository folder:
+For the native build, start the bridge from the directory containing `config.json`.
 
 ```bash
 ./wa-bridge
 ```
 
-On first start there is no linked device, so a login window opens. The window listens on 127.0.0.1 only.
+On the first native start, a login window opens. With Docker, scan the QR code in the terminal.
+The native login window listens on 127.0.0.1 only.
 Its address carries a one-time token: the first visit exchanges it for a session cookie and the token is
 spent. The same QR code is also printed in the terminal.
 
@@ -116,7 +153,8 @@ After linking, the phone sends recent history and the bridge stores it in `store
 stored as they arrive. Keep the bridge running while this happens. Older messages can be requested from
 the phone later with the history tools.
 
-Check the state from another terminal:
+For Docker, run `docker exec wa-mcp-bridge /usr/local/bin/wa-bridge health`. For the native bridge,
+check the state from another terminal.
 
 ```bash
 curl -H "Authorization: Bearer $(./wa-bridge api-token)" http://127.0.0.1:8080/api/v1/status
@@ -129,34 +167,35 @@ PowerShell use `curl.exe`. The token is kept in the OS keystore, and `wa-bridge 
 curl.exe -H "Authorization: Bearer $(.\wa-bridge.exe api-token)" http://127.0.0.1:8080/api/v1/status
 ```
 
-## 5. Connect an assistant
+## 5. Connect your MCP client
 
-Add the server to your MCP client. For Claude Desktop, open Settings, then Developer, then Edit Config, and add:
+Use the [install buttons](../README.md#quick-start) with `WA_MCP_CONFIG` set to the absolute config
+path in the environment your client inherits. For manual setup, replace `CONFIG_FILE` below with
+that path. Each argument is a separate string, including paths with spaces.
 
 ```json
 {
   "mcpServers": {
     "wa-mcp": {
-      "command": "uv",
+      "command": "uvx",
       "args": [
-        "run", "--directory", "/path/to/wa-mcp",
-        "wa-mcp", "--config", "/path/to/wa-mcp/config.json"
+        "--from", "wa-mcp-server==0.1.0", "--with", "wa-mcp-sdk[encryption,files]",
+        "wa-mcp", "--config", "CONFIG_FILE"
       ]
     }
   }
 }
 ```
 
-Replace `/path/to/wa-mcp` with the folder of your clone. On Windows use forward slashes, for example
-`C:/Users/you/wa-mcp`. Restart the client. The other clients are covered in
-[Connect an MCP client](guides/mcp-clients.md).
+With pipx, set the command to `wa-mcp` and keep just `["--config", "CONFIG_FILE"]` as the arguments.
+Restart the client. See [Connect an MCP client](guides/mcp-clients.md) for client-specific settings.
 
-Then ask the assistant to run `bridge_status`. It reports whether the database exists, whether the
+Run `bridge_status` in your client. It reports whether the database exists, whether the
 bridge is reachable and logged in, whether sending is enabled and which transcription backend is set.
 After that try:
 
 - "List my most recent chats."
-- "What did I talk about with Alice last week?"
+- "Which chats were active last week?"
 - "What are my tasks today?"
 
 ## Keep the bridge running
@@ -172,8 +211,10 @@ Stop it with Ctrl+C. It shuts down cleanly.
 ```bash
 git pull
 go build -C bridge -o ../wa-bridge ./cmd/wa-bridge
-uv sync
 ```
+
+For Docker, use the new release tag with the existing data directory and key. Update the package pins
+in your uvx client config or run `pipx upgrade wa-mcp-server --include-injected`.
 
 The database schema is migrated automatically on start. A database written by a newer bridge is refused
 with a message asking you to update.

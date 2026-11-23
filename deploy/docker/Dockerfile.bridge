@@ -10,7 +10,7 @@ WORKDIR /src
 COPY bridge/go.mod bridge/go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod go mod download
 COPY bridge/ ./
-ARG VERSION=0.1.0
+ARG VERSION=0.1.1
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o /out/wa-bridge ./cmd/wa-bridge \
     && mkdir -p /out/data/store /out/data/downloads /out/data/exports /out/session

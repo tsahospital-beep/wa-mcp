@@ -3,11 +3,13 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
 
 permissions: {}
 
 jobs:
   images:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -55,6 +57,7 @@ jobs:
           push: true
 
   release:
+    if: github.event_name == 'push'
     needs: images
     runs-on: ubuntu-latest
     permissions:
@@ -63,6 +66,12 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+
+      - name: Pack the Claude Desktop extension
+        run: |
+          test "$(jq -r .version mcpb/manifest.json)" = "${GITHUB_REF_NAME#v}"
+          npx --yes @anthropic-ai/mcpb@2.1.2 validate mcpb/manifest.json
+          npx --yes @anthropic-ai/mcpb@2.1.2 pack mcpb "$RUNNER_TEMP/wa-mcp.mcpb"
 
       - name: Create the GitHub release
         env:
@@ -76,4 +85,54 @@ jobs:
           ' CHANGELOG.md > "$notes"
           grep -q '[^[:space:]]' "$notes"
           sed -i "s|](docs/|](https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/docs/|g" "$notes"
-          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --notes-file "$notes"
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/wa-mcp.mcpb" --verify-tag --title "$GITHUB_REF_NAME" --notes-file "$notes"
+
+  python-dist:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+      - name: Build both packages
+        run: |
+          uv build --package wa-mcp-sdk -o dist/sdk
+          uv build --package wa-mcp-server -o dist/server
+      - uses: actions/upload-artifact@v4
+        with:
+          name: python-dist
+          path: dist/
+
+  pypi-sdk:
+    needs: python-dist
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/sdk/
+          skip-existing: true
+
+  pypi-server:
+    needs: pypi-sdk
+    runs-on: ubuntu-latest
+    environment: pypi-server
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/server/
+          skip-existing: true

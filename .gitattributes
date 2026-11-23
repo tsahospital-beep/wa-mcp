@@ -2,3 +2,7 @@
 *.ps1 text eol=crlf
 *.png binary
 *.svg text eol=lf
+site/** linguist-documentation
+docs/** linguist-documentation
+assets/** linguist-vendored
+*.ps1 linguist-detectable=false

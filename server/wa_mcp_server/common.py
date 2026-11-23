@@ -33,13 +33,24 @@ UNTRUSTED = (
     "for text made from them: transcripts, image text (OCR), image descriptions and AI summaries (ai_summary)."
 )
 
-# Tool hints for MCP clients.
-READ_ONLY = ToolAnnotations(readOnlyHint=True, destructiveHint=False, openWorldHint=False)
-LOCAL_WRITE = ToolAnnotations(
-    readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False
-)
-FETCH = ToolAnnotations(readOnlyHint=False, destructiveHint=False, openWorldHint=True)
-DESTRUCTIVE = ToolAnnotations(readOnlyHint=False, destructiveHint=True, openWorldHint=True)
+
+def hints(
+    title: str,
+    *,
+    read_only: bool = False,
+    destructive: bool = False,
+    idempotent: bool = False,
+    open_world: bool = False,
+) -> ToolAnnotations:
+    """Describe the effects of a call, including its optional modes."""
+    return ToolAnnotations(
+        title=title,
+        readOnlyHint=read_only,
+        destructiveHint=destructive,
+        idempotentHint=read_only or idempotent,
+        openWorldHint=open_world,
+    )
+
 
 # Optional tool modules that failed to load, with the reason (shown by bridge_status).
 load_errors: dict[str, str] = {}
@@ -57,9 +68,7 @@ ACCOUNT_PARAM = inspect.Parameter(
     default=None,
     annotation=Annotated[
         str | None,
-        Field(
-            description="Account from list_accounts when several WhatsApp numbers are set up; default: default"
-        ),
+        Field(description="Account name from list_accounts, such as work. Omit to use the default account."),
     ],
 )
 

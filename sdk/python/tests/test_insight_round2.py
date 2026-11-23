@@ -222,6 +222,7 @@ def test_insight_tool_annotations() -> None:
     writes = {
         "my_day",
         "chat_analytics",
+        "chat_analytics_compare",
         "tasks_overview",
         "task_detail",
         "which_task",
@@ -231,6 +232,7 @@ def test_insight_tool_annotations() -> None:
     }
     for name in writes:
         a = ann[name]
-        assert a is not None and a.readOnlyHint is False and a.destructiveHint is False, name
+        assert a is not None and a.readOnlyHint is False, name
+        assert a.destructiveHint == (name != "chat_analytics_compare"), name
     for name in set(ann) - writes:
         assert ann[name] is not None and ann[name].readOnlyHint is True, name

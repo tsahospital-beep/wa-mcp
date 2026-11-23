@@ -4,31 +4,26 @@
 child process, so there is no port to open and nothing to keep running besides the bridge. Any MCP client
 that can start a stdio server works. This page shows the setup for the common ones.
 
-Replace `/path/to/wa-mcp` with the folder of your clone. On Windows write the path with forward slashes,
-for example `C:/Users/you/wa-mcp`, so that you do not have to escape backslashes in JSON.
-
 ## The command
 
-```text
-uv run --directory /path/to/wa-mcp wa-mcp --config /path/to/wa-mcp/config.json
+Install uv and give your client the absolute path of the bridge config in place of `CONFIG_FILE`.
+The server uses that file to find the message store, encryption settings and bridge API.
+
+```bash
+uvx --from wa-mcp-server==0.1.0 --with 'wa-mcp-sdk[encryption,files]' wa-mcp --config "CONFIG_FILE"
 ```
 
-`--directory` makes uv use the project environment in that folder. `--config` points the server at the
-same `config.json` as the bridge. The file does not have to exist. Without it the defaults apply, and
-`store/` is then expected inside the folder that contains the path you give.
-
-Faster alternative that does not need uv on the client's `PATH`: run the installed script directly.
-
-| System | Command |
-| --- | --- |
-| macOS and Linux | `/path/to/wa-mcp/.venv/bin/wa-mcp` |
-| Windows | `C:/path/to/wa-mcp/.venv/Scripts/wa-mcp.exe` |
-
-Both take the same `--config` and `--log-level` arguments.
+If you installed the server with pipx, use `wa-mcp --config "CONFIG_FILE"`. For a source checkout
+with `uv sync`, use `uv run --directory "REPOSITORY_DIRECTORY" wa-mcp --config "CONFIG_FILE"`.
 
 ## Claude Desktop
 
-Open Settings, then Developer, then Edit Config. The file is `claude_desktop_config.json`:
+Download `wa-mcp.mcpb` from the [latest release](https://github.com/tsahospital-beep/wa-mcp/releases/latest)
+and open it. Select Install, then choose the bridge's `config.json` in the extension settings.
+Claude Desktop needs access to uvx and the bridge's message store. Keep the bridge running for live tools.
+
+For releases without the bundle, including v0.1.0, use manual configuration. Open Settings, then
+Developer, then Edit Config to find `claude_desktop_config.json`.
 
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 - On macOS, use Finder to open the `~/Library/Application Support/Claude` folder and select the config file.
@@ -37,10 +32,10 @@ Open Settings, then Developer, then Edit Config. The file is `claude_desktop_con
 {
   "mcpServers": {
     "wa-mcp": {
-      "command": "uv",
+      "command": "uvx",
       "args": [
-        "run", "--directory", "/path/to/wa-mcp",
-        "wa-mcp", "--config", "/path/to/wa-mcp/config.json"
+        "--from", "wa-mcp-server==0.1.0", "--with", "wa-mcp-sdk[encryption,files]",
+        "wa-mcp", "--config", "CONFIG_FILE"
       ]
     }
   }
@@ -52,11 +47,11 @@ Quit Claude Desktop completely and start it again.
 ## Claude Code
 
 ```bash
-claude mcp add wa-mcp -- uv run --directory /path/to/wa-mcp wa-mcp --config /path/to/wa-mcp/config.json
+claude mcp add wa-mcp -- uvx --from wa-mcp-server==0.1.0 --with 'wa-mcp-sdk[encryption,files]' wa-mcp --config "CONFIG_FILE"
 ```
 
 Put `--scope user` before the name to make the server available in every project, for example
-`claude mcp add --scope user wa-mcp -- uv run ...`. Use `--scope project` to write a `.mcp.json` file in the
+`claude mcp add --scope user wa-mcp -- uvx ...`. Use `--scope project` to write a `.mcp.json` file in the
 project. Check the result with `claude mcp list`.
 
 ## Cursor
@@ -68,10 +63,10 @@ as for Claude Desktop:
 {
   "mcpServers": {
     "wa-mcp": {
-      "command": "uv",
+      "command": "uvx",
       "args": [
-        "run", "--directory", "/path/to/wa-mcp",
-        "wa-mcp", "--config", "/path/to/wa-mcp/config.json"
+        "--from", "wa-mcp-server==0.1.0", "--with", "wa-mcp-sdk[encryption,files]",
+        "wa-mcp", "--config", "CONFIG_FILE"
       ]
     }
   }
@@ -88,10 +83,10 @@ Edit `~/.codeium/windsurf/mcp_config.json`. The format is the same as for Claude
 {
   "mcpServers": {
     "wa-mcp": {
-      "command": "uv",
+      "command": "uvx",
       "args": [
-        "run", "--directory", "/path/to/wa-mcp",
-        "wa-mcp", "--config", "/path/to/wa-mcp/config.json"
+        "--from", "wa-mcp-server==0.1.0", "--with", "wa-mcp-sdk[encryption,files]",
+        "wa-mcp", "--config", "CONFIG_FILE"
       ]
     }
   }
@@ -110,10 +105,10 @@ applies to every workspace. VS Code uses the key `servers` and a `type`:
   "servers": {
     "wa-mcp": {
       "type": "stdio",
-      "command": "uv",
+      "command": "uvx",
       "args": [
-        "run", "--directory", "/path/to/wa-mcp",
-        "wa-mcp", "--config", "/path/to/wa-mcp/config.json"
+        "--from", "wa-mcp-server==0.1.0", "--with", "wa-mcp-sdk[encryption,files]",
+        "wa-mcp", "--config", "CONFIG_FILE"
       ]
     }
   }
@@ -124,15 +119,15 @@ The tools appear in chat in agent mode.
 
 ## Other clients
 
-Any client that supports stdio servers needs three things: the transport `stdio`, the command (`uv` or the
+Any client that supports stdio servers needs three things: the transport `stdio`, the command (`uvx` or the
 path of `wa-mcp`) and the arguments. Environment variables can be added with an `env` object, which most
 clients support:
 
 ```json
 {
-  "command": "/path/to/wa-mcp/.venv/bin/wa-mcp",
+  "command": "wa-mcp",
   "args": ["--log-level", "INFO"],
-  "env": { "WA_MCP_CONFIG": "/path/to/wa-mcp/config.json" }
+  "env": { "WA_MCP_CONFIG": "CONFIG_FILE" }
 }
 ```
 
@@ -154,8 +149,8 @@ database still answer and the tools that need the bridge report that it is not r
 
 | Symptom | Check |
 | --- | --- |
-| The client shows no `wa-mcp` tools | Run the command from a terminal. `uv run --directory /path/to/wa-mcp wa-mcp --help` should print the usage text. Fix the path or run `uv sync` in the folder. |
-| `uv` is not found | GUI applications often have a shorter `PATH` than your terminal. Use the full path of `uv` as the command (`which uv` on macOS and Linux, `where uv` on Windows) or use the `.venv` script. |
+| The client shows no `wa-mcp` tools | Run `uvx --from wa-mcp-server==0.1.0 wa-mcp --help` in a terminal and check the config path in the client. |
+| The client cannot find `uvx` | Give the client the absolute path from `command -v uvx` or `where.exe uvx` on Windows. |
 | `no database at ...` | The bridge has not run yet in that folder, or `--config` points to a different folder. Start the bridge once and use the same config path. |
 | `bridge not reachable` | Start `wa-bridge`. Check that `api.listen` is the same for both programs. |
 | `no API token` | The bridge creates the token on first start and keeps it in the OS keystore of your user (or in `store/api.token`). Start the bridge once, as the same user as the client. |

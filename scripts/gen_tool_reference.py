@@ -57,7 +57,7 @@ GROUPS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ),
     (
         "Media and files",
-        "Download attachments and read text from documents, archives and shared links.",
+        "Download attachments, read images and documents, or inspect shared links.",
         (
             "download_media",
             "download_chat_media",
@@ -65,8 +65,11 @@ GROUPS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
             "list_stickers",
             "extract_file_text",
             "fetch_shared_docs",
+            "check_links",
+            "read_images",
         ),
     ),
+    ("Chat imports", "Add older messages from a local WhatsApp export.", ("import_chat_export",)),
     (
         "Voice transcription",
         "Turn voice notes and audio messages into text with the configured backend.",
@@ -85,7 +88,7 @@ GROUPS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     (
         "Sending",
         "Off by default. Each call needs `sending.enabled`. With `sending.require_confirm` the server asks the user "
-        "through the client (MCP elicitation) and falls back to `confirm=true` only for clients that cannot ask.",
+        "through the client (MCP elicitation). The fallback also requires `sending.allow_confirm_flag`.",
         ("send_message", "send_file", "send_voice_note", "send_sticker"),
     ),
     (
@@ -95,7 +98,7 @@ GROUPS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ),
     (
         "Analytics and tasks",
-        "Rule-based analysis of the local archive. No language model is involved in these tools.",
+        "Analyze the local archive. Only the optional summary in `my_day` uses a model provider.",
         (
             "my_day",
             "chat_analytics",
@@ -165,13 +168,12 @@ def hint_of(tool: Any) -> str:
     a = getattr(tool, "annotations", None)
     if a is None:
         return ""
-    if a.readOnlyHint:
-        return "Read-only."
+    labels = ["read-only" if a.readOnlyHint else "may change state"]
     if a.destructiveHint:
-        return "Changes WhatsApp or scheduled data. Clients may ask before running it."
-    if a.openWorldHint:
-        return "Reads from the network (WhatsApp or the web) and saves the result locally."
-    return "Writes local files or the local database only."
+        labels.append("potentially destructive")
+    labels.append("idempotent" if a.idempotentHint else "retries can have additional effects")
+    labels.append("open world" if a.openWorldHint else "closed world")
+    return ", ".join(labels)
 
 
 def render_tool(tool: Any) -> str:
@@ -179,13 +181,16 @@ def render_tool(tool: Any) -> str:
     lines = [f"### `{tool.name}`", "", summary, ""]
     hint = hint_of(tool)
     if hint:
-        lines += [f"Client hint: {hint}", ""]
+        lines += [f"**{tool.annotations.title}** ({hint}).", ""]
     props: dict[str, Any] = (tool.inputSchema or {}).get("properties", {})
     required = set((tool.inputSchema or {}).get("required", []))
     if props:
-        lines += ["| Argument | Type | Default |", "| --- | --- | --- |"]
+        lines += ["| Argument | Type | Default | Description |", "| --- | --- | --- | --- |"]
         for name, schema in props.items():
-            lines.append(f"| `{name}` | {type_of(schema)} | {default_of(name, schema, required)} |")
+            description = clean(schema["description"]).replace("|", "\\|")
+            lines.append(
+                f"| `{name}` | {type_of(schema)} | {default_of(name, schema, required)} | {description} |"
+            )
         lines.append("")
     else:
         lines += ["No arguments.", ""]

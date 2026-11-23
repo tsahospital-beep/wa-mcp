@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tsahospital-beep.github.io/wa-mcp/sitemap.xml

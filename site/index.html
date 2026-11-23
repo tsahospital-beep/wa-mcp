@@ -1,0 +1,1252 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>WA MCP | A local WhatsApp MCP server for your assistant</title>
+    <meta
+      name="description"
+      content="WA MCP connects WhatsApp to Claude, Cursor and VS Code. Search chats, transcribe voice notes and track replies with a local bridge."
+    />
+    <link rel="canonical" href="https://tsahospital-beep.github.io/wa-mcp/" />
+    <link rel="describedby" href="llms.txt" type="text/plain" />
+    <link rel="icon" href="assets/brand/logo.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="WA MCP" />
+    <meta property="og:title" content="WA MCP | A local WhatsApp MCP server for your assistant" />
+    <meta
+      property="og:description"
+      content="WA MCP connects WhatsApp to Claude, Cursor and VS Code. Search chats, transcribe voice notes and track replies with a local bridge."
+    />
+    <meta property="og:url" content="https://tsahospital-beep.github.io/wa-mcp/" />
+    <meta property="og:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <meta property="og:image:alt" content="WA MCP project logo and wordmark" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="WA MCP | A local WhatsApp MCP server for your assistant" />
+    <meta
+      name="twitter:description"
+      content="WA MCP connects WhatsApp to Claude, Cursor and VS Code. Search chats, transcribe voice notes and track replies with a local bridge."
+    />
+    <meta name="twitter:image" content="https://tsahospital-beep.github.io/wa-mcp/assets/brand/social-preview.png" />
+    <script>
+      try {
+        const t = localStorage.getItem("wa-theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="site.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "SoftwareApplication",
+            "name": "WA MCP",
+            "description": "WA MCP connects WhatsApp to Claude, Cursor and VS Code. Search chats, transcribe voice notes and track replies with a local bridge.",
+            "url": "https://tsahospital-beep.github.io/wa-mcp/",
+            "softwareVersion": "0.1.1",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Windows, macOS, Linux",
+            "license": "https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE",
+            "downloadUrl": "https://github.com/tsahospital-beep/wa-mcp/releases/latest",
+            "offers": {
+              "@type": "Offer",
+              "price": 0,
+              "priceCurrency": "USD"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "WA MCP",
+                "item": "https://tsahospital-beep.github.io/wa-mcp/"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What does my assistant see?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Your assistant receives the results of the tools it calls. For example, a message search returns matching messages. A hosted assistant processes that content under its own terms."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I read messages from before I linked my phone?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, when the phone supplies older history or you have a WhatsApp chat export. Request older pages from the phone or preview and import a TXT or ZIP file."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Do I need a second AI provider?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. Your MCP client can interpret the tool results. Local rules detect tasks. A separate provider is optional for daily summaries and image descriptions."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Will WA MCP send messages automatically?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sending is off by default. If enabled, a client with MCP elicitation asks for approval before a send. Once scheduled, a message can go out through the running bridge even when the assistant is closed."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="container bar">
+        <a class="brand" href="./"><img width="32" height="32" src="assets/brand/logo.svg" alt="" />WA MCP</a>
+        <button class="menu-button tool" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">
+          <svg
+            class="ui menu"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M3 7h18M3 16h18" />
+          </svg>
+        </button>
+        <div id="navigation" class="navigation">
+          <nav aria-label="Primary">
+            <a href="#features">Features</a><a href="#install">Install</a><a href="#guides">Guides</a
+            ><a href="whatsapp-mcp-security/">Security</a>
+          </nav>
+          <div class="actions">
+            <a
+              class="button star-button"
+              href="https://github.com/tsahospital-beep/wa-mcp"
+              title="Open the repository to star WA MCP"
+              ><svg
+                class="ui star"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" /></svg
+              >Star on GitHub <span class="star-count" hidden></span></a
+            ><a class="button solid" href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg
+            ></a>
+          </div>
+        </div>
+        <button class="theme tool" aria-label="Switch color mode">
+          <svg
+            class="ui sun"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path
+              d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2 M16 12a4 4 0 1 0-8 0 4 4 0 1 0 8 0"
+            /></svg
+          ><svg
+            class="ui moon"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          >
+            <path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+    <main id="main">
+      <div class="container hero">
+        <div class="hero-copy">
+          <a class="release" href="https://github.com/tsahospital-beep/wa-mcp/releases/tag/v0.1.0"
+            ><span class="light-dot"></span> Open source <span>/</span> v0.1.0
+            <svg
+              class="ui out"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            >
+              <path d="M6 18 18 6M6 6h12v12" /></svg
+          ></a>
+          <h1 id="name">Ask your<br /><em>WhatsApp.</em></h1>
+          <p class="lead">
+            WA MCP connects WhatsApp to Claude, Cursor and VS Code. Search chats, transcribe voice notes and track
+            replies with a local bridge.
+          </p>
+          <div class="hero-actions">
+            <a class="button green" href="#install"
+              >Get started
+              <svg
+                class="ui arrow"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+            ><a class="text-link" href="#architecture"
+              >How it works
+              <svg
+                class="ui down"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m5 9 7 7 7-7" /></svg
+            ></a>
+          </div>
+          <div class="command">
+            <svg
+              class="ui terminal"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            >
+              <path d="m3 6 6 6-6 6m9 0h9" /></svg
+            ><code id="command">pipx install wa-mcp-server</code
+            ><button type="button" id="copy" aria-label="Copy install command">
+              <svg
+                class="ui copy"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M9 8h11v13H9zM5 16H3V3h12v2" />
+              </svg></button
+            ><span class="copy-feedback" id="status" role="status"></span>
+          </div>
+        </div>
+        <div class="demo plate">
+          <div class="stage-bar">
+            <span><i class="light-dot"></i> Interactive demo</span
+            ><button id="replay" type="button">
+              <svg
+                class="ui replay"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M4 10a8 8 0 1 1 0 5m0-12v7h7" />
+              </svg>
+              Replay
+            </button>
+          </div>
+          <div class="conversation">
+            <div class="bubble question" id="prompt">What are my tasks today?</div>
+            <div class="bubble result">
+              <div class="demo-agent">
+                <img src="assets/brand/logo.svg" width="23" height="23" alt="" /> WA MCP
+                <code id="tool-name">my_day</code>
+              </div>
+              <strong id="result-title">Four things need you today.</strong>
+              <ul id="result-list">
+                <li>Send the updated invoice.</li>
+                <li>Share the photos you promised.</li>
+                <li>Reply to the book club.</li>
+                <li>Book club reminder at 18:00.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="switcher" role="group" aria-label="Choose an example">
+            <button aria-pressed="true" data-example="day">
+              <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#my-day" /></svg> My day</button
+            ><button aria-pressed="false" data-example="search">
+              <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#search-all-chats" /></svg>
+              Search</button
+            ><button aria-pressed="false" data-example="voice">
+              <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#voice-transcription" /></svg>
+              Voice
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="fact-band">
+        <dl class="container facts">
+          <div>
+            <dt>MCP tools</dt>
+            <dd>49</dd>
+          </div>
+          <div>
+            <dt>Implementation</dt>
+            <dd>Go <span>+</span> Python</dd>
+          </div>
+          <div>
+            <dt>Field encryption</dt>
+            <dd>On by default</dd>
+          </div>
+          <div>
+            <dt>License</dt>
+            <dd>MIT</dd>
+          </div>
+        </dl>
+      </div>
+      <section id="features" class="section container">
+        <div class="section-title">
+          <div>
+            <div class="kicker">Tool directory</div>
+            <h2 id="feature-title">Inside the toolkit.</h2>
+          </div>
+          <p>18 features for the messages, media and follow-ups in your WhatsApp history.</p>
+        </div>
+        <div class="feature-groups">
+          <section class="group group-0">
+            <div class="group-art">
+              <svg class="dot-art" aria-hidden="true" viewBox="0 0 180 140">
+                <defs>
+                  <pattern id="p-chat-history" width="3.6" height="3.6" patternUnits="userSpaceOnUse">
+                    <circle cx="1.8" cy="1.8" r="1.35" fill="white" />
+                  </pattern>
+                  <mask id="m-chat-history">
+                    <path
+                      d="M3 3.5h14v10H8l-5 4Z M9 17.5h6.5l5 3.5V8.5"
+                      transform="translate(31 13) scale(4.9)"
+                      fill="none"
+                      stroke="white"
+                      stroke-width="2.35"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </mask>
+                </defs>
+                <g mask="url(#m-chat-history)"><rect width="180" height="140" fill="url(#p-chat-history)" /></g>
+              </svg>
+            </div>
+            <div class="group-text">
+              <h3>Chats and media</h3>
+              <ul>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#chat-history" /></svg>
+                  <div>
+                    <strong>Chat history</strong>
+                    <p>Read synced messages and request older history from your phone.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#search-all-chats" /></svg>
+                  <div>
+                    <strong>Search all chats</strong>
+                    <p>Find messages, transcripts and file text in any script.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true">
+                    <use href="assets/features/icons.svg#voice-transcription" />
+                  </svg>
+                  <div>
+                    <strong>Voice transcription</strong>
+                    <p>Turn voice notes into text with a local or remote backend.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#text-from-images" /></svg>
+                  <div>
+                    <strong>Text from images</strong>
+                    <p>Read text in photos and screenshots with local OCR.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#document-text" /></svg>
+                  <div>
+                    <strong>Document text</strong>
+                    <p>Extract text from PDFs, Office documents and HTML.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#download-media" /></svg>
+                  <div>
+                    <strong>Download media</strong>
+                    <p>Save photos, video, audio, documents and stickers.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+          <section class="group group-1">
+            <div class="group-art">
+              <svg class="dot-art" aria-hidden="true" viewBox="0 0 180 140">
+                <defs>
+                  <pattern id="p-my-day" width="3.6" height="3.6" patternUnits="userSpaceOnUse">
+                    <circle cx="1.8" cy="1.8" r="1.35" fill="white" />
+                  </pattern>
+                  <mask id="m-my-day">
+                    <path
+                      d="M3 16h18 M7 16a5 5 0 0 1 10 0 M12 4v2 M3.5 8l2 2 M20.5 8l-2 2 M6 20.5h12"
+                      transform="translate(31 13) scale(4.9)"
+                      fill="none"
+                      stroke="white"
+                      stroke-width="2.35"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </mask>
+                </defs>
+                <g mask="url(#m-my-day)"><rect width="180" height="140" fill="url(#p-my-day)" /></g>
+              </svg>
+            </div>
+            <div class="group-text">
+              <h3>Daily activity</h3>
+              <ul>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#my-day" /></svg>
+                  <div>
+                    <strong>My day</strong>
+                    <p>See open requests, promises due today and chats waiting for a reply.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#chat-analytics" /></svg>
+                  <div>
+                    <strong>Chat analytics</strong>
+                    <p>Compare message volume and reply times across up to eight chats.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#call-history" /></svg>
+                  <div>
+                    <strong>Call history</strong>
+                    <p>Check incoming and outgoing calls, outcomes and duration.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#human-like-sending" /></svg>
+                  <div>
+                    <strong>Human-like sending</strong>
+                    <p>Show a typing indicator, space out sends and respect quiet hours.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#scheduled-messages" /></svg>
+                  <div>
+                    <strong>Scheduled messages</strong>
+                    <p>Send once or repeat daily, weekly or monthly.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true">
+                    <use href="assets/features/icons.svg#replies-and-mentions" />
+                  </svg>
+                  <div>
+                    <strong>Replies and mentions</strong>
+                    <p>Reply to a message, mention a contact and see reactions.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+          <section class="group group-2">
+            <div class="group-art">
+              <svg class="dot-art" aria-hidden="true" viewBox="0 0 180 140">
+                <defs>
+                  <pattern id="p-agent-connector" width="3.6" height="3.6" patternUnits="userSpaceOnUse">
+                    <circle cx="1.8" cy="1.8" r="1.35" fill="white" />
+                  </pattern>
+                  <mask id="m-agent-connector">
+                    <path
+                      d="M7 3v4.5 M16 3v4.5 M4.5 7.5h14v4a7 7 0 0 1-14 0Z M9 11.5h.1 M14 11.5h.1 M11.5 18.5v.5q0 3 3.5 3h2"
+                      transform="translate(31 13) scale(4.9)"
+                      fill="none"
+                      stroke="white"
+                      stroke-width="2.35"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </mask>
+                </defs>
+                <g mask="url(#m-agent-connector)"><rect width="180" height="140" fill="url(#p-agent-connector)" /></g>
+              </svg>
+            </div>
+            <div class="group-text">
+              <h3>Setup and integrations</h3>
+              <ul>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#import-old-chats" /></svg>
+                  <div>
+                    <strong>Import old chats</strong>
+                    <p>Load a WhatsApp chat export from a TXT or ZIP file.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#multiple-accounts" /></svg>
+                  <div>
+                    <strong>Multiple accounts</strong>
+                    <p>Link several numbers with separate stores and sending limits.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#encrypted-storage" /></svg>
+                  <div>
+                    <strong>Encrypted storage</strong>
+                    <p>Encrypt message text with a key held in your OS keystore.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#remote-mcp" /></svg>
+                  <div>
+                    <strong>Remote MCP</strong>
+                    <p>Connect over HTTP with a device token or OAuth.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true">
+                    <use href="assets/features/icons.svg#webhooks-and-python-sdk" />
+                  </svg>
+                  <div>
+                    <strong>Webhooks and Python SDK</strong>
+                    <p>Receive signed events or read the local store from Python.</p>
+                  </div>
+                </li>
+                <li>
+                  <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#agent-connector" /></svg>
+                  <div>
+                    <strong>Agent connector</strong>
+                    <p>Draft text and voice replies for the chats you choose.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </div>
+      </section>
+      <section class="architecture section" id="architecture">
+        <div class="container">
+          <div class="section-title">
+            <div>
+              <div class="kicker">How it works</div>
+              <h2>From phone to prompt.</h2>
+            </div>
+            <p>The Go bridge receives your messages. The Python server gives your assistant access to the tools.</p>
+          </div>
+          <div class="flow">
+            <div class="flow-node">
+              <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#chat-history" /></svg>
+              <div><strong>WhatsApp</strong><small>Linked device</small></div>
+            </div>
+            <div class="flow-node">
+              <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#multiple-accounts" /></svg>
+              <div><strong>Go bridge</strong><small>Local SQLite store + API</small></div>
+            </div>
+            <div class="flow-node">
+              <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#remote-mcp" /></svg>
+              <div><strong>MCP server</strong><small>Python tools</small></div>
+            </div>
+            <div class="flow-node">
+              <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#agent-connector" /></svg>
+              <div><strong>Your assistant</strong><small>Claude, Cursor or VS Code</small></div>
+            </div>
+          </div>
+          <a class="text-link" href="whatsapp-mcp-server/"
+            >Read the architecture guide
+            <svg
+              class="ui arrow"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            >
+              <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+          ></a>
+        </div>
+      </section>
+      <section class="container section split" id="install">
+        <div>
+          <div class="kicker">Installation</div>
+          <h2>Bring your<br />own client.</h2>
+          <p class="lead">Link your phone once. Choose where you want to ask the next question.</p>
+          <a class="text-link" href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/getting-started.md"
+            >Bridge setup
+            <svg
+              class="ui out"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            >
+              <path d="M6 18 18 6M6 6h12v12" /></svg
+          ></a>
+        </div>
+        <div class="install-list">
+          <p>
+            Keep a linked bridge running and install uv. For the editor buttons, set <code>WA_MCP_CONFIG</code> to the
+            absolute path of its <code>config.json</code>, then restart the client.
+          </p>
+          <a class="install-link" href="https://github.com/tsahospital-beep/wa-mcp/releases/latest"
+            ><svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#chat-history" /></svg>
+            <div><strong>Claude Desktop</strong><span>Release assets (.mcpb)</span></div>
+            <svg
+              class="ui out"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            >
+              <path d="M6 18 18 6M6 6h12v12" /></svg></a
+          ><a
+            class="install-link"
+            href="https://cursor.com/install-mcp?name=wa-mcp&amp;config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLWZyb20iLCJ3YS1tY3Atc2VydmVyPT0wLjEuMCIsIi0td2l0aCIsIndhLW1jcC1zZGtbZW5jcnlwdGlvbixmaWxlc10iLCJ3YS1tY3AiXX0%3D"
+            ><svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#agent-connector" /></svg>
+            <div><strong>Cursor</strong><span>Add the stdio server</span></div>
+            <svg
+              class="ui out"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            >
+              <path d="M6 18 18 6M6 6h12v12" /></svg></a
+          ><a
+            class="install-link"
+            href="https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wa-mcp%2522%252C%2522type%2522%253A%2522stdio%2522%252C%2522command%2522%253A%2522uvx%2522%252C%2522args%2522%253A%255B%2522--from%2522%252C%2522wa-mcp-server%253D%253D0.1.0%2522%252C%2522--with%2522%252C%2522wa-mcp-sdk%255Bencryption%252Cfiles%255D%2522%252C%2522wa-mcp%2522%255D%257D"
+            ><svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#remote-mcp" /></svg>
+            <div><strong>VS Code</strong><span>Install for agent mode</span></div>
+            <svg
+              class="ui out"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            >
+              <path d="M6 18 18 6M6 6h12v12" /></svg
+          ></a>
+          <p class="note">
+            <strong>Claude Desktop v0.1.0</strong> ships without the bundle. Use the
+            <a href="connect-whatsapp-to-claude/">manual configuration</a> for this release.
+          </p>
+          <details>
+            <summary>
+              Finish a pipx installation
+              <svg
+                class="ui down"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m5 9 7 7 7-7" />
+              </svg>
+            </summary>
+            <p>
+              Use Python 3.11 or newer. After installing the server, add the SDK extras for encrypted fields and file
+              text.
+            </p>
+            <pre><code>pipx inject --force wa-mcp-server &#x27;wa-mcp-sdk[encryption,files]&#x27;</code></pre>
+            <p>
+              Set your client command to <code>wa-mcp</code> with <code>--config</code> and the absolute config path.
+              Check the connection with <code>bridge_status</code>.
+            </p>
+          </details>
+        </div>
+      </section>
+      <section class="security">
+        <div class="container split">
+          <div>
+            <div class="kicker">Security and privacy</div>
+            <h2>Your store.<br />Your controls.</h2>
+            <a class="text-link" href="whatsapp-mcp-security/"
+              >See what is protected
+              <svg
+                class="ui arrow"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+            ></a>
+          </div>
+          <dl class="security-points">
+            <div>
+              <dt>
+                <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#encrypted-storage" /></svg>
+                Encrypted fields
+              </dt>
+              <dd>
+                Message text and transcripts are encrypted by default with a key held for your OS user. Downloads and
+                exports need separate protection.
+              </dd>
+            </div>
+            <div>
+              <dt>
+                <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#remote-mcp" /></svg> Local by
+                default
+              </dt>
+              <dd>
+                The bridge listens on loopback. Your MCP client receives the results it requests. Remote access is
+                opt-in.
+              </dd>
+            </div>
+            <div>
+              <dt>
+                <svg class="icon" aria-hidden="true"><use href="assets/features/icons.svg#replies-and-mentions" /></svg>
+                Sending starts off
+              </dt>
+              <dd>
+                Enable sending explicitly. Supported clients ask before each send. Other clients need a separate, weaker
+                confirmation setting.
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+      <section class="section container" id="comparison">
+        <div class="section-title">
+          <div>
+            <div class="kicker">Comparison</div>
+            <h2 id="compare-title">Compare the servers.</h2>
+          </div>
+          <p>
+            November 2026 comparison. Other servers are linked by language and license. Partial means limited or
+            unconfirmed support.
+          </p>
+        </div>
+        <p class="scroll-hint">Swipe across the table to compare all six servers.</p>
+        <div
+          class="table-scroll"
+          role="region"
+          aria-label="WhatsApp MCP server comparison, scroll horizontally"
+          tabindex="0"
+        >
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Feature</th>
+                <th scope="col">WA MCP</th>
+                <th scope="col"><a href="https://github.com/finereli/whatsapp-mcp">finereli</a></th>
+                <th scope="col"><a href="https://github.com/verygoodplugins/whatsapp-mcp">verygoodplugins</a></th>
+                <th scope="col"><a href="https://github.com/felipeadeildo/whatsapp-mcp">felipeadeildo</a></th>
+                <th scope="col"><a href="https://github.com/jlucaso1/whatsapp-mcp-ts">jlucaso1</a></th>
+                <th scope="col"><a href="https://github.com/BrOrlandi/whatsapp-mcp-server">BrOrlandi</a></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Send messages</th>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <th scope="row">Send media and voice notes</th>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>No</td>
+                <td>Partial</td>
+              </tr>
+              <tr>
+                <th scope="row">Voice transcription</th>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <th scope="row">Text from images (OCR)</th>
+                <td>Yes</td>
+                <td>No</td>
+                <td>No</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <th scope="row">Document text</th>
+                <td>Yes</td>
+                <td>Partial</td>
+                <td>No</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <th scope="row">Encryption at rest</th>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>No</td>
+                <td>No</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <th scope="row">Human-like pacing and limits</th>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Partial</td>
+                <td>Partial</td>
+                <td>No</td>
+                <td>Partial</td>
+              </tr>
+              <tr>
+                <th scope="row">Scheduled messages</th>
+                <td>Yes</td>
+                <td>No</td>
+                <td>No</td>
+                <td>No</td>
+                <td>No</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <th scope="row">Several accounts</th>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <th scope="row">Webhooks</th>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <th scope="row">Remote MCP over HTTP with OAuth</th>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>Partial</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Partial</td>
+              </tr>
+              <tr>
+                <th scope="row">Docker</th>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>No</td>
+                <td>Yes</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <th scope="row">Chat import</th>
+                <td>Yes</td>
+                <td>No</td>
+                <td>No</td>
+                <td>No</td>
+                <td>No</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <th scope="row">License</th>
+                <td>MIT</td>
+                <td>MIT</td>
+                <td>MIT</td>
+                <td>GPL-3.0</td>
+                <td>ISC</td>
+                <td>MIT</td>
+              </tr>
+              <tr>
+                <th scope="row">Language</th>
+                <td>Go, Python</td>
+                <td>TypeScript</td>
+                <td>Go, Python</td>
+                <td>TypeScript</td>
+                <td>TypeScript</td>
+                <td>Go</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">
+          Encryption covers message text at rest. Chat import means reading a WhatsApp export.
+          <a href="https://github.com/tsahospital-beep/wa-mcp#how-it-compares"
+            >Comparison source
+            <svg
+              class="ui out"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            >
+              <path d="M6 18 18 6M6 6h12v12" /></svg
+          ></a>
+        </p>
+      </section>
+      <section id="guides" class="section guide-index">
+        <div class="container">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Documentation</div>
+              <h2 id="docs">Field guides.</h2>
+            </div>
+            <p>Set up a client, work with a conversation or run the bridge on your own server.</p>
+          </div>
+          <div class="index-cols">
+            <div>
+              <h3>Connect a client</h3>
+              <a class="row-link" href="whatsapp-mcp-server/"
+                ><span>WhatsApp MCP server</span
+                ><svg
+                  class="ui arrow"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+              ><a class="row-link" href="connect-whatsapp-to-claude/"
+                ><span>Connect WhatsApp to Claude</span
+                ><svg
+                  class="ui arrow"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+              ><a class="row-link" href="whatsapp-cursor-mcp/"
+                ><span>WhatsApp MCP for Cursor</span
+                ><svg
+                  class="ui arrow"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+              ><a class="row-link" href="whatsapp-vs-code-mcp/"
+                ><span>WhatsApp MCP for VS Code</span
+                ><svg
+                  class="ui arrow"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+              ></a>
+            </div>
+            <div>
+              <h3>Work with chats</h3>
+              <a class="row-link" href="whatsapp-ai-assistant/"
+                ><span>A WhatsApp assistant for your day</span
+                ><svg
+                  class="ui arrow"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+              ><a class="row-link" href="search-whatsapp-messages-with-ai/"
+                ><span>Search WhatsApp messages with AI</span
+                ><svg
+                  class="ui arrow"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+              ><a class="row-link" href="whatsapp-voice-note-transcription/"
+                ><span>Transcribe WhatsApp voice notes</span
+                ><svg
+                  class="ui arrow"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+              ><a class="row-link" href="whatsapp-chat-export-import/"
+                ><span>Import a WhatsApp chat export</span
+                ><svg
+                  class="ui arrow"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+              ></a>
+            </div>
+            <div>
+              <h3>Run a server</h3>
+              <a class="row-link" href="self-hosted-whatsapp-api/"
+                ><span>A self-hosted WhatsApp API</span
+                ><svg
+                  class="ui arrow"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+              ><a class="row-link" href="whatsapp-mcp-security/"
+                ><span>WhatsApp MCP security and privacy</span
+                ><svg
+                  class="ui arrow"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" /></svg></a
+              ><a class="row-link" href="whatsapp-mcp-docker/"
+                ><span>Run WhatsApp MCP in Docker</span
+                ><svg
+                  class="ui arrow"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                >
+                  <path d="M5 12h14m-6-6 6 6-6 6" /></svg
+              ></a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section container split" id="faq">
+        <div>
+          <div class="kicker">FAQ</div>
+          <h2 id="faq-title">Questions.</h2>
+        </div>
+        <div>
+          <details>
+            <summary>
+              What does my assistant see?<svg
+                class="ui down"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m5 9 7 7 7-7" />
+              </svg>
+            </summary>
+            <p>
+              Your assistant receives the results of the tools it calls. For example, a message search returns matching
+              messages. A hosted assistant processes that content under its own terms.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Can I read messages from before I linked my phone?<svg
+                class="ui down"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m5 9 7 7 7-7" />
+              </svg>
+            </summary>
+            <p>
+              Yes, when the phone supplies older history or you have a WhatsApp chat export. Request older pages from
+              the phone or preview and import a TXT or ZIP file.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Do I need a second AI provider?<svg
+                class="ui down"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m5 9 7 7 7-7" />
+              </svg>
+            </summary>
+            <p>
+              No. Your MCP client can interpret the tool results. Local rules detect tasks. A separate provider is
+              optional for daily summaries and image descriptions.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Will WA MCP send messages automatically?<svg
+                class="ui down"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="m5 9 7 7 7-7" />
+              </svg>
+            </summary>
+            <p>
+              Sending is off by default. If enabled, a client with MCP elicitation asks for approval before a send. Once
+              scheduled, a message can go out through the running bridge even when the assistant is closed.
+            </p>
+          </details>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="container">
+        <div class="foot-top">
+          <a class="brand" href="./"><img width="32" height="32" src="assets/brand/logo.svg" alt="" />WA MCP</a>
+          <nav aria-label="Footer">
+            <a href="#guides">Guides</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/docs/reference/tools.md">Tool reference</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp/blob/main/LICENSE">MIT license</a
+            ><a href="https://github.com/tsahospital-beep/wa-mcp"
+              >GitHub
+              <svg
+                class="ui out"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+              >
+                <path d="M6 18 18 6M6 6h12v12" /></svg></a
+            ><a href="llms.txt">llms.txt</a>
+          </nav>
+        </div>
+        <div class="foot-note">
+          <p>
+            <strong>Account risk.</strong> WA MCP uses the unofficial WhatsApp Web protocol. WhatsApp can restrict or
+            ban a linked account, even with sending limits in place.
+          </p>
+          <span>Updated <time datetime="2026-11-23">23 Nov 2026</time></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

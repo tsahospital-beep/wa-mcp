@@ -21,7 +21,7 @@ this repository stays under the MIT License.
 | --- | --- | --- |
 | go.mau.fi/whatsmeow | v0.0.0-20261110152934-c88388f983b4 | MPL-2.0 |
 | go.mau.fi/util | v0.11.0 | MPL-2.0 |
-| go.mau.fi/libsignal | v0.2.2 | GPL-3.0 (see the note below) |
+| go.mau.fi/libsignal | v0.2.3 | GPL-3.0 (see the note below) |
 | github.com/glebarez/go-sqlite | v1.23.0 | BSD-3-Clause |
 | modernc.org/sqlite | v1.55.0 | BSD-3-Clause |
 | modernc.org/libc | v1.74.1 | BSD-3-Clause (third-party notices in the module) |

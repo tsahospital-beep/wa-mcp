@@ -1,41 +1,61 @@
 """Tools: contacts and chats."""
 
-from typing import Any
+from typing import Annotated, Any
 
 from mcp.server.fastmcp import FastMCP
+from pydantic import Field
 
 from wa_mcp import db, people
 from wa_mcp_server.common import (
-    READ_ONLY,
     UNTRUSTED,
     Result,
     chat_jids,
     clamp,
     display_name,
+    hints,
     ok,
     safe,
     shape_messages,
 )
+from wa_mcp_server.tools.inputs import Chat, Offset, PageSize
 
 
 def register(mcp: FastMCP) -> None:
-    @mcp.tool(annotations=READ_ONLY)
+    @mcp.tool(annotations=hints("Search contacts", read_only=True))
     @safe
-    def search_contacts(query: str, limit: int = 20) -> Result:
-        """Find people by name, alias or part of a phone number.
-
-        Returns each person once with all JIDs (phone form and LID form are merged).
-        Use the returned jid as `chat` in other tools.
+    def search_contacts(
+        query: Annotated[
+            str,
+            Field(
+                description="Case-insensitive name, alias or phone fragment, such as Rivera or 55501. A blank query yields no contacts."
+            ),
+        ],
+        limit: Annotated[
+            int, Field(description="Maximum matching contacts, up to 200. Zero or negative uses 20.")
+        ] = 20,
+    ) -> Result:
+        """Resolve a name, alias or phone fragment in the local directory. Returns count and contacts with
+        name, name_source, phone and jids. Use a returned JID for an unambiguous lookup. Use list_chats to
+        browse conversations by activity.
         """
         found = people.search(query, limit=clamp(limit, 20))
         return ok(contacts=found, count=len(found), note=UNTRUSTED)
 
-    @mcp.tool(annotations=READ_ONLY)
+    @mcp.tool(annotations=hints("List recent chats", read_only=True))
     @safe
-    def list_chats(query: str | None = None, limit: int = 50, offset: int = 0) -> Result:
-        """List chats (people and groups) by most recent activity, optionally filtered by title or JID.
-
-        One person may have two JIDs (phone and LID); they are shown as one entry with both JIDs.
+    def list_chats(
+        query: Annotated[
+            str | None,
+            Field(
+                description="Filter by stored title or JID substring, such as Team or @g.us. Omit for all chats."
+            ),
+        ] = None,
+        limit: PageSize = 50,
+        offset: Offset = 0,
+    ) -> Result:
+        """Browse stored conversations by most recent activity. Returns chats with jid, jids, name, is_group
+        and last_activity. Linked phone and LID identities are merged within the page. Page with
+        next_offset. Use get_chat for recent messages in one result.
         """
         offset = max(offset, 0)
         rows = db.conversations(query=query, limit=clamp(limit), offset=offset)
@@ -57,12 +77,17 @@ def register(mcp: FastMCP) -> None:
                 entry["last_activity"] = row["time"]
         return ok(chats=list(merged.values()), offset=offset, next_offset=offset + len(rows), note=UNTRUSTED)
 
-    @mcp.tool(annotations=READ_ONLY)
+    @mcp.tool(annotations=hints("Inspect one chat", read_only=True))
     @safe
-    def get_chat(chat: str, recent: int = 5) -> Result:
-        """Returns found=false for a chat absent from the store. Otherwise returns its name, all JIDs, group flag and the most recent messages.
-
-        `chat` may be a JID, a phone number with country code, or a chat or contact name.
+    def get_chat(
+        chat: Chat,
+        recent: Annotated[
+            int, Field(description="Number of recent messages, up to 200. Zero or negative uses 5.")
+        ] = 5,
+    ) -> Result:
+        """Look up a stored person or group. Returns found, chat metadata (jid, jids, name, phone and
+        is_group) and recent_messages, newest first. A resolved JID absent from the store gives
+        found=false. Use list_messages for a longer or filtered history.
         """
         jids = chat_jids(chat)
         info = next((c for c in (db.conversation(j) for j in jids) if c), None)
@@ -83,10 +108,13 @@ def register(mcp: FastMCP) -> None:
             note=UNTRUSTED,
         )
 
-    @mcp.tool(annotations=READ_ONLY)
+    @mcp.tool(annotations=hints("Get the last exchange", read_only=True))
     @safe
-    def get_last_interaction(chat: str) -> Result:
-        """When we last talked with a person or group: latest message overall, latest from them, latest from me."""
+    def get_last_interaction(chat: Chat) -> Result:
+        """Check who wrote last in one stored conversation. Returns chat, name, last, last_from_them and
+        last_from_me. Each message has id, time, from and text, or is null when absent. Use
+        get_message_context for the surrounding exchange.
+        """
         jids = chat_jids(chat)
         rows = [
             row for direction in (False, True) for row in db.messages(conv=jids, outgoing=direction, limit=1)

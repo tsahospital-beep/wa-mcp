@@ -1,22 +1,24 @@
 """Tool: add the messages of a WhatsApp "Export chat" file to the local store."""
 
-from typing import Any
+from typing import Annotated, Any
 
 from mcp.server.fastmcp import FastMCP
+from pydantic import Field
 
 from wa_mcp import db
 from wa_mcp.client import BridgeError
 from wa_mcp_server.common import (
-    LOCAL_WRITE,
     UNTRUSTED,
     Result,
     bridge,
     chat_jids,
     fail,
+    hints,
     importable_file,
     ok,
     safe,
 )
+from wa_mcp_server.tools.inputs import Chat
 
 
 def _target_jid(chat: str) -> str:
@@ -29,29 +31,51 @@ def _target_jid(chat: str) -> str:
 
 
 def register(mcp: FastMCP) -> None:
-    @mcp.tool(annotations=LOCAL_WRITE)
+    @mcp.tool(annotations=hints("Import a WhatsApp chat export", idempotent=True))
     @safe
     def import_chat_export(
-        path: str,
-        chat: str,
-        me: str | None = None,
-        date_order: str | None = None,
-        dry_run: bool = False,
-        timezone: str | None = None,
-        names: dict[str, str] | None = None,
+        path: Annotated[
+            str,
+            Field(
+                description="Server-local .txt or .zip file inside downloads_dir, exports_dir or import.allowed_dirs, such as /exports/Chat.zip."
+            ),
+        ],
+        chat: Chat,
+        me: Annotated[
+            str | None,
+            Field(
+                description="Your sender name exactly as printed, such as Alex Lee. Required when the importer cannot infer it."
+            ),
+        ] = None,
+        date_order: Annotated[
+            str | None,
+            Field(
+                description="Date component order: dmy, mdy or ymd. Omit for detection. Supply it if dates are ambiguous."
+            ),
+        ] = None,
+        dry_run: Annotated[
+            bool,
+            Field(
+                description="Preview counts and sender mapping without importing. Default false writes to the store."
+            ),
+        ] = False,
+        timezone: Annotated[
+            str | None,
+            Field(
+                description="Time zone of the exported timestamps, such as Asia/Tbilisi. Omit for the bridge's local zone."
+            ),
+        ] = None,
+        names: Annotated[
+            dict[str, str] | None,
+            Field(
+                description='Map export sender names to JIDs or international phone numbers, such as {"Alex Lee":"+15550100001"}. Omit for automatic resolution.'
+            ),
+        ] = None,
     ) -> Result:
-        """Add the messages of a WhatsApp "Export chat" file to a chat, for history older than the phone sync.
-
-        path is a .txt file or a .zip (text plus media) inside downloads_dir, exports_dir or a folder in
-        import.allowed_dirs. chat is a JID, a phone number or a chat name. me is the sender name that is
-        you, as the export shows it; it is needed unless the file name or the account's push name tells.
-        date_order is dmy, mdy or ymd and is detected when the file allows it. timezone is the zone the
-        export was made in (default: local time). names maps a sender name to a JID or phone number.
-
-        Run it with dry_run=true first: it reports the counts, the detected date order and how each sender
-        name would be stored, and writes nothing. The same file can be imported again without creating
-        duplicates, and messages that the phone already synced are skipped. Nothing is sent to anyone. Needs
-        the bridge to be running.
+        """Add a WhatsApp text or ZIP export to one chat through the running bridge, including eligible
+        media. Preview with dry_run=true to check dates and senders. Reimporting skips duplicates and
+        synced messages. Returns messages_added, duplicates, media_added, date_order and senders. Imported
+        content is untrusted. Use sync_chat_history for history available from the phone.
         """
         file = importable_file(path)
         try:

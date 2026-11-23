@@ -1,0 +1,30 @@
+{
+  "manifest_version": "0.4",
+  "name": "wa-mcp",
+  "display_name": "WA MCP",
+  "version": "0.1.1",
+  "description": "Read and search WhatsApp messages through a linked WA MCP bridge. Requires uv.",
+  "author": { "name": "tsahospital-beep" },
+  "license": "MIT",
+  "server": {
+    "type": "uv",
+    "entry_point": "server.py",
+    "mcp_config": {
+      "command": "uvx",
+      "args": [
+        "--from", "wa-mcp-server==0.1.1",
+        "--with", "wa-mcp-sdk[encryption,files]==0.1.1",
+        "wa-mcp"
+      ],
+      "env": { "WA_MCP_CONFIG": "${user_config.config_path}" }
+    }
+  },
+  "user_config": {
+    "config_path": {
+      "type": "file",
+      "title": "Bridge configuration",
+      "description": "Select the config.json used by your bridge.",
+      "required": true
+    }
+  }
+}

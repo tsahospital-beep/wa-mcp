@@ -1,0 +1,202 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  go:
+    name: Go (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        working-directory: bridge
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: bridge/go.mod
+          cache-dependency-path: bridge/go.sum
+
+      - name: gofmt
+        shell: bash
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then
+            echo "These files need gofmt:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test ./...
+
+      - name: go test -race
+        if: runner.os == 'Linux'
+        run: go test -race ./...
+
+  govulncheck:
+    name: govulncheck
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bridge
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: bridge/go.mod
+          cache-dependency-path: bridge/go.sum
+
+      - name: govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
+          govulncheck ./...
+
+  python:
+    name: Python ${{ matrix.python }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.11", "3.13"]
+        include:
+          - os: windows-latest
+            python: "3.13"
+          - os: macos-latest
+            python: "3.13"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python }}
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: ruff format
+        run: uv run ruff format --check .
+
+      - name: ruff check
+        run: uv run ruff check .
+
+      - name: mypy
+        run: uv run mypy --strict
+
+      - name: pytest
+        run: uv run pytest
+
+  pip-audit:
+    name: pip-audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Audit the locked Python packages (all extras)
+        run: |
+          uv export --locked --all-packages --all-extras --no-emit-workspace --format requirements-txt -o requirements-audit.txt
+          uvx pip-audit --disable-pip --no-deps --strict -r requirements-audit.txt
+
+  docker:
+    name: Docker images and compose preview
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: deploy/docker
+    env:
+      WA_MCP_DOMAIN: wa.example.test
+      WA_MCP_PORT: "18765"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the bridge image
+        run: docker build -f Dockerfile.bridge -t wa-mcp-bridge:local ../..
+
+      - name: Build the server image
+        run: docker build -f Dockerfile.server -t wa-mcp-server:local ../..
+
+      - name: Key file script
+        run: |
+          sh secrets/make-key.sh
+          test "$(sudo stat -c '%u %a' secrets/wa_mcp.key)" = "65532 600"
+
+      - name: Start the preview stack (no WhatsApp)
+        run: docker compose -f compose.yaml -f compose.preview.yaml up -d --wait --wait-timeout 120
+
+      - name: Health checks
+        run: |
+          curl -fsS "http://127.0.0.1:${WA_MCP_PORT}/health"
+          docker compose -f compose.yaml -f compose.preview.yaml exec -T bridge /usr/local/bin/wa-bridge health
+          docker compose -f compose.yaml -f compose.preview.yaml exec -T server wa-mcp health
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST "http://127.0.0.1:${WA_MCP_PORT}/mcp" -H "Host: ${WA_MCP_DOMAIN}")" = "401"
+
+      - name: Logs
+        if: always()
+        run: docker compose -f compose.yaml -f compose.preview.yaml logs --no-color
+
+      - name: Stop
+        if: always()
+        run: docker compose -f compose.yaml -f compose.preview.yaml down -v
+
+  docs:
+    name: Documentation checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: bridge/go.mod
+          cache-dependency-path: bridge/go.sum
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Links and images
+        run: uv run python scripts/check_links.py
+
+      - name: OpenAPI copy
+        run: uv run python scripts/check_openapi_sync.py
+
+      - name: config.example.json (Go and Python defaults)
+        run: uv run python scripts/check_config_example.py
+
+      - name: Tool reference
+        run: uv run python scripts/gen_tool_reference.py --check
+
+      - name: whatsmeow schema used by the Python tests
+        run: |
+          (cd bridge && go mod download go.mau.fi/whatsmeow)
+          uv run pytest sdk/python/tests/test_core.py -k whatsmeow_schema
+        env:
+          WA_MCP_REQUIRE_GO: "1"

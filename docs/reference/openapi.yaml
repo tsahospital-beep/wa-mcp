@@ -1,0 +1,1034 @@
+openapi: 3.1.0
+info:
+  title: wa-mcp bridge API
+  version: "1"
+  summary: Local HTTP API of the wa-mcp WhatsApp bridge.
+  description: |
+    The bridge listens on the loopback interface only (default 127.0.0.1:8080).
+    Every request needs `Authorization: Bearer <token>`. The token is `api.token`
+    from config.json or, when that is empty, the content of `store/api.token`
+    (created on first start). A token must have at least 32 characters.
+    Requests whose Host header does not match the listen address are refused
+    with 403.
+
+    Errors always have the form `{"ok": false, "error": "..."}`. A 500 means a
+    local problem in the bridge; 502 means WhatsApp or its CDN answered with an
+    error; 503 means the bridge is not logged in or not connected; 504 means
+    WhatsApp did not answer a send in time (the message may have been
+    delivered, so a retry of the same text is refused as a duplicate).
+
+    Timestamps in responses are unix seconds. Query parameters that take a time
+    accept RFC3339 (`2026-01-02T15:04:05Z`), a date (`2026-01-02`, local time)
+    or a number: an integer greater than 100000000000 is milliseconds,
+    otherwise seconds (the same rule as the Python package).
+
+    Chat parameters accept phone numbers and JIDs on s.whatsapp.net, lid and
+    g.us; read endpoints also accept hosted and hosted.lid, which are never
+    sent to.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: http://127.0.0.1:8080/api/v1
+security:
+  - bearer: []
+tags:
+  - name: status
+  - name: read
+    description: Stored chats, messages and calls.
+  - name: act
+    description: Actions on the WhatsApp account.
+  - name: schedule
+paths:
+  /health:
+    servers:
+      - url: http://127.0.0.1:8080
+    get:
+      tags: [status]
+      summary: Health check without a token
+      description: |
+        For container health checks. It needs no token and answers only
+        whether the bridge is connected and has a linked device. The Host
+        header is checked as for every other path. The login preview
+        (`--login-preview`) answers it too, with both values false.
+      operationId: getHealth
+      security: []
+      responses:
+        "200":
+          description: The bridge runs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, connected, logged_in]
+                properties:
+                  ok: { type: boolean, const: true }
+                  connected: { type: boolean }
+                  logged_in: { type: boolean }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /status:
+    get:
+      tags: [status]
+      summary: Connection state
+      operationId: getStatus
+      responses:
+        "200":
+          description: Bridge state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /chats:
+    get:
+      tags: [read]
+      summary: List chats by recent activity
+      operationId: listChats
+      parameters:
+        - name: query
+          in: query
+          description: Substring of the title or JID.
+          schema: { type: string }
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: Chats, most recent first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, chats]
+                properties:
+                  ok: { type: boolean, const: true }
+                  chats:
+                    type: array
+                    items: { $ref: "#/components/schemas/Chat" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /messages:
+    get:
+      tags: [read]
+      summary: List stored messages
+      operationId: listMessages
+      parameters:
+        - name: chat
+          in: query
+          description: Chat JID or phone number. All chats when omitted.
+          schema: { type: string }
+        - name: after
+          in: query
+          description: Only messages sent after this time.
+          schema: { type: string }
+        - name: before
+          in: query
+          description: Only messages sent before this time.
+          schema: { type: string }
+        - name: query
+          in: query
+          description: Case-insensitive text search (all scripts, not only ASCII) in body and attachment name. Deleted messages are not searched unless include_deleted is set.
+          schema: { type: string }
+        - name: order
+          in: query
+          description: "`desc` (newest first, default) or `asc`."
+          schema: { type: string, enum: [asc, desc] }
+        - name: include_deleted
+          in: query
+          description: Show the text of messages that were deleted for everyone (they are always listed, with `deleted_at` set and an empty body otherwise).
+          schema: { type: boolean, default: false }
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: Messages.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, messages]
+                properties:
+                  ok: { type: boolean, const: true }
+                  messages:
+                    type: array
+                    items: { $ref: "#/components/schemas/Message" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /send:
+    post:
+      tags: [act]
+      summary: Send a message
+      description: |
+        Runs the send pipeline: limits, dedupe, quiet hours, then (unless
+        `human` is false or `sending.human_like` is off) mark-read, a short
+        reading pause, typing or recording presence and the send.
+
+        Text and media: images, videos and documents carry the text as caption.
+        Voice notes (`as_voice`, Ogg/Opus only) and stickers (`.webp`) cannot,
+        so the text is sent first as its own message; `ids` then lists every
+        message id.
+
+        Files: `media_path` and `sticker_path` must be inside `downloads_dir`,
+        `exports_dir` (always allowed) or a folder listed in
+        `sending.allowed_media_dirs`. Files of the store folder and the config
+        file are never sent, under any name (hard links are compared by
+        identity). A file with more than one hard link, or a path through a
+        junction or symbolic link on Windows, is refused. The checked file is
+        opened once and uploaded from that handle.
+
+        Concurrent requests reserve their place in the limits before sending, so
+        they cannot exceed them together. A client that disconnects does not
+        stop a send in progress.
+
+        Disabled unless `sending.enabled` is true in the config.
+      operationId: send
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SendRequest" }
+      responses:
+        "200":
+          description: Sent.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SendResult" }
+        "202":
+          description: Quiet hours with action `queue`; stored as a scheduled message.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, queued, scheduled_id]
+                properties:
+                  ok: { type: boolean, const: true }
+                  queued: { type: boolean, const: true }
+                  scheduled_id: { type: integer }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403":
+          description: Sending disabled, quiet hours with action `refuse`, a media file refused by the folder rules, or wrong Host.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "504":
+          description: WhatsApp did not answer the send in time; the message may have been delivered.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "409":
+          description: The same message went to this chat within `sending.dedupe_window_minutes`.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "413": { $ref: "#/components/responses/TooLarge" }
+        "429":
+          description: A limit in `sending.limits` was reached.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "502": { $ref: "#/components/responses/Upstream" }
+        "503": { $ref: "#/components/responses/NotConnected" }
+  /read:
+    post:
+      tags: [act]
+      summary: Mark messages read
+      description: |
+        Sends read receipts; WhatsApp applies them on all linked devices and the
+        senders see the messages as read. Refused with 403 when
+        `read_receipts.allow_mark_read` is false in the config (default true).
+      operationId: markRead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chat, ids]
+              properties:
+                chat: { type: string, description: Chat JID or phone number. }
+                ids:
+                  type: array
+                  minItems: 1
+                  maxItems: 200
+                  items: { type: string }
+                author:
+                  type: string
+                  description: Sender of the messages. Needed in groups unless the messages are stored.
+      responses:
+        "200":
+          description: Marked.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, marked]
+                properties:
+                  ok: { type: boolean, const: true }
+                  marked: { type: integer }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403":
+          description: "`read_receipts.allow_mark_read` is false, or wrong Host."
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "502": { $ref: "#/components/responses/Upstream" }
+        "503": { $ref: "#/components/responses/NotConnected" }
+  /history:
+    post:
+      tags: [act]
+      summary: Ask the phone for older messages
+      description: |
+        Sends an on-demand history request to our own phone (nothing goes to
+        contacts). The messages arrive in the background and are stored like
+        any other history sync. The request is anchored at `before_id` or at
+        the oldest stored message of the chat.
+      operationId: requestHistory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chat]
+              properties:
+                chat: { type: string }
+                count: { type: integer, minimum: 1, maximum: 100, default: 50 }
+                before_id: { type: string, description: Stored message id to page back from. }
+      responses:
+        "200":
+          description: Requested.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, requested, anchor_id, oldest_known]
+                properties:
+                  ok: { type: boolean, const: true }
+                  requested: { type: integer }
+                  anchor_id: { type: string }
+                  oldest_known: { type: integer, description: sent_at of the anchor message. }
+                  note: { type: string }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "502": { $ref: "#/components/responses/Upstream" }
+        "503": { $ref: "#/components/responses/NotConnected" }
+  /media/download:
+    post:
+      tags: [act]
+      summary: Save the attachment of a message
+      description: |
+        Downloads into `downloads_dir/<chat>/` (the folder name is the chat JID
+        with characters other than letters, digits, space, dot, underscore and
+        dash replaced by `_`) with a file name unique to the message. Stickers
+        are named after their content hash; documents keep their name plus a
+        short message id, or only the id when the store is encrypted. When the
+        CDN copy has expired the bridge asks the phone to upload it again (up to
+        40 seconds) and retries. The file is streamed to a temporary file and
+        renamed when complete; attachments above `media.max_download_mb`
+        (default 512) are refused with 400.
+      operationId: saveAttachment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chat, id]
+              properties:
+                chat: { type: string }
+                id: { type: string }
+      responses:
+        "200":
+          description: Saved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, path, kind]
+                properties:
+                  ok: { type: boolean, const: true }
+                  path: { type: string, description: Absolute path of the saved file. }
+                  kind: { $ref: "#/components/schemas/Kind" }
+                  attachment_name: { type: string }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422":
+          description: The stored attachment details are incomplete.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "502": { $ref: "#/components/responses/Upstream" }
+        "503": { $ref: "#/components/responses/NotConnected" }
+  /avatar:
+    get:
+      tags: [act]
+      summary: Save a profile picture
+      description: Saves the full-size picture to `downloads_dir/avatars/<user>.jpg`.
+      operationId: getAvatar
+      parameters:
+        - name: jid
+          in: query
+          required: true
+          description: Contact or group JID, or a phone number.
+          schema: { type: string }
+      responses:
+        "200":
+          description: Saved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, path]
+                properties:
+                  ok: { type: boolean, const: true }
+                  path: { type: string }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "502": { $ref: "#/components/responses/Upstream" }
+        "503": { $ref: "#/components/responses/NotConnected" }
+  /calls:
+    get:
+      tags: [read]
+      summary: List recorded calls
+      operationId: listCalls
+      parameters:
+        - name: since
+          in: query
+          description: Only calls started at or after this time.
+          schema: { type: string }
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Calls, newest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, calls]
+                properties:
+                  ok: { type: boolean, const: true }
+                  calls:
+                    type: array
+                    items: { $ref: "#/components/schemas/Call" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /schedule:
+    get:
+      tags: [schedule]
+      summary: List scheduled messages
+      operationId: listScheduled
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: "#/components/schemas/ScheduleStatus" }
+      responses:
+        "200":
+          description: Entries, soonest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, scheduled]
+                properties:
+                  ok: { type: boolean, const: true }
+                  scheduled:
+                    type: array
+                    items: { $ref: "#/components/schemas/Scheduled" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      tags: [schedule]
+      summary: Schedule a message
+      description: |
+        The runner checks every 15 seconds and sends through the normal
+        pipeline (limits and human-like timing apply; quiet hours do not,
+        because the time was chosen explicitly). Runs missed while the bridge
+        was down are sent once, not once per missed run. Monthly entries keep
+        their day of month and use the last day in shorter months.
+
+        The entry stores how its file is sent (`as_voice`, `sticker_path` or
+        plain media) and its `human` flag, so the later send matches the
+        request. Messages queued by quiet hours keep these too. After a crash,
+        a one-time entry caught while sending is marked failed (it may have
+        gone out); a recurring one skips that run and keeps its schedule.
+      operationId: addScheduled
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ScheduleRequest" }
+      responses:
+        "201":
+          description: Stored.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, id, next_run, scheduled]
+                properties:
+                  ok: { type: boolean, const: true }
+                  id: { type: integer }
+                  next_run: { type: integer }
+                  scheduled: { $ref: "#/components/schemas/Scheduled" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403":
+          description: Sending disabled, media outside `sending.allowed_media_dirs` or inside the store, or wrong Host.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "413": { $ref: "#/components/responses/TooLarge" }
+  /schedule/{id}:
+    delete:
+      tags: [schedule]
+      summary: Cancel a pending scheduled message
+      operationId: cancelScheduled
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        "200":
+          description: Cancelled.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, cancelled, id]
+                properties:
+                  ok: { type: boolean, const: true }
+                  cancelled: { type: boolean, const: true }
+                  id: { type: integer }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: The entry is not pending.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /import:
+    post:
+      tags: [act]
+      summary: Import an exported chat file
+      description: |
+        Reads a file written by WhatsApp's "Export chat" feature (a `.txt` file,
+        or a `.zip` with the `.txt` and the media) and stores its messages in
+        one chat, for history older than what the phone syncs. Android and iOS
+        layouts are read; the date order is detected from the file unless
+        `date_order` is given. Export files carry no time zone, so `timezone`
+        names the one the export was made in (the bridge's local zone by
+        default).
+
+        Send the file as the form field `file`, or send JSON with `path`, a
+        file inside `downloads_dir`, `exports_dir` or `import.allowed_dirs`.
+        The size limit is `import.max_mb`. Attachments of a zip are copied to
+        `downloads_dir/<chat>/`. Nothing is sent to anyone, and no webhook event
+        is emitted.
+
+        Messages get ids that start with `imp-` and depend on the chat, the
+        minute, the sender name and the text, so importing the same file again
+        adds nothing. A message that matches a synced one (same direction and
+        text, within 2 minutes) is skipped. With `dry_run` nothing is written.
+        Imports run one at a time.
+      operationId: importChat
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { $ref: "#/components/schemas/ImportForm" }
+          application/json:
+            schema: { $ref: "#/components/schemas/ImportRequest" }
+      responses:
+        "200":
+          description: What was imported, or with `dry_run` what would be.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ImportReport" }
+        "400":
+          description: |
+            The file is not a usable export (damaged or unsafe archive, no
+            message lines, ambiguous or conflicting dates), an option is wrong,
+            or the sender who is you could not be told. The last case lists the
+            names found in `senders`.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403":
+          description: A path outside the allowed folders or inside the store, or wrong Host.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "404":
+          description: The file or the chat was not found. For a chat title, `candidates` lists near matches.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "409":
+          description: Several chats have this title (`candidates` lists them), or another import is running.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "413":
+          description: The file or its unpacked content is larger than `import.max_mb`.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "500": { $ref: "#/components/responses/Internal" }
+  /login/url:
+    post:
+      tags: [status]
+      summary: Issue a one-time link to the login window
+      description: |
+        While the bridge waits for a login, it prints the link with its
+        one-time token only to an interactive terminal. When its output goes to
+        a file, use this endpoint (or `wa-bridge login-url`) to get a fresh link.
+        Each link works once: the first visit exchanges it for a session cookie.
+      operationId: loginURL
+      responses:
+        "200":
+          description: A fresh link.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, url]
+                properties:
+                  ok: { type: boolean, const: true }
+                  url: { type: string, examples: ["http://127.0.0.1:53412/?t=0f3a"] }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409":
+          description: No login in progress; the bridge is already linked.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /openapi.yaml:
+    get:
+      tags: [status]
+      summary: This document
+      operationId: getOpenAPI
+      responses:
+        "200":
+          description: OpenAPI 3.1 document.
+          content:
+            application/yaml:
+              schema: { type: string }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/Internal" }
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      description: Token from `api.token` or `store/api.token`.
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 0, maximum: 500, default: 50 }
+    Offset:
+      name: offset
+      in: query
+      schema: { type: integer, minimum: 0, default: 0 }
+  responses:
+    BadRequest:
+      description: Invalid input.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Unauthorized:
+      description: Missing or wrong bearer token.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Forbidden:
+      description: Host header does not match the listen address.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: Not found.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    TooLarge:
+      description: Request body larger than 256 KiB.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Internal:
+      description: A local problem in the bridge (database, file system).
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Upstream:
+      description: WhatsApp or its media CDN returned an error.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotConnected:
+      description: The bridge is not logged in or not connected.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+  schemas:
+    Error:
+      type: object
+      required: [ok, error]
+      properties:
+        ok: { type: boolean, const: false }
+        error: { type: string }
+    Status:
+      type: object
+      required: [ok, connected, logged_in, account, version]
+      properties:
+        ok: { type: boolean, const: true }
+        connected: { type: boolean }
+        logged_in: { type: boolean }
+        account:
+          type: string
+          description: Own number, masked (first digit and last four), empty before login.
+          examples: ["+1 ••• ••• 0101"]
+        version: { type: string }
+        sending_enabled: { type: boolean }
+        security_events:
+          type: array
+          description: The last 20 session events, newest first. They survive restarts.
+          items: { $ref: "#/components/schemas/SecurityEvent" }
+        security_alert:
+          type: boolean
+          description: True when a warning event happened in the last 7 days.
+        protection:
+          type: object
+          description: How the store is protected. No secrets.
+          properties:
+            field_encryption: { type: string, enum: [keystore, passphrase, keyfile, "off"] }
+            key_store: { type: string, examples: [dpapi, keychain, secret-service, file, env, none] }
+            api_token: { type: string, examples: [dpapi, keychain, secret-service, file, config] }
+            efs: { type: string, enum: ["on", partial, unavailable, not_windows, disabled] }
+            compaction:
+              type: string
+              enum: [done, pending]
+              description: pending while old plain text may still be in free pages or the WAL after the first encryption; the next start compacts again.
+            plain_copy:
+              type: string
+              enum: [none, kept]
+              description: kept when the plain copy made before the first encryption could not be removed.
+    SecurityEvent:
+      type: object
+      required: [at, kind, level, detail]
+      properties:
+        at: { type: integer, description: Unix seconds. }
+        kind:
+          type: string
+          enum: [logged_out, session_replaced, device_added, device_removed, account_mismatch, paired]
+        level: { type: string, enum: [warning, info] }
+        detail:
+          type: string
+          description: Plain explanation. Phone numbers are masked; no message text.
+    Kind:
+      type: string
+      description: |
+        Attachments: image, video (round video notes included), audio, voice,
+        document, sticker. Typed placeholders (no attachment, text in body):
+        location (name and coordinates), contact (name and phone numbers), poll
+        (question and options), unsupported (a message type the bridge cannot
+        show; the body names the type, nothing is dropped silently).
+      enum: [text, image, video, audio, voice, document, sticker, location, contact, poll, unsupported]
+    Chat:
+      type: object
+      required: [jid, title, is_group, last_activity]
+      properties:
+        jid: { type: string, examples: ["15550100002@s.whatsapp.net"] }
+        title: { type: string, examples: ["Book club"] }
+        is_group: { type: boolean }
+        last_activity: { type: integer }
+    Message:
+      type: object
+      required: [conv, msg_id, author, outgoing, sent_at, body, kind]
+      properties:
+        conv: { type: string, description: Chat JID. }
+        msg_id: { type: string }
+        author: { type: string, description: Sender JID. }
+        outgoing: { type: boolean }
+        sent_at: { type: integer }
+        body: { type: string, description: Text or media caption. }
+        kind: { $ref: "#/components/schemas/Kind" }
+        attachment_name: { type: string }
+        mime: { type: string }
+        byte_size: { type: integer }
+        local_path: { type: string, description: Set once the attachment was saved. }
+        reply_to_id: { type: string }
+        reply_to_author: { type: string }
+        reply_preview: { type: string, description: "Short text of the quoted message; media shows as [image] and similar." }
+        mentioned:
+          type: array
+          items: { type: string }
+        read_at: { type: integer, description: When we marked it read. }
+        edited_at: { type: integer, description: Time of the newest edit by the author. }
+        deleted_at: { type: integer, description: Set when the message was deleted for everyone; body is empty unless include_deleted is set. }
+        deleted_unverified:
+          type: integer
+          description: Set when a group member other than the author deleted the message and is not a confirmed admin; the text stays visible. Turns into deleted_at once the member is confirmed as admin.
+        deleted_by: { type: string, description: JID of whoever deleted the message. }
+        reactions:
+          type: array
+          description: Reactions to this message (text capped at 32 bytes).
+          items:
+            type: object
+            required: [reactor, emoji, reacted_at]
+            properties:
+              reactor: { type: string }
+              emoji: { type: string }
+              reacted_at: { type: integer }
+    Call:
+      type: object
+      required: [call_id, peer, outgoing, video, started_at, outcome]
+      properties:
+        call_id: { type: string }
+        peer: { type: string }
+        group_jid: { type: string }
+        outgoing: { type: boolean }
+        video: { type: boolean }
+        started_at: { type: integer }
+        ended_at: { type: integer }
+        outcome: { type: string, enum: [missed, rejected, answered, unknown] }
+    Reply:
+      type: object
+      required: [id]
+      properties:
+        id: { type: string, description: Id of the quoted message. }
+        author:
+          type: string
+          description: Author JID or phone. Looked up in the database when omitted; needed in groups.
+        preview:
+          type: string
+          description: Quoted text shown above the reply. Looked up in the database when omitted.
+    SendRequest:
+      type: object
+      required: [to]
+      properties:
+        to: { type: string, description: Chat JID or phone number with country code. }
+        text: { type: string }
+        media_path: { type: string, description: Existing local file inside downloads_dir, exports_dir or a folder in `sending.allowed_media_dirs`; never a file of the store folder or the config file. }
+        as_voice: { type: boolean, default: false, description: Send media_path (Ogg/Opus) as a voice note. }
+        sticker_path: { type: string, description: Local .webp file sent as a sticker. }
+        reply_to: { $ref: "#/components/schemas/Reply" }
+        mentions:
+          type: array
+          description: JIDs or phone numbers; "@<number>" is added to the text when missing.
+          items: { type: string }
+        human: { type: boolean, default: true, description: false skips the human-like waits; limits and dedupe still apply. }
+      examples:
+        - to: "15550100002"
+          text: "See you at the book club"
+        - to: "120363000000000001@g.us"
+          text: "I will bring the snacks"
+          reply_to: { id: "3EB0A1B2C3D4E5F6" }
+          mentions: ["15550100003"]
+    SendResult:
+      type: object
+      required: [ok, id, sent_at, waited_ms]
+      properties:
+        ok: { type: boolean, const: true }
+        id: { type: string, description: Id of the first message sent. }
+        ids:
+          type: array
+          description: All ids when the request became more than one message.
+          items: { type: string }
+        sent_at: { type: integer }
+        waited_ms: { type: integer, description: Time spent on human-like waits. }
+    ScheduleStatus:
+      type: string
+      enum: [pending, sending, sent, failed, cancelled]
+    ScheduleRequest:
+      type: object
+      required: [to, at]
+      properties:
+        to: { type: string }
+        text: { type: string }
+        media_path: { type: string, description: Same rules as for /send. }
+        as_voice: { type: boolean, default: false, description: Send media_path (Ogg/Opus) as a voice note. }
+        sticker_path: { type: string, description: A .webp file sent as a sticker (not together with media_path). }
+        human: { type: boolean, description: false skips the human-like waits for this entry. }
+        reply_to:
+          description: Message id, or an object with `id`.
+          oneOf:
+            - type: string
+            - $ref: "#/components/schemas/Reply"
+        mentions:
+          type: array
+          items: { type: string }
+        at: { type: string, description: First run (RFC3339 or a number; above 100000000000 it is milliseconds). }
+        recurrence: { type: string, enum: [once, daily, weekly, monthly], default: once }
+    Scheduled:
+      type: object
+      required: [id, target, body, next_run, recurrence, status, attempts, created_at]
+      properties:
+        id: { type: integer }
+        target: { type: string }
+        body: { type: string }
+        media_path: { type: string }
+        kind: { type: string, enum: [text, image, video, audio, voice, document, sticker], description: How media_path is sent. }
+        human: { type: boolean, description: Stored pacing flag; absent means the config default. }
+        reply_to_id: { type: string }
+        mentions:
+          type: array
+          items: { type: string }
+        next_run: { type: integer }
+        recurrence: { type: string, enum: [once, daily, weekly, monthly] }
+        status: { $ref: "#/components/schemas/ScheduleStatus" }
+        attempts: { type: integer }
+        last_error: { type: string }
+        created_at: { type: integer }
+        last_sent_at: { type: integer }
+    ImportRequest:
+      type: object
+      required: [path, chat]
+      properties:
+        path:
+          type: string
+          description: Export file (.txt or .zip) inside `downloads_dir`, `exports_dir` or `import.allowed_dirs`.
+        chat:
+          type: string
+          description: Chat JID, phone number with country code, or the exact title of a stored chat.
+        me:
+          type: string
+          description: |
+            The sender name that is you, as the export shows it. When empty, the push name of the
+            account is tried, then (in a direct chat with two senders) the name that is not the
+            other person's.
+        date_order:
+          type: string
+          enum: [dmy, mdy, ymd]
+          description: Date order of the file. Detected when empty; a file that cannot be decided is refused unless this is set.
+        timezone:
+          type: string
+          description: IANA zone name the export was made in, such as `Europe/Berlin`. Default is the local zone of the bridge.
+        dry_run: { type: boolean, default: false }
+        names:
+          type: object
+          additionalProperties: { type: string }
+          description: Maps a sender name to a JID or phone number.
+    ImportForm:
+      type: object
+      required: [file, chat]
+      properties:
+        file: { type: string, format: binary }
+        chat: { type: string }
+        me: { type: string }
+        date_order: { type: string, enum: [dmy, mdy, ymd] }
+        timezone: { type: string }
+        dry_run: { type: string, description: "`true` or `false`." }
+        names: { type: string, description: "JSON object that maps a sender name to a JID or phone number." }
+    ImportSender:
+      type: object
+      required: [name, messages, author, outgoing]
+      properties:
+        name: { type: string }
+        messages: { type: integer }
+        author:
+          type: string
+          description: JID the messages are stored with, your own JID for your messages, or `name:<name>` when the sender could not be matched to a person.
+        outgoing: { type: boolean }
+    ImportReport:
+      type: object
+      required: [ok, dry_run, chat, messages_added, duplicates, date_order, date_order_source, skipped_lines, senders]
+      properties:
+        ok: { type: boolean, const: true }
+        dry_run: { type: boolean }
+        chat: { type: string, description: "JID of the chat." }
+        chat_title: { type: string }
+        new_chat: { type: boolean, description: "The chat did not exist and was created." }
+        messages_added: { type: integer, description: "Messages stored (with `dry_run`, that would be stored)." }
+        duplicates: { type: integer, description: "Messages skipped because they are already stored." }
+        already_imported: { type: integer, description: "Duplicates of an earlier import." }
+        already_synced: { type: integer, description: "Duplicates of a message the phone synced." }
+        media_added: { type: integer, description: "Attachments copied to `downloads_dir` and linked to their messages." }
+        media_missing: { type: integer, description: "Attachment lines whose file is not in the archive." }
+        media_omitted: { type: integer, description: "Placeholders such as `<Media omitted>`." }
+        media_skipped: { type: integer, description: "Attachments that were refused (too large, encrypted, unpacking far above their stored size)." }
+        system_lines: { type: integer, description: "Lines such as the encryption notice or \"added\", which are not stored." }
+        skipped_lines:
+          type: object
+          required: [count, first]
+          properties:
+            count: { type: integer }
+            first: { type: array, items: { type: integer }, description: "Line numbers of the first five." }
+        date_order: { type: string, enum: [dmy, mdy, ymd] }
+        date_order_source:
+          type: string
+          enum: [forced, detected, chronology, unambiguous, assumed]
+        timezone: { type: string }
+        first: { type: string, format: date-time }
+        last: { type: string, format: date-time }
+        me: { type: string, description: "The sender name that was taken as you." }
+        senders:
+          type: array
+          items: { $ref: "#/components/schemas/ImportSender" }
+        warnings: { type: array, items: { type: string } }
+    WebhookEnvelope:
+      description: Body of webhook calls (not an endpoint of this API).
+      type: object
+      required: [event, at, account, self, data]
+      properties:
+        event: { type: string, enum: [message, receipt, call, connection, scheduled, security] }
+        account: { type: string, description: 'The account in "accounts" ("default" without accounts).' }
+        self: { type: string, description: Own number, masked as in the status; empty before the first link. }
+        at: { type: integer }
+        data:
+          type: object
+          description: For `security` the data is a SecurityEvent.
+webhooks:
+  event:
+    post:
+      summary: Event delivered to a configured webhook URL
+      description: |
+        Headers: `X-WA-MCP-Event` (event name), `X-WA-MCP-Delivery` (UUID, the
+        same for retries), `X-WA-MCP-Timestamp` (unix seconds of this attempt)
+        and `X-WA-MCP-Signature: sha256=<hex>`, the HMAC-SHA256 of
+        `<timestamp>.<delivery id>.<raw body>` with the secret from the variable
+        named in `secret_env`. Receivers should recompute the signature, compare
+        it in constant time, reject timestamps more than 5 minutes away from
+        their own clock and drop delivery ids they have already processed,
+        which stops replays of old or repeated deliveries.
+
+        Every target has its own queue. A non-2xx answer (redirects included;
+        they are not followed) is retried after 1 s, 5 s and 25 s without
+        holding up other deliveries.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEnvelope" }
+      responses:
+        "200":
+          description: Any 2xx status acknowledges the delivery.

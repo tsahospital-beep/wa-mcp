@@ -1,0 +1,162 @@
+{
+  "store_dir": "store",
+  "downloads_dir": "downloads",
+  "exports_dir": "exports",
+  "session_file": "session.db",
+  "api": {
+    "listen": "127.0.0.1:8080",
+    "token": "",
+    "token_file_fallback": false
+  },
+  "login": {
+    "open_window": true,
+    "port": 0,
+    "public": {
+      "url": "",
+      "listen": "127.0.0.1:8766"
+    }
+  },
+  "read_receipts": {
+    "auto_mark_read": false,
+    "allow_mark_read": true
+  },
+  "calls": {
+    "record": true
+  },
+  "media": {
+    "max_download_mb": 512
+  },
+  "sending": {
+    "enabled": false,
+    "require_confirm": true,
+    "allow_confirm_flag": false,
+    "human_like": true,
+    "mark_read_before_reply": true,
+    "typing_chars_per_second": 7,
+    "typing_min_seconds": 1.2,
+    "typing_max_seconds": 20,
+    "jitter": 0.3,
+    "pause_between_messages_seconds": [1.0, 3.5],
+    "quiet_hours": {
+      "enabled": false,
+      "start": "23:00",
+      "end": "08:00",
+      "action": "queue"
+    },
+    "limits": {
+      "per_chat_per_hour": 20,
+      "per_hour": 60,
+      "per_day": 300
+    },
+    "dedupe_window_minutes": 10,
+    "allowed_media_dirs": []
+  },
+  "webhooks": [],
+  "accounts": {},
+  "encryption": {
+    "mode": "keystore",
+    "passphrase_env": "WA_MCP_PASSPHRASE",
+    "key_file": "",
+    "efs": true
+  },
+  "transcription": {
+    "backend": "faster-whisper",
+    "model": "large-v3",
+    "device": "auto",
+    "compute_type": "auto",
+    "language": null,
+    "chunk_seconds": 30,
+    "whisper_cpp": {
+      "binary": "",
+      "model": ""
+    },
+    "http": {
+      "url": "http://127.0.0.1:8000/v1/audio/transcriptions",
+      "model": "whisper-1",
+      "api_key_env": "WA_MCP_STT_API_KEY"
+    },
+    "command": {
+      "argv": []
+    }
+  },
+  "people": {
+    "aliases": {}
+  },
+  "tasks": {
+    "projects": [],
+    "keywords": {},
+    "burst_gap_minutes": 4,
+    "reply_window_minutes": 30,
+    "refresh_days": 14,
+    "min_score": 60,
+    "stale_days": 60,
+    "keep_days": 365,
+    "include_imported": false
+  },
+  "mentions": {
+    "watch": []
+  },
+  "import": {
+    "allowed_dirs": [],
+    "max_mb": 1024,
+    "omitted_phrases": []
+  },
+  "insight": {
+    "night_hours": [0, 7],
+    "date_order": "dmy",
+    "turn_gap_seconds": 180,
+    "session_gap_hours": 6,
+    "cache_days": 30,
+    "my_names": [],
+    "words": {},
+    "dates": {}
+  },
+  "ai": {
+    "provider": "none",
+    "base_url": "",
+    "text_model": "",
+    "vision_model": "",
+    "api_key_env": "WA_MCP_AI_API_KEY",
+    "timeout_s": 60,
+    "max_calls_per_day": 200,
+    "max_input_chars": 12000
+  },
+  "vision": {
+    "ocr": "tesseract",
+    "languages": ["eng"],
+    "tesseract_binary": "",
+    "max_image_mb": 20,
+    "timeout_s": 60,
+    "min_text_chars": 3
+  },
+  "server": {
+    "listen": "127.0.0.1:8765",
+    "public_url": "",
+    "allowed_hosts": [],
+    "allowed_origins": [],
+    "cors_origins": [],
+    "trusted_proxies": [],
+    "max_request_kb": 256,
+    "rate_limit": {
+      "per_token_per_minute": 120,
+      "per_ip_per_minute": 240,
+      "auth_per_ip_per_minute": 20,
+      "registrations_per_ip_per_hour": 10
+    },
+    "oauth": {
+      "enabled": false,
+      "approval": "link",
+      "admin_password_env": "WA_MCP_ADMIN_PASSWORD",
+      "access_token_minutes": 60,
+      "refresh_token_days": 30,
+      "max_clients": 20,
+      "redirect_uri_prefixes": [
+        "https://claude.ai/api/mcp/auth_callback",
+        "https://claude.com/api/mcp/auth_callback",
+        "http://localhost:",
+        "http://127.0.0.1:",
+        "http://[::1]:"
+      ]
+    }
+  }
+}

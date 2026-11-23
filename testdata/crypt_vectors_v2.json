@@ -1,0 +1,117 @@
+{
+  "comment": "wae2: values are AES-256-GCM with associated data (AAD). AAD = UTF-8 of table + \"|\" + column + \"|\" + conv + \"|\" + msg_id, and for derived_text also + \"|\" + source. scheduled_messages: conv = target, msg_id empty. wa_contacts: conv = jid, msg_id empty. Value = \"wae2:\" + base64(nonce(12) || ciphertext || tag(16)). wae1: values have no AAD and stay readable (meta.crypt_check is wae1). One vector per sealed column. Made by bridge/internal/crypt.",
+  "key_hex": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf",
+  "v1_plain": "old format",
+  "v1_sealed": "wae1:hs35DsbbFUKdOmuVOosNJgWSpCpOP6+jYhzKEb9xNkzSINSYjOU=",
+  "vectors": [
+    {
+      "aad_hex": "636861745f6d657373616765737c626f64797c313535353031303030303240732e77686174736170702e6e65747c4131",
+      "column": "body",
+      "conv": "15550100002@s.whatsapp.net",
+      "msg_id": "A1",
+      "plain": "Hello from Alice",
+      "sealed": "wae2:O6+Eh+KPBcC4kupHQoxhsACfUsP5c4kDPC1IGaHyucrFunekFtieUK10Ebs=",
+      "table": "chat_messages"
+    },
+    {
+      "aad_hex": "636861745f6d657373616765737c6174746163686d656e745f6e616d657c313535353031303030303240732e77686174736170702e6e65747c4134",
+      "column": "attachment_name",
+      "conv": "15550100002@s.whatsapp.net",
+      "msg_id": "A4",
+      "plain": "plan.pdf",
+      "sealed": "wae2:UjaThFVaRR5+xix8UuvxOGZbUFPmnTtqYwQap4LGyRqlGyjP",
+      "table": "chat_messages"
+    },
+    {
+      "aad_hex": "636861745f6d657373616765737c7265706c795f707265766965777c313535353031303030303240732e77686174736170702e6e65747c4132",
+      "column": "reply_preview",
+      "conv": "15550100002@s.whatsapp.net",
+      "msg_id": "A2",
+      "plain": "Hello from Alice",
+      "sealed": "wae2:mHj5HqMFPO7+lxjtVO9btdcRtJI3/q24Q9m1PLLciku5NAdxe1PCIYTNtS4=",
+      "table": "chat_messages"
+    },
+    {
+      "aad_hex": "636861745f6d657373616765737c6d656469615f6b65797c313535353031303030303240732e77686174736170702e6e65747c4133",
+      "column": "media_key",
+      "conv": "15550100002@s.whatsapp.net",
+      "msg_id": "A3",
+      "plain_hex": "000102fe",
+      "sealed": "wae2:XvLDZaFbx0ep4S5ZbwgDPzUct03043qxjHcDcAy/fEQ=",
+      "table": "chat_messages"
+    },
+    {
+      "aad_hex": "70656e64696e675f6368616e6765737c626f64797c313535353031303030303240732e77686174736170702e6e65747c4c41544552",
+      "column": "body",
+      "conv": "15550100002@s.whatsapp.net",
+      "msg_id": "LATER",
+      "plain": "edited text",
+      "sealed": "wae2:HQ6K9yCunP44zCuhT0uvnZb5eBKqKRJGXVvaOy7XmnRIz3ov09J9",
+      "table": "pending_changes"
+    },
+    {
+      "aad_hex": "7265616374696f6e737c656d6f6a697c31323033363330303030303030303030303140672e75737c4731",
+      "column": "emoji",
+      "conv": "120363000000000001@g.us",
+      "msg_id": "G1",
+      "plain": "ok",
+      "sealed": "wae2:efAyIMoEr85Eag2Y3ih83Xh8GiHzSCpCfMoGYR9/",
+      "table": "reactions"
+    },
+    {
+      "aad_hex": "7363686564756c65645f6d657373616765737c626f64797c31323033363330303030303030303030303140672e75737c",
+      "column": "body",
+      "conv": "120363000000000001@g.us",
+      "msg_id": "",
+      "plain": "Reading tonight",
+      "sealed": "wae2:3pyf0Fh8RD0zZij5NDW724VR6WNjxyjAhMiFDwXs+H58aWsp3qtuzEzqaQ==",
+      "table": "scheduled_messages"
+    },
+    {
+      "aad_hex": "646572697665645f746578747c636f6e74656e747c31323033363330303030303030303030303140672e75737c47317c7472616e736372697074",
+      "column": "content",
+      "conv": "120363000000000001@g.us",
+      "msg_id": "G1",
+      "plain": "Café über αβγ",
+      "sealed": "wae2:Z9tvxu9XXY6DlJKKlQlDM89xOxXm7xfoyYynqpsEg1rkAaO4SQ0IW8Q0mcmQJw==",
+      "source": "transcript",
+      "table": "derived_text"
+    },
+    {
+      "aad_hex": "77615f636f6e74616374737c66697273745f6e616d657c313535353031303030303340732e77686174736170702e6e65747c",
+      "column": "first_name",
+      "conv": "15550100003@s.whatsapp.net",
+      "msg_id": "",
+      "plain": "Bob",
+      "sealed": "wae2:zc4yEoYcn/T467Ygt+RjVlbdZzzu3tv9Ck4jUR1eOw==",
+      "table": "wa_contacts"
+    },
+    {
+      "aad_hex": "77615f636f6e74616374737c66756c6c5f6e616d657c313535353031303030303340732e77686174736170702e6e65747c",
+      "column": "full_name",
+      "conv": "15550100003@s.whatsapp.net",
+      "msg_id": "",
+      "plain": "Bob Example",
+      "sealed": "wae2:jqdge/t1y6yQ61CnDu8+Fu1RLLeQcjCpttE4dfQvht0LeEoQaIZw",
+      "table": "wa_contacts"
+    },
+    {
+      "aad_hex": "77615f636f6e74616374737c707573685f6e616d657c313535353031303030303340732e77686174736170702e6e65747c",
+      "column": "push_name",
+      "conv": "15550100003@s.whatsapp.net",
+      "msg_id": "",
+      "plain": "Bobby",
+      "sealed": "wae2:oHFI8OK+Cir3U80l4li/KCPs9+X0cHmUM7baSdq8oNRH",
+      "table": "wa_contacts"
+    },
+    {
+      "aad_hex": "77615f636f6e74616374737c627573696e6573735f6e616d657c313535353031303030303340732e77686174736170702e6e65747c",
+      "column": "business_name",
+      "conv": "15550100003@s.whatsapp.net",
+      "msg_id": "",
+      "plain": "Bob's Books",
+      "sealed": "wae2:tSQk7h325/tiKYrAu1e07A13AOYSQBz5vSnb0xYSzerLcSnOJ7sc",
+      "table": "wa_contacts"
+    }
+  ]
+}

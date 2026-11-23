@@ -1,0 +1,45 @@
+name: Feature request
+description: Suggest a change or an addition
+title: "[feature] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What you want to do that is hard or impossible today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How it could work. A new tool, a config key, an API endpoint, a documentation change.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Bridge (login, sync, sending, API)
+        - MCP server or a tool
+        - Python SDK
+        - Transcription
+        - Documentation
+        - Not sure
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched the existing issues and the documentation.
+          required: true
+        - label: My example data contains no real phone numbers or messages.
+          required: true

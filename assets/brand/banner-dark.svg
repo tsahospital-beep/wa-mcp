@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-labelledby="banner-title banner-description">
+  <title id="banner-title">WA MCP</title>
+  <desc id="banner-description">WhatsApp MCP for AI assistants</desc>
+  <defs>
+    <radialGradient id="glow">
+      <stop stop-color="#008069" stop-opacity="0.17"/>
+      <stop offset="1" stop-color="#008069" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="320" fill="#0d1117"/>
+  <ellipse cx="464" cy="160" rx="480" ry="244" fill="url(#glow)"/>
+  <g transform="translate(399 112) scale(2)">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2fd383"/><stop offset="1" stop-color="#009a74"/></linearGradient></defs>
+    <rect width="48" height="48" rx="13" fill="url(#g)"/>
+    <path d="M24 11.5c-7 0-12.5 5.1-12.5 11.5 0 3.3 1.5 6.3 3.9 8.4l-1.2 5 5.2-2.6c1.4.5 3 .7 4.6.7 7 0 12.5-5.1 12.5-11.5S31 11.5 24 11.5z" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M19.6 23.6l8-3.9M19.6 23.6l8 3.9" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/>
+    <circle cx="19.2" cy="23.6" r="2.5" fill="#fff"/><circle cx="28.6" cy="19.3" r="2.5" fill="#fff"/><circle cx="28.6" cy="27.9" r="2.5" fill="#fff"/>
+  </g>
+  <g font-family="&quot;Segoe UI&quot;, -apple-system, &quot;Helvetica Neue&quot;, Arial, sans-serif">
+    <text x="527" y="166" font-size="64" font-weight="600" fill="#e6edf3">WA MCP</text>
+    <text x="529" y="207" font-size="25" font-weight="400" fill="#e6edf3" fill-opacity="0.76">WhatsApp MCP for AI assistants</text>
+  </g>
+</svg>

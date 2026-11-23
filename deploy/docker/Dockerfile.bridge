@@ -1,0 +1,33 @@
+# syntax=docker/dockerfile:1
+# wa-bridge: static Go build (pure Go SQLite, no cgo), distroless runtime, non-root user 65532.
+# Build from the repository root:
+#   docker build -f deploy/docker/Dockerfile.bridge -t wa-mcp-bridge .
+
+ARG GO_VERSION=1.26
+
+FROM golang:${GO_VERSION}-bookworm AS build
+WORKDIR /src
+COPY bridge/go.mod bridge/go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod go mod download
+COPY bridge/ ./
+ARG VERSION=0.1.0
+RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o /out/wa-bridge ./cmd/wa-bridge \
+    && mkdir -p /out/data/store /out/data/downloads /out/data/exports /out/session
+
+FROM gcr.io/distroless/static-debian12:nonroot
+COPY --from=build /out/wa-bridge /usr/local/bin/wa-bridge
+COPY --from=build --chown=65532:65532 /out/data /data
+COPY --from=build --chown=65532:65532 /out/session /session
+COPY deploy/docker/config.container.json /config/config.json
+# HOME=/data keeps the store inside the home folder of the service user.
+ENV HOME=/data \
+    WA_MCP_CONFIG=/config/config.json \
+    WA_MCP_LOGIN_OPEN_WINDOW=false
+USER 65532:65532
+VOLUME ["/data", "/session"]
+# 8766: the login page for a TLS proxy (login.public). The API stays on 127.0.0.1:8080.
+EXPOSE 8766
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD ["/usr/local/bin/wa-bridge", "health"]
+ENTRYPOINT ["/usr/local/bin/wa-bridge"]

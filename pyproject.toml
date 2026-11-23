@@ -1,0 +1,60 @@
+[project]
+name = "wa-mcp-workspace"
+version = "0.1.0"
+description = "Development workspace for the wa-mcp Python packages"
+requires-python = ">=3.11"
+dependencies = [
+    "wa-mcp-sdk[encryption,files]",
+    "wa-mcp-server",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+    "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["sdk/python", "server"]
+
+[tool.uv.sources]
+wa-mcp-sdk = { workspace = true }
+wa-mcp-server = { workspace = true }
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "S", "PL", "T20"]
+ignore = [
+    "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR2004",
+    "S603", "S607", "S608", "S310", "PLR0917", "PLC0415", "E501",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["wa_mcp", "wa_mcp_server", "webhook_receiver"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S101", "S105", "S106", "S108", "PLC0415", "PLW0603"]
+"examples/**" = ["T201"]
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+files = ["sdk/python/wa_mcp", "server/wa_mcp_server", "examples", "scripts/e2e_check.py"]
+mypy_path = "examples"
+
+[[tool.mypy.overrides]]
+module = ["faster_whisper.*", "whisper.*", "rarfile.*", "argon2.*", "pypdf.*", "numpy.*", "rapidocr_onnxruntime.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["sdk/python/tests", "server/tests", "scripts/tests", "examples/tests"]
+addopts = "-p no:cacheprovider"
+pythonpath = ["examples", "scripts"]

@@ -1,0 +1,27 @@
+{
+  "store_dir": "/data/store",
+  "session_file": "/session/session.db",
+  "downloads_dir": "/data/downloads",
+  "exports_dir": "/data/exports",
+  "api": {
+    "listen": "127.0.0.1:8080"
+  },
+  "login": {
+    "open_window": false,
+    "public": {
+      "listen": "0.0.0.0:8766"
+    }
+  },
+  "server": {
+    "listen": "0.0.0.0:8765",
+    "trusted_proxies": [
+      "172.16.0.0/12",
+      "192.168.0.0/16",
+      "10.0.0.0/8"
+    ],
+    "oauth": {
+      "enabled": true,
+      "approval": "link"
+    }
+  }
+}

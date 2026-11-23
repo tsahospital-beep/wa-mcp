@@ -1,0 +1,31 @@
+package media
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"io"
+	"os"
+)
+
+// sameFile reports whether the file at path is the attachment: its size
+// matches when the size is known, and its SHA-256 when the hash is known, so
+// a file that was replaced or cut short is downloaded again.
+func sameFile(path string, size int64, plainSHA256 []byte) bool {
+	st, err := os.Stat(path)
+	if err != nil || !st.Mode().IsRegular() || (size > 0 && st.Size() != size) {
+		return false
+	}
+	if len(plainSHA256) != sha256.Size {
+		return true
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return false
+	}
+	return bytes.Equal(h.Sum(nil), plainSHA256)
+}

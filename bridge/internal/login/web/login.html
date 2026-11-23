@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>WA MCP</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='13' fill='%2300a884'/%3E%3Cpath d='M24 11.5c-7 0-12.5 5.1-12.5 11.5 0 3.3 1.5 6.3 3.9 8.4l-1.2 5 5.2-2.6c1.4.5 3 .7 4.6.7 7 0 12.5-5.1 12.5-11.5S31 11.5 24 11.5z' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#eef2f0; --card:#fff; --ink:#111b21; --ink2:#54656f; --ink3:#8696a0;
+  --line:#e9edef; --soft:#f0f2f5; --acc:#00a884; --acc2:#008069; --accsoft:#e7f6f0;
+  --red:#d64545; --amber:#e9a23b; --r:24px;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  display:flex;align-items:center;justify-content:center;padding:14px;overflow:hidden;
+  background:radial-gradient(120% 60% at 50% -12%,#d9f1e6 0%,rgba(217,241,230,0) 62%),var(--bg);
+  font:14px/1.45 "Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;
+}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.card{
+  width:100%;max-width:404px;height:100%;max-height:640px;display:flex;flex-direction:column;background:var(--card);border-radius:var(--r);padding:20px 24px 14px;
+  box-shadow:0 1px 2px rgba(11,20,26,.05),0 10px 28px rgba(11,20,26,.07),0 28px 60px rgba(11,20,26,.06);
+  opacity:0;transform:translateY(12px) scale(.97);animation:card-in .55s var(--ease) .05s forwards;
+}
+@keyframes card-in{to{opacity:1;transform:none}}
+
+.head{display:flex;align-items:center;gap:12px}
+.mark{width:40px;height:40px;flex:none;filter:drop-shadow(0 3px 8px rgba(0,168,132,.28))}
+h1{font-size:17px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+.sub{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.local{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--acc2);background:var(--accsoft);padding:5px 10px 5px 8px;border-radius:999px}
+/* account selector, only with several accounts */
+.head{position:relative}
+.acc{display:inline-flex;align-items:center;gap:2px;margin:-1px 0 0 1px;padding:1px 3px 1px 5px;border-radius:7px;font-weight:600;color:var(--ink);vertical-align:top;transition:background .2s}
+.acc span{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acc svg{color:var(--ink3)}
+.acc:hover,.acc[aria-expanded=true]{background:var(--soft)}
+.acc-menu{position:absolute;left:52px;top:46px;z-index:5;min-width:210px;max-height:280px;overflow:auto;padding:6px;border-radius:14px;background:#fff;border:1px solid var(--line);
+  box-shadow:0 10px 28px rgba(11,20,26,.12);opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .2s,transform .2s var(--ease)}
+.acc-menu.on{opacity:1;transform:none;pointer-events:auto}
+.acc-menu button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:34px;padding:0 10px;border-radius:9px;font-size:13px;text-align:left}
+.acc-menu button:hover:not(:disabled){background:var(--soft)}
+.acc-menu button:disabled{cursor:default;font-weight:600}
+.acc-menu .note{font-size:11.5px;color:var(--ink3);font-weight:400}
+.acc-menu .note.bad{color:var(--red)}
+
+.seg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--soft);border-radius:12px;padding:3px;margin:16px 0}
+.seg button{position:relative;z-index:1;height:32px;border-radius:9px;font-size:13px;font-weight:500;color:var(--ink2);transition:color .2s}
+.seg button[aria-selected=true]{color:var(--ink);font-weight:600}
+.seg-ind{position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:32px;border-radius:9px;background:#fff;
+  box-shadow:0 1px 2px rgba(11,20,26,.08),0 3px 8px rgba(11,20,26,.06);transition:transform .34s var(--ease)}
+.seg[data-on=phone] .seg-ind{transform:translateX(100%)}
+.hidden-seg .seg{display:none}
+
+.view{display:none}
+.view.on{display:block;flex:1;animation:view-in .38s var(--ease) both}
+#v-done.on,#v-err.on{display:flex;align-items:center;justify-content:center}
+#v-phone.on{display:flex;flex-direction:column;justify-content:center}
+@keyframes view-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* QR */
+.qr-box{position:relative;width:244px;height:244px;margin:0 auto;padding:14px;border-radius:18px;background:#fff;border:1px solid var(--line)}
+.qr{position:relative;width:100%;height:100%;color:var(--ink);transition:filter .4s ease,opacity .4s ease}
+.qr .layer{position:absolute;inset:0;opacity:0;transition:opacity .5s ease}
+.qr .layer.on{opacity:1}
+.qr svg{display:block;width:100%;height:100%}
+.qr .badge{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;padding:4px;border-radius:13px;background:#fff;opacity:0;transition:opacity .4s}
+.qr.has .badge{opacity:1}
+.qr .badge svg{filter:none}
+.sk{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:12px;opacity:0;pointer-events:none;transition:opacity .3s;font-size:12.5px;color:var(--ink3)}
+.loading .sk{opacity:1}
+.loading .qr{opacity:0}
+.spin{width:28px;height:28px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--acc);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.expired .qr{filter:blur(3px);opacity:.16}
+.reload{position:absolute;inset:0;margin:auto;width:150px;height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  opacity:0;pointer-events:none;transform:scale(.94);transition:opacity .3s ease,transform .3s var(--ease)}
+.expired .reload{opacity:1;pointer-events:auto;transform:none}
+.ring{width:66px;height:66px;border-radius:50%;background:var(--acc);display:grid;place-items:center;box-shadow:0 8px 20px rgba(0,168,132,.32);transition:transform .2s var(--ease),background .2s}
+.reload:hover .ring{transform:scale(1.06);background:var(--acc2)}
+.reload:active .ring{transform:scale(.97)}
+.reload .t{font-size:12.5px;font-weight:600;color:var(--acc2);text-align:center;line-height:1.3;max-width:130px}
+.reload.busy .ring svg{animation:spin .9s linear infinite}
+
+.timer{display:flex;align-items:center;gap:10px;width:244px;margin:10px auto 0;font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.bar{flex:1;height:3px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:3px;transform-origin:left center;transform:scaleX(0)}
+.timer .lbl{min-width:78px;text-align:right;white-space:nowrap}
+.expired .timer .lbl,.timer.off .lbl{color:var(--ink3)}
+
+.steps{list-style:none;margin:16px 2px 2px;display:grid;gap:8px;counter-reset:s}
+.steps li{display:flex;gap:11px;align-items:flex-start;font-size:13.5px;line-height:1.42}
+.steps li::before{counter-increment:s;content:counter(s);flex:none;width:20px;height:20px;margin-top:0;border-radius:50%;background:var(--soft);color:var(--ink2);font-size:11px;font-weight:700;display:grid;place-items:center}
+.steps b{font-weight:600}
+.ic{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;background:var(--soft);color:var(--ink2);vertical-align:-5px;margin:0 1px}
+
+/* phone */
+.ptitle{font-size:15px;font-weight:600}
+.ptext{font-size:13px;color:var(--ink2);margin-top:4px}
+.lbl2{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin:18px 0 6px}
+.field{display:flex;align-items:center;height:48px;padding:0 14px;border:1.5px solid var(--line);border-radius:12px;transition:border-color .2s,box-shadow .2s}
+.field:focus-within{border-color:var(--acc);box-shadow:0 0 0 4px rgba(0,168,132,.12)}
+.field .plus{font-size:16px;color:var(--ink2);margin-right:4px}
+.field input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:16px;letter-spacing:.03em;color:var(--ink);-webkit-user-select:text;user-select:text}
+.field input::placeholder{color:#b5c0c6;letter-spacing:.02em}
+.hint{font-size:12px;color:var(--ink3);margin-top:6px}
+.ferr{font-size:12.5px;color:var(--red);min-height:18px;margin-top:8px}
+.btn{width:100%;height:46px;margin-top:10px;border-radius:12px;background:var(--acc);color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:9px;transition:background .2s,opacity .2s,transform .1s}
+.btn:hover{background:var(--acc2)}
+.btn:active{transform:scale(.99)}
+.btn:disabled{opacity:.45;cursor:default;background:var(--acc)}
+.btn .spin{width:16px;height:16px;border-width:2px;border-color:rgba(255,255,255,.35);border-top-color:#fff;display:none}
+.btn.busy .spin{display:block}
+.link{display:block;margin:14px auto 0;font-size:13px;font-weight:600;color:var(--acc2)}
+.link:hover{text-decoration:underline}
+.code{display:flex;justify-content:center;gap:5px;margin:18px 0 6px}
+.code span{width:34px;height:48px;border-radius:10px;background:var(--soft);display:grid;place-items:center;
+  font:600 24px/1 ui-monospace,"Cascadia Mono","SF Mono",Menlo,Consolas,monospace;color:var(--ink);opacity:0;transform:translateY(6px);animation:pop .4s var(--ease) forwards}
+.code span.dash{width:12px;background:none;color:var(--ink3);font-weight:400}
+@keyframes pop{to{opacity:1;transform:none}}
+.codefor{text-align:center;font-size:12.5px;color:var(--ink3)}
+.copy{display:flex;align-items:center;gap:6px;margin:10px auto 0;padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--acc2);background:var(--accsoft);transition:background .2s}
+.copy:hover{background:#d8f1e7}
+.pcode .steps{margin-top:18px}
+
+/* result */
+.result{width:100%;text-align:center;padding:10px 6px 24px}
+.result h2{font-size:20px;font-weight:600;letter-spacing:-.01em;margin-top:18px}
+.result p{font-size:13.5px;color:var(--ink2);margin-top:6px}
+.result .small{font-size:12px;color:var(--ink3);margin-top:16px;font-variant-numeric:tabular-nums}
+.check{width:76px;height:76px;margin:0 auto;display:block}
+.check circle{fill:var(--acc);transform-origin:center;transform:scale(.4);opacity:0;animation:grow .5s var(--ease) forwards}
+.check path{fill:none;stroke:#fff;stroke-width:4.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40;animation:draw .45s var(--ease) .35s forwards}
+.warn circle{fill:#fdf3e2;animation:grow .5s var(--ease) forwards;transform-origin:center;transform:scale(.4);opacity:0}
+.warn path{stroke:var(--amber);stroke-width:4;stroke-linecap:round;fill:none}
+@keyframes grow{to{transform:none;opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.result .btn{margin-top:24px}
+
+.foot{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink3)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){*,*::before{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="mg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2fd383"/><stop offset="1" stop-color="#009a74"/>
+    </linearGradient>
+    <symbol id="mark" viewBox="0 0 48 48">
+      <rect width="48" height="48" rx="13" fill="url(#mg)"/>
+      <path d="M24 11.5c-7 0-12.5 5.1-12.5 11.5 0 3.3 1.5 6.3 3.9 8.4l-1.2 5 5.2-2.6c1.4.5 3 .7 4.6.7 7 0 12.5-5.1 12.5-11.5S31 11.5 24 11.5z" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/>
+      <path d="M19.6 23.6l8-3.9M19.6 23.6l8 3.9" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/>
+      <circle cx="19.2" cy="23.6" r="2.5" fill="#fff"/><circle cx="28.6" cy="19.3" r="2.5" fill="#fff"/><circle cx="28.6" cy="27.9" r="2.5" fill="#fff"/>
+    </symbol>
+    <symbol id="lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></g></symbol>
+    <symbol id="dots" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="5.5" r="2.1"/><circle cx="12" cy="12" r="2.1"/><circle cx="12" cy="18.5" r="2.1"/></g></symbol>
+    <symbol id="gear" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6.8"/><path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.8 1.8M16.8 16.8l1.8 1.8M5.4 18.6l1.8-1.8M16.8 7.2l1.8-1.8"/></g></symbol>
+    <symbol id="copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></g></symbol>
+  </defs>
+</svg>
+
+<main class="card" id="card">
+  <header class="head">
+    <svg class="mark" aria-hidden="true"><use href="#mark"/></svg>
+    <div>
+      <h1>WA MCP</h1>
+      <p class="sub" data-i="subtitle"></p>
+    </div>
+    <span class="local"><svg width="12" height="12" aria-hidden="true"><use href="#lock"/></svg><span data-i="local"></span></span>
+    <div class="acc-menu" id="accMenu" role="menu"></div>
+  </header>
+
+  <nav class="seg" id="seg" data-on="qr" role="tablist">
+    <button role="tab" id="tab-qr" aria-selected="true" data-tab="qr" data-i="tabQR"></button>
+    <button role="tab" id="tab-phone" aria-selected="false" data-tab="phone" data-i="tabPhone"></button>
+    <i class="seg-ind" aria-hidden="true"></i>
+  </nav>
+
+  <section class="view on" id="v-qr" role="tabpanel" aria-labelledby="tab-qr">
+    <div class="qr-wrap loading" id="wrap">
+      <div class="qr-box">
+        <div class="qr" id="qr">
+          <div class="badge"><svg width="38" height="38" aria-hidden="true"><use href="#mark"/></svg></div>
+        </div>
+        <div class="sk"><div class="spin"></div><span data-i="generating"></span></div>
+        <button class="reload" id="reload" type="button">
+          <span class="ring"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.8 4.2v4.6h-4.6"/></svg></span>
+          <span class="t" data-i="reload"></span>
+        </button>
+      </div>
+      <div class="timer" id="timer"><div class="bar"><i id="bar"></i></div><span class="lbl" id="left"></span></div>
+    </div>
+    <ol class="steps" id="steps"></ol>
+  </section>
+
+  <section class="view" id="v-phone" role="tabpanel" aria-labelledby="tab-phone">
+    <form id="pform" autocomplete="off" novalidate>
+      <p class="ptitle" data-i="phoneTitle"></p>
+      <p class="ptext" data-i="phoneText"></p>
+      <label class="lbl2" for="phone" data-i="phoneLabel"></label>
+      <div class="field"><span class="plus">+</span><input id="phone" inputmode="tel" maxlength="20" placeholder="1 555 010 4567"></div>
+      <p class="hint" data-i="phoneHint"></p>
+      <p class="ferr" id="ferr" role="alert"></p>
+      <button class="btn" id="next" type="submit" disabled><span class="spin"></span><span id="nextLbl" data-i="next"></span></button>
+    </form>
+    <div class="pcode" id="pcode" hidden>
+      <p class="ptitle" style="text-align:center" data-i="codeTitle"></p>
+      <div class="code" id="code" aria-live="polite"></div>
+      <p class="codefor" id="codefor"></p>
+      <button class="copy" id="copy" type="button"><svg width="13" height="13" aria-hidden="true"><use href="#copy"/></svg><span id="copyLbl" data-i="copy"></span></button>
+      <ol class="steps" id="codeSteps"></ol>
+      <button class="link" id="other" type="button" data-i="otherNumber"></button>
+    </div>
+  </section>
+
+  <section class="view" id="v-done" aria-live="polite">
+    <div class="result">
+      <svg class="check" viewBox="0 0 76 76" aria-hidden="true"><circle cx="38" cy="38" r="38"/><path d="M23.5 39.5l9.5 9.5 19.5-20"/></svg>
+      <h2 data-i="doneTitle"></h2>
+      <p id="doneText"></p>
+      <p class="small" id="closing"></p>
+    </div>
+  </section>
+
+  <section class="view" id="v-err" aria-live="assertive">
+    <div class="result">
+      <svg class="check warn" viewBox="0 0 76 76" aria-hidden="true"><circle cx="38" cy="38" r="38"/><path d="M38 24v18M38 51.5v.5"/></svg>
+      <h2 data-i="errTitle"></h2>
+      <p id="errText"></p>
+      <button class="btn" id="retry" type="button" data-i="errBtn"></button>
+    </div>
+  </section>
+
+  <footer class="foot"><svg width="12" height="12" aria-hidden="true"><use href="#lock"/></svg><span data-i="foot"></span></footer>
+</main>
+
+<script>
+(() => {
+  const TOKEN = "{{TOKEN}}";
+  const ic = id => `<span class="ic"><svg width="14" height="14"><use href="#${id}"/></svg></span>`;
+  const S = {
+      subtitle: "Link a device", local: "Local", tabQR: "QR code", tabPhone: "Phone number",
+      generating: "Generating code", reload: "Click to reload QR code",
+      expiresIn: "Expires in {t}", expired: "Code expired",
+      steps: [
+        "Open <b>WhatsApp</b> on your phone",
+        `Tap <b>Menu</b> ${ic("dots")} or <b>Settings</b> ${ic("gear")}`,
+        "Tap <b>Linked devices</b>, then <b>Link a device</b>",
+        "Point your phone at this screen to scan the code"
+      ],
+      phoneTitle: "Link with phone number", phoneText: "Enter the number of the WhatsApp account you want to link.",
+      phoneLabel: "Phone number", phoneHint: "Include the country code. Spaces are fine.",
+      next: "Next", invalid: "Enter the full number, including the country code.", failed: "Could not get a code: {e}",
+      codeTitle: "Enter this code on your phone", codeFor: "For {p}", copy: "Copy code", copied: "Copied",
+      codeSteps: [
+        "Open <b>Linked devices</b> and tap <b>Link a device</b>",
+        "Tap <b>Link with phone number instead</b>",
+        "Enter the 8-character code shown above"
+      ],
+      otherNumber: "Use a different number",
+      doneTitle: "Connected", doneText: "WA MCP is linked to {p}.", doneTextNoPhone: "WA MCP is linked.",
+      closing: "This window closes in {n} s",
+      errTitle: "Could not link this device", errBtn: "Show a new code", errGeneric: "The connection was interrupted.",
+      foot: "Your session is stored only on this computer.",
+      accHere: "This window", accOpening: "Opening", accLinked: "Already linked",
+      accStopped: "Bridge not running", accFailed: "Could not open"
+  };
+  const $ = s => document.querySelector(s);
+  const fmt = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => o[k]);
+  document.querySelectorAll("[data-i]").forEach(el => { el.textContent = S[el.dataset.i]; });
+  const list = (el, items) => { el.innerHTML = items.map(x => `<li><span>${x}</span></li>`).join(""); };
+  list($("#steps"), S.steps);
+  list($("#codeSteps"), S.codeSteps);
+
+  // Several accounts: "Link a device: work" and a menu that opens the login window of another account
+  // through a fresh one-time link from that account's own bridge.
+  const ACCOUNTS = {{ACCOUNTS}};
+  if (ACCOUNTS.names.length > 1) {
+    const sub = $(".sub"), menu = $("#accMenu"), btn = document.createElement("button");
+    sub.textContent = S.subtitle + ": ";
+    btn.type = "button"; btn.className = "acc"; btn.id = "accBtn";
+    btn.setAttribute("aria-haspopup", "menu"); btn.setAttribute("aria-expanded", "false");
+    btn.innerHTML = '<span></span><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    btn.firstChild.textContent = ACCOUNTS.current;
+    sub.appendChild(btn);
+    const toggle = on => { menu.classList.toggle("on", on); btn.setAttribute("aria-expanded", on); };
+    btn.onclick = e => { e.stopPropagation(); toggle(!menu.classList.contains("on")); };
+    document.addEventListener("click", e => { if (!menu.contains(e.target)) toggle(false); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") toggle(false); });
+    ACCOUNTS.names.forEach(name => {
+      const item = document.createElement("button"), label = document.createElement("span"), note = document.createElement("span");
+      item.type = "button"; item.setAttribute("role", "menuitem"); note.className = "note";
+      label.textContent = name;
+      item.append(label, note);
+      if (name === ACCOUNTS.current) { item.disabled = true; note.textContent = S.accHere; }
+      else item.onclick = e => {
+        e.stopPropagation();
+        note.className = "note"; note.textContent = S.accOpening;
+        post("account", { name }).then(r => {
+          if (r.ok && r.url) { location.href = r.url; return; }
+          note.className = "note bad";
+          note.textContent = r.error === "linked" ? S.accLinked : r.error === "not_running" ? S.accStopped : S.accFailed;
+        });
+      };
+      menu.appendChild(item);
+    });
+  }
+
+  const post = (path, body) => fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Login-Token": TOKEN },
+    body: JSON.stringify(body || {})
+  }).then(r => r.json().catch(() => ({ ok: false })));
+
+  const wrap = $("#wrap"), qr = $("#qr"), bar = $("#bar"), left = $("#left"), reloadBtn = $("#reload");
+  let cur = null, pending = null, wantFresh = true, expTimer = 0, graceTimer = 0, tick = 0, final = false;
+  const active = () => document.visibilityState === "visible" && document.hasFocus();
+  const overlay = () => wrap.classList.contains("expired");
+
+  function showView(id) {
+    document.querySelectorAll(".view").forEach(v => v.classList.toggle("on", v.id === id));
+  }
+  function setTab(tab) {
+    if (final) return;
+    $("#seg").dataset.on = tab;
+    $("#tab-qr").setAttribute("aria-selected", tab === "qr");
+    $("#tab-phone").setAttribute("aria-selected", tab === "phone");
+    showView(tab === "qr" ? "v-qr" : "v-phone");
+    if (tab === "phone" && $("#pcode").hidden) setTimeout(() => $("#phone").focus(), 60);
+  }
+  $("#tab-qr").onclick = () => setTab("qr");
+  $("#tab-phone").onclick = () => setTab("phone");
+
+  function display(q) {
+    wantFresh = false; pending = null; cur = q;
+    clearTimeout(graceTimer);
+    const layer = document.createElement("div");
+    layer.className = "layer";
+    layer.innerHTML = q.svg;
+    const old = [...qr.querySelectorAll(".layer")];
+    qr.insertBefore(layer, qr.querySelector(".badge"));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      layer.classList.add("on");
+      old.forEach(o => { o.classList.remove("on"); setTimeout(() => o.remove(), 600); });
+    }));
+    qr.classList.add("has");
+    wrap.classList.remove("expired", "loading");
+    reloadBtn.classList.remove("busy");
+    runTimer(q);
+  }
+  function remaining(q) { return Math.max(0, q.exp - Date.now()); }
+  function label(ms) {
+    const s = Math.ceil(ms / 1000);
+    return fmt(S.expiresIn, { t: Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0") });
+  }
+  function runTimer(q) {
+    clearTimeout(expTimer); clearInterval(tick);
+    const ms = remaining(q);
+    bar.style.transition = "none";
+    bar.style.transform = `scaleX(${q.total ? ms / q.total : 0})`;
+    void bar.offsetWidth;
+    bar.style.transition = `transform ${ms}ms linear`;
+    bar.style.transform = "scaleX(0)";
+    left.textContent = label(ms);
+    tick = setInterval(() => { if (cur === q) left.textContent = label(remaining(q)); }, 250);
+    expTimer = setTimeout(onExpire, ms);
+  }
+  function onExpire() {
+    clearInterval(tick);
+    if (pending && remaining(pending) > 4000 && active()) return display(pending);
+    if (active() && !pending) {
+      graceTimer = setTimeout(showExpired, 1500);
+      return;
+    }
+    showExpired();
+  }
+  function showExpired() {
+    clearTimeout(expTimer); clearTimeout(graceTimer); clearInterval(tick);
+    wrap.classList.remove("loading");
+    if (!cur) { wrap.classList.add("loading"); return; }
+    wrap.classList.add("expired");
+    reloadBtn.classList.remove("busy");
+    bar.style.transition = "none"; bar.style.transform = "scaleX(0)";
+    left.textContent = S.expired;
+  }
+  function onQR(s) {
+    const q = { seq: s.seq, svg: s.svg, exp: Date.now() + (s.expires_in_ms || 0), total: s.total_ms || 0 };
+    if (cur && q.seq === cur.seq) {
+      if (wantFresh) display(q);
+      return;
+    }
+    const expiredNoOverlay = cur && remaining(cur) === 0 && !overlay();
+    if (!cur || wantFresh || (active() && !overlay()) || (expiredNoOverlay && active())) display(q);
+    else pending = q;
+  }
+  reloadBtn.onclick = () => {
+    if (pending && remaining(pending) > 5000) return display(pending);
+    reloadBtn.classList.add("busy");
+    wantFresh = true;
+    post("reload");
+  };
+  window.addEventListener("focus", () => {
+    if (pending && !overlay() && remaining(pending) > 3000) display(pending);
+  });
+
+  // phone number
+  const phone = $("#phone"), next = $("#next"), ferr = $("#ferr");
+  const digits = () => phone.value.replace(/\D/g, "");
+  phone.addEventListener("input", () => {
+    phone.value = phone.value.replace(/[^\d\s()-]/g, "");
+    next.disabled = digits().length < 7;
+    ferr.textContent = "";
+  });
+  $("#pform").addEventListener("submit", e => {
+    e.preventDefault();
+    if (digits().length < 7) { ferr.textContent = S.invalid; return; }
+    next.classList.add("busy"); next.disabled = true;
+    post("pair", { phone: digits() }).then(r => {
+      next.classList.remove("busy"); next.disabled = false;
+      if (r.ok) showCode(r.code, "");
+      else ferr.textContent = r.error === "invalid_phone" ? S.invalid : fmt(S.failed, { e: r.error || "?" });
+    });
+  });
+  function showCode(code, masked) {
+    const box = $("#code");
+    const chars = String(code).replace(/[^A-Za-z0-9]/g, "").toUpperCase().split("");
+    if (box.dataset.code !== chars.join("")) {
+      box.dataset.code = chars.join("");
+      box.innerHTML = chars.map((c, i) => (i === 4 ? `<span class="dash" style="animation-delay:${i * 40}ms">-</span>` : "") +
+        `<span style="animation-delay:${(i + (i > 3)) * 40}ms">${c}</span>`).join("");
+    }
+    if (masked) $("#codefor").textContent = fmt(S.codeFor, { p: masked });
+    $("#pform").hidden = true; $("#pcode").hidden = false;
+    setTab("phone");
+  }
+  $("#copy").onclick = () => {
+    const c = $("#code").dataset.code || "";
+    const done = () => { $("#copyLbl").textContent = S.copied; setTimeout(() => $("#copyLbl").textContent = S.copy, 1600); };
+    (navigator.clipboard ? navigator.clipboard.writeText(c.slice(0, 4) + "-" + c.slice(4)) : Promise.reject()).then(done, done);
+  };
+  $("#other").onclick = () => {
+    $("#pcode").hidden = true; $("#pform").hidden = false; $("#code").dataset.code = "";
+    setTimeout(() => phone.focus(), 60);
+  };
+
+  function finish(s) {
+    final = true;
+    document.body.classList.add("hidden-seg");
+    showView("v-done");
+    $("#doneText").textContent = s.phone ? fmt(S.doneText, { p: s.phone }) : S.doneTextNoPhone;
+    let n = 3;
+    const step = () => {
+      $("#closing").textContent = fmt(S.closing, { n });
+      if (n-- <= 0) { try { window.close(); } catch (e) {} return; }
+      setTimeout(step, 1000);
+    };
+    step();
+  }
+  function fail(s) {
+    document.body.classList.add("hidden-seg");
+    showView("v-err");
+    $("#errText").textContent = s.error || S.errGeneric;
+  }
+  $("#retry").onclick = () => {
+    document.body.classList.remove("hidden-seg");
+    cur = null; pending = null; wantFresh = true;
+    qr.querySelectorAll(".layer").forEach(l => l.remove());
+    qr.classList.remove("has");
+    wrap.classList.remove("expired"); wrap.classList.add("loading");
+    setTab("qr");
+    post("reload");
+  };
+
+  function apply(s) {
+    if (final) return;
+    switch (s.phase) {
+      case "starting": if (!cur) wrap.classList.add("loading"); break;
+      case "qr": onQR(s); break;
+      case "expired": if (!cur || remaining(cur) === 0) showExpired(); else pending = null; break;
+      case "code": showCode(s.pair_code, s.phone); break;
+      case "connected": finish(s); break;
+      case "error": fail(s); break;
+    }
+  }
+  const es = new EventSource("events");
+  es.onmessage = e => { try { apply(JSON.parse(e.data)); } catch (err) {} };
+  es.onerror = () => { if (final) es.close(); };
+})();
+</script>
+</body>
+</html>

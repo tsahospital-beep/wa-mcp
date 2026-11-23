@@ -1,0 +1,16 @@
+# Preview: the bridge shows the login page with fake codes and never connects to WhatsApp, and nothing
+# is stored, so no database key is needed. For trying the stack and its health checks:
+#   WA_MCP_DOMAIN=wa.example.test WA_MCP_PORT= docker compose -f compose.yaml -f compose.preview.yaml up -d --build --wait
+#   docker compose -f compose.yaml -f compose.preview.yaml ps     # both services are healthy
+#   curl "http://$(docker compose -f compose.yaml -f compose.preview.yaml port bridge 8765)/health"
+
+services:
+  bridge:
+    command: ["--login-preview"]
+    environment:
+      WA_MCP_ENCRYPTION_MODE: "off"
+    secrets: !reset []
+  server:
+    environment:
+      WA_MCP_ENCRYPTION_MODE: "off"
+    secrets: !reset []

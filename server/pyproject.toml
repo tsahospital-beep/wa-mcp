@@ -7,7 +7,7 @@ authors = [{ name = "tsahospital-beep" }]
 requires-python = ">=3.11"
 dependencies = [
     "wa-mcp-sdk>=0.1.0",
-    "mcp~=1.30",
+    "mcp>=1.30,<3.0",
 ]
 
 [project.scripts]
